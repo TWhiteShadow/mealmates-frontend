@@ -87,7 +87,7 @@ function App() {
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="bg-[#D4C3E2] bg-opacity-20 p-8 rounded-lg text-center">
+            <div className="bg-purple-light bg-opacity-20 p-8 rounded-lg text-center">
               <div className="bg-[#5E1969] rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-6">
                 <Smartphone className="h-8 w-8 text-white" />
               </div>
@@ -97,7 +97,7 @@ function App() {
               </p>
             </div>
             
-            <div className="bg-[#D4C3E2] bg-opacity-20 p-8 rounded-lg text-center">
+            <div className="bg-purple-light bg-opacity-20 p-8 rounded-lg text-center">
               <div className="bg-[#5E1969] rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-6">
                 <Utensils className="h-8 w-8 text-white" />
               </div>
@@ -107,7 +107,7 @@ function App() {
               </p>
             </div>
             
-            <div className="bg-[#D4C3E2] bg-opacity-20 p-8 rounded-lg text-center">
+            <div className="bg-purple-light bg-opacity-20 p-8 rounded-lg text-center">
               <div className="bg-[#5E1969] rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-6">
                 <Users className="h-8 w-8 text-white" />
               </div>
@@ -120,7 +120,7 @@ function App() {
         </div>
       </section>
 
-      <section className="py-20 bg-[#D4C3E2] bg-opacity-10">
+      <section className="py-20 bg-purple-light bg-opacity-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-3xl font-bold text-primary font-Lilita">Pourquoi Choisir MealMates?</h2>
@@ -192,7 +192,7 @@ function App() {
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="bg-[#D4C3E2] bg-opacity-20 p-6 rounded-lg">
+            <div className="bg-purple-light bg-opacity-20 p-6 rounded-lg">
               <div className="flex mb-4">
                 <Star className="h-5 w-5 text-yellow-400" fill="#FBBF24" />
                 <Star className="h-5 w-5 text-yellow-400" fill="#FBBF24" />
@@ -212,7 +212,7 @@ function App() {
               </div>
             </div>
             
-            <div className="bg-[#D4C3E2] bg-opacity-20 p-6 rounded-lg">
+            <div className="bg-purple-light bg-opacity-20 p-6 rounded-lg">
               <div className="flex mb-4">
                 <Star className="h-5 w-5 text-yellow-400" fill="#FBBF24" />
                 <Star className="h-5 w-5 text-yellow-400" fill="#FBBF24" />
@@ -232,7 +232,7 @@ function App() {
               </div>
             </div>
             
-            <div className="bg-[#D4C3E2] bg-opacity-20 p-6 rounded-lg">
+            <div className="bg-purple-light bg-opacity-20 p-6 rounded-lg">
               <div className="flex mb-4">
                 <Star className="h-5 w-5 text-yellow-400" fill="#FBBF24" />
                 <Star className="h-5 w-5 text-yellow-400" fill="#FBBF24" />

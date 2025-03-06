@@ -139,4 +139,8 @@
 @theme {
   --font-Noto: "Noto Sans", sans-serif;
   --font-Lilita: "Lilita One";
+  --color-purple-light: #D4C3E2;
+  --color-purple: #C19EE0;
+  --color-purple-semi-dark: #7F4591;
+  --color-purple-dark: #5E1969;
 }
