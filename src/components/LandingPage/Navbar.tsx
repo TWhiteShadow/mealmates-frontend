@@ -21,12 +21,17 @@ function Navbar() {
               </a>
             </div>
           </div>
-          <div className='flex items-center'>
+          <div className='flex items-center gap-4'>
             <a
               href='#download'
               className={cn(buttonVariants({ variant: 'default' }))}
             >
               Télécharger l'app
+            </a>
+            <a href="/app/login"
+              className={cn(buttonVariants({ variant: 'outline' }))}
+            >
+              Se Connecter
             </a>
           </div>
         </div>
