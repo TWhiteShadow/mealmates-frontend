@@ -12,7 +12,7 @@ function HeroSection() {
           <div>
             <h1 className='text-4xl md:text-5xl font-bold text-primary leading-tight'>
               Arrêter le gaspillage, Économiser de l'argent, Sauvez la
-              Planète!!!!
+              Planète.
             </h1>
             <p className='mt-4 text-lg text-gray-700'>
               Connectez-vous avec vos voisins pour partager les surplus
