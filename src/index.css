@@ -1,4 +1,4 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
 @plugin "tailwindcss-animate";
 
@@ -38,10 +38,10 @@
   --sidebar-accent-foreground: oklch(0.208 0.042 265.755);
   --sidebar-border: oklch(0.929 0.013 255.508);
   --sidebar-ring: oklch(0.704 0.04 256.788);
-  --color-purple-light: #D4C3E2;
-  --color-purple: #C19EE0;
-  --color-purple-semi-dark: #7F4591;
-  --color-purple-dark: #5E1969;
+  --color-purple-light: #d4c3e2;
+  --color-purple: #c19ee0;
+  --color-purple-semi-dark: #7f4591;
+  --color-purple-dark: #5e1969;
 }
 
 .dark {
@@ -126,7 +126,8 @@
     @apply bg-background text-foreground;
   }
 
-  button:not([disabled]), [role="button"]:not([disabled]) {
+  button:not([disabled]),
+  [role='button']:not([disabled]) {
     @apply cursor-pointer;
   }
 }
@@ -137,10 +138,10 @@
 }
 
 @theme {
-  --font-Noto: "Noto Sans", sans-serif;
-  --font-Lilita: "Lilita One";
-  --color-purple-light: #D4C3E2;
-  --color-purple: #C19EE0;
-  --color-purple-semi-dark: #7F4591;
-  --color-purple-dark: #5E1969;
+  --font-Noto: 'Noto Sans', sans-serif;
+  --font-Lilita: 'Lilita One';
+  --color-purple-light: #d4c3e2;
+  --color-purple: #c19ee0;
+  --color-purple-semi-dark: #7f4591;
+  --color-purple-dark: #5e1969;
 }
