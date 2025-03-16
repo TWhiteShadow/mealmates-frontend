@@ -7,6 +7,7 @@ function App() {
     <Routes>
       <Route index element={< LandingPage />} />
       <Route path='app' element={<MobileApp />} />
+      <Route path='*' element={<div>404</div>} />
     </Routes>
 
   );
