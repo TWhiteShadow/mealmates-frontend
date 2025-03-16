@@ -28,7 +28,8 @@ function Navbar() {
             >
               Télécharger l'app
             </a>
-            <a href="/app/login"
+            <a
+              href='/app/login'
               className={cn(buttonVariants({ variant: 'outline' }))}
             >
               Se Connecter

@@ -1,13 +1,13 @@
 import BackgroundCircles from '@/components/ui/BackgroundCircles';
-import HomePage from '@/components/HomePage/HomePage';
+import Connection from '@/components/Connection/Connection';
 
-function Homepage() {
+function ConnectPage() {
   return (
     <div className='h-screen relative bg-gray-100 overflow-hidden'>
       <BackgroundCircles />
-      <HomePage />
+      <Connection />
     </div>
   );
 }
 
-export default Homepage;
+export default ConnectPage;

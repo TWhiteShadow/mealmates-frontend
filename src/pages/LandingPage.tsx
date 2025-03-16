@@ -7,17 +7,17 @@ import DownloadSection from '../components/LandingPage/DownloadSection';
 import Footer from '../components/LandingPage/Footer';
 
 function App() {
-    return (
-        <div className='min-h-screen bg-white'>
-            <Navbar />
-            <HeroSection />
-            <HowItWorks />
-            <Features />
-            <Testimonials />
-            <DownloadSection />
-            <Footer />
-        </div>
-    );
+  return (
+    <div className='min-h-screen bg-white'>
+      <Navbar />
+      <HeroSection />
+      <HowItWorks />
+      <Features />
+      <Testimonials />
+      <DownloadSection />
+      <Footer />
+    </div>
+  );
 }
 
 export default App;
