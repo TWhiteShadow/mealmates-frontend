@@ -1,4 +1,3 @@
-import React from 'react';
 import { Leaf, DollarSign, Users, Clock, Star, Smartphone } from 'lucide-react';
 
 function Features() {

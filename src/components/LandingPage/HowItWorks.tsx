@@ -1,4 +1,3 @@
-import React from 'react';
 import { Smartphone, Utensils, Users } from 'lucide-react';
 
 function HowItWorks() {

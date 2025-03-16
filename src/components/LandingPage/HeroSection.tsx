@@ -1,4 +1,3 @@
-import React from 'react';
 import { ArrowDown } from 'lucide-react';
 import HeroBannerImage from '../../assets/landing_page_hero-banner.png';
 import CountUp from 'react-countup';
