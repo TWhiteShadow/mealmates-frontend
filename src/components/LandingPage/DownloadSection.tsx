@@ -1,10 +1,11 @@
 import { Download } from 'lucide-react';
+import PhoneMockup from '../../assets/phone-mockup.png';
 
 function DownloadSection() {
   return (
     <section
       id='download'
-      className='py-20 bg-gradient-to-r from-[#5E1969] to-[#C19EE0] text-white'
+      className='py-20 bg-gradient-to-b md:bg-gradient-to-r from-[#5E1969] to-[#C19EE0] text-white'
     >
       <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
         <div className='grid grid-cols-1 md:grid-cols-2 gap-12 items-center'>
@@ -78,7 +79,7 @@ function DownloadSection() {
           </div>
           <div className='relative'>
             <img
-              src='https://images.unsplash.com/photo-1551650975-87deedd944c3?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80'
+              src={PhoneMockup}
               alt='MealMates App on Phone'
               className='rounded-lg shadow-2xl mx-auto'
             />
