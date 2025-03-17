@@ -22,7 +22,7 @@ const HomePage = () => {
             <span>Connexion avec Github</span>
           </a>
           <a
-             href={`${import.meta.env.VITE_BACKEND_URL}/connect/google`}
+            href={`${import.meta.env.VITE_BACKEND_URL}/connect/google`}
             className={cn(buttonVariants({ variant: 'google' }), 'w-full')}
           >
             <img src={googleLogo} className='h-full' alt='Google Logo' />
@@ -41,7 +41,7 @@ const HomePage = () => {
           >
             Connexion par mail
           </a>
-          <a href='app/login' className='text-purple-semi-dark'>
+          <a href='discover' className='text-purple-semi-dark'>
             Ignorer pour le moment
           </a>
         </div>
