@@ -15,7 +15,7 @@ function Navbar() {
                   alt='MealMates Logo'
                   className='h-8 w-8'
                 />
-                <span className='ml-2 text-xl font-bold text-primary font-Lilita none sm:block'>
+                <span className='ml-2 text-xl font-bold text-primary font-Lilita hidden sm:block'>
                   MealMates
                 </span>
               </a>
