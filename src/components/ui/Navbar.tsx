@@ -14,56 +14,59 @@ import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import AccountCircleOutlinedIcon from '@mui/icons-material/AccountCircleOutlined';
 
 export default function SimpleBottomNavigation() {
-    const [value, setValue] = React.useState(0);
+  const [value, setValue] = React.useState(0);
 
-    return (
-        <Box
-            component={'nav'}
-            sx={{
-                position: 'fixed',
-                bottom: 0,
-                left: 0,
-                right: 0,
-                '& .MuiBottomNavigationAction-root': {
-                    color: 'var(--color-purple)'
-                },
-                '& .MuiBottomNavigationAction-root.Mui-selected': {
-                    color: 'var(--color-purple-dark)'
-                },
-            }}>
-            <BottomNavigation
-                showLabels
-                value={value}
-                onChange={(event, newValue) => {
-                    event.preventDefault();
-                    setValue(newValue);
-                }}
-            >
-                <BottomNavigationAction
-                    label="Découvrir"
-                    icon={
-                        value === 0
-                            ? <ExploreIcon />
-                            : <ExploreOutlinedIcon />
-                    }
-                />
-                <BottomNavigationAction
-                    label="Parcourir"
-                    icon={value === 1 ? <ManageSearchIcon /> : <ManageSearchOutlinedIcon />}
-                />
-                <BottomNavigationAction
-                    label="Vendre"
-                    icon={value === 2 ? <AddCircleIcon /> : <AddCircleOutlineOutlinedIcon />}
-                />
-                <BottomNavigationAction
-                    label="Messages"
-                    icon={value === 3 ? <MessageIcon /> : <MessageOutlinedIcon />}
-                />
-                <BottomNavigationAction
-                    label="Profil"
-                    icon={value === 4 ? <AccountCircleIcon /> : <AccountCircleOutlinedIcon />}
-                />
-            </BottomNavigation>
-        </Box>
-    );
+  return (
+    <Box
+      component={'nav'}
+      sx={{
+        position: 'fixed',
+        bottom: 0,
+        left: 0,
+        right: 0,
+        '& .MuiBottomNavigationAction-root': {
+          color: 'var(--color-purple)',
+        },
+        '& .MuiBottomNavigationAction-root.Mui-selected': {
+          color: 'var(--color-purple-dark)',
+        },
+      }}
+    >
+      <BottomNavigation
+        showLabels
+        value={value}
+        onChange={(event, newValue) => {
+          event.preventDefault();
+          setValue(newValue);
+        }}
+      >
+        <BottomNavigationAction
+          label='Découvrir'
+          icon={value === 0 ? <ExploreIcon /> : <ExploreOutlinedIcon />}
+        />
+        <BottomNavigationAction
+          label='Parcourir'
+          icon={
+            value === 1 ? <ManageSearchIcon /> : <ManageSearchOutlinedIcon />
+          }
+        />
+        <BottomNavigationAction
+          label='Vendre'
+          icon={
+            value === 2 ? <AddCircleIcon /> : <AddCircleOutlineOutlinedIcon />
+          }
+        />
+        <BottomNavigationAction
+          label='Messages'
+          icon={value === 3 ? <MessageIcon /> : <MessageOutlinedIcon />}
+        />
+        <BottomNavigationAction
+          label='Profil'
+          icon={
+            value === 4 ? <AccountCircleIcon /> : <AccountCircleOutlinedIcon />
+          }
+        />
+      </BottomNavigation>
+    </Box>
+  );
 }
