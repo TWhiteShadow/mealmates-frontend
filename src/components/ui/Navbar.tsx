@@ -12,9 +12,11 @@ import AddCircleIcon from '@mui/icons-material/AddCircle';
 import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOutlined';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import AccountCircleOutlinedIcon from '@mui/icons-material/AccountCircleOutlined';
+import { useNavigate } from 'react-router';
 
 export default function SimpleBottomNavigation() {
   const [value, setValue] = React.useState(0);
+  const navigate = useNavigate();
 
   return (
     <Box
@@ -64,6 +66,10 @@ export default function SimpleBottomNavigation() {
           label='Profil'
           icon={
             value === 4 ? <AccountCircleIcon /> : <AccountCircleOutlinedIcon />
+          }
+          onClick={() => {
+            navigate('/app/profile', { replace: true });
+          }
           }
         />
       </BottomNavigation>
