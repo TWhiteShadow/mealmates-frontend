@@ -14,7 +14,7 @@ interface StatCardProps {
 const StatCard = ({ title, value, unit, icon, children }: StatCardProps & { children?: ReactNode }) => {
   return (
     <div className="bg-white p-4 rounded-lg drop-shadow-lg text-center">
-    <div className="text-sm text-gray-600 font-bold">{title}</div>
+      <div className="text-sm text-gray-600 font-bold">{title}</div>
       <div className="flex justify-center mb-2">
         {icon}
       </div>
