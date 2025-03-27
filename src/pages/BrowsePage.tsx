@@ -1,50 +1,117 @@
+import { useState, useCallback } from 'react';
 import Browse from '@/components/Browse/Browse';
 import SearchBar from '@/components/Browse/SearchBar';
 import Navbar from '@/components/ui/Navbar';
 import "../assets/browse-map.css";
-import { useState } from 'react';
 import RadiusControl from '@/components/Browse/map/RadiusControl';
+import SearchFilter, { AdvancedFilterState } from '@/components/Browse/SearchFilter';
 
 function BrowsePage() {
   const [search, setSearch] = useState<string>('');
-  // const [showFilters, setShowFilters] = useState<boolean>(false);
-  const [searchRadius, setSearchRadius] = useState<number>(1000); // 1000m 
+  const [showFilters, setShowFilters] = useState<boolean>(false);
   const [showRadiusFilter, setShowRadiusFilter] = useState<boolean>(false);
+  const [filters, setFilters] = useState<AdvancedFilterState>({
+    productTypes: [],
+    dietaryPreferences: [],
+    expirationDate: '',
+    distance: 1000,
+    price: {
+      min: 0,
+      max: 50
+    },
+    minSellerRating: 0,
+    pickupOptions: []
+  });
 
-  const handleSearch = (value: string) => {
+  const handleSearch = useCallback((value: string) => {
     setSearch(value);
-  };
+  }, []);
 
-  const handleFilterClick = () => {
-    setShowRadiusFilter(!showRadiusFilter);
-  };
+  const handleFilterClick = useCallback(() => {
+    setShowFilters(prev => !prev);
+  }, []);
 
-  const handleLocationClick = () => {
-    const address = prompt("Entrez une adresse pour recentrer la carte:");
-    if (address) {
-      handleSearch(address);
+  const handleLocationClick = useCallback(() => {
+    setShowRadiusFilter(prev => !prev);
+  }, []);
+
+  const handleApplyFilters = useCallback((newFilters: AdvancedFilterState) => {
+    setFilters(newFilters);
+    console.log("Filtres appliqués:", newFilters);
+  }, []);
+
+  const setSearchRadius = useCallback((value: number) => {
+    setFilters(prev => ({ ...prev, distance: value }));
+  }, []);
+
+  const getActiveFiltersCount = useCallback((): number => {
+    let count = 0;
+    
+    if (filters.productTypes.length > 0) {
+       count++;
     }
-  };
+    if (filters.dietaryPreferences.length > 0) {
+      count++;
+    }
+    if (filters.expirationDate) {
+      count++;
+    }
+    if (filters.price.min > 0 || filters.price.max < 50) {
+      count++;
+    }
+    if (filters.minSellerRating > 0) {
+      count++;
+    }
+    if (filters.pickupOptions.length > 0) {
+      count++;
+    }
+    
+    return count;
+  }, [filters]);
+
+  const activeFiltersCount = getActiveFiltersCount();
 
   return (
     <div className="h-screen relative bg-gray-100 overflow-hidden">
-      <div className='fixed top-0 left-0 w-full z-100'>
+      <div className='fixed top-0 left-0 w-full z-10'>
         <div className='max-w-md mx-auto pt-12 pb-6 px-4 xs:px-9 rounded-b-[20px] bg-purple-dark/10 backdrop-blur-lg'>
-        <SearchBar 
+          <SearchBar 
             onSearch={handleSearch} 
             onFilterClick={handleFilterClick}
             onLocationClick={handleLocationClick}
           />
+          {activeFiltersCount > 0 && (
+            <div className="mt-2 flex justify-center">
+              <div className="bg-purple-dark/10 text-purple-dark rounded-full text-xs px-3 py-1">
+                {activeFiltersCount} filtre{activeFiltersCount > 1 ? 's' : ''} actif{activeFiltersCount > 1 ? 's' : ''}
+              </div>
+            </div>
+          )}
         </div>
-        <div className="absolute top-0 pt-24 left-0 right-0 z-10 max-w-md mx-auto">
-          <RadiusControl 
-            searchRadius={searchRadius}
-            setSearchRadius={setSearchRadius}
-            showRadiusFilter={showRadiusFilter}
-          />
-        </div>
+        
+        {showRadiusFilter && (
+          <div className="max-w-md mx-auto">
+            <RadiusControl 
+              searchRadius={filters.distance}
+              setSearchRadius={setSearchRadius}
+              showRadiusFilter={showRadiusFilter}
+            />
+          </div>
+        )}
       </div>
-      <Browse searchValue={search} radius={searchRadius} />
+
+      <SearchFilter 
+        showFilters={showFilters}
+        onClose={() => setShowFilters(false)}
+        initialFilters={filters}
+        onApplyFilters={handleApplyFilters}
+      />
+
+      <Browse 
+        searchValue={search} 
+        radius={filters.distance} 
+        filters={filters}
+      />
       
       <Navbar />
     </div>

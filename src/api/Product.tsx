@@ -5,7 +5,28 @@ export interface Product {
   name: string;
   description: string;
   price: number;
-  position: [number, number];
+  position: number[];
+
+  type: string;
+  expiryDate: string;
+  quantity: string;
+  dietaryTags: string[];
+  sellerRating: number;
+  isSoldOut: boolean;
+  pickupOptions: string[];
+  pickupDetails: string;
+
+  seller?: {
+    id: number;
+    name: string;
+    rating: number;
+    profilePicture?: string;
+  };
+  images?: string[];
+  originalPrice?: number;
+  discount?: number;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export async function getProductsUndetailed(): Promise<Product[]> {
