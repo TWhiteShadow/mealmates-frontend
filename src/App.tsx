@@ -7,6 +7,7 @@ import LoginPage from './pages/Connection/LoginPage';
 import DiscoverPage from './pages/DiscoverPage';
 import AuthCallbackPage from './pages/AuthCallbackPage';
 import ProfilePage from './pages/Profile/ProfilePage';
+import SettingsPage from './pages/Profile/SettingsPage';
 
 function App() {
   return (
@@ -19,6 +20,7 @@ function App() {
       <Route path='auth-callback' element={<AuthCallbackPage />} />
       <Route path='app/discover' element={<DiscoverPage />} />
       <Route path='app/profile' element={<ProfilePage />} />
+      <Route path='app/profile/settings' element={<SettingsPage />} />
       <Route path='*' element={<div>404</div>} />
     </Routes>
   );

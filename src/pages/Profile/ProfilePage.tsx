@@ -2,13 +2,35 @@ import Navbar from "@/components/ui/Navbar";
 import ProfileAppBar from "@/components/ProfileAppBar";
 import MealMatesLogo from '../../assets/MealMatesLogo.png';
 import OrderCard from "@/components/OrderCard";
-import { BoltRounded, Euro } from "@mui/icons-material";
+import { BoltRounded, Euro, Settings } from "@mui/icons-material";
 import StatCard from "@/components/StatCard";
+import { Avatar } from "@mui/material";
+import { useNavigate } from "react-router";
 
 const ProfilePage = () => {
+
+    const navigate = useNavigate();
+
+    const handleSettings = () => {
+        navigate('/app/profile/settings');
+    };
+
+
     return (
         <div className="h-screen relative bg-gray-100 overflow-hidden">
-            <ProfileAppBar />
+            <ProfileAppBar>
+                <div className="flex items-center gap-3">
+                    <Avatar
+                        src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
+                        alt="Profile"
+                        sx={{ width: 32, height: 32 }}
+                    />
+                    <span className="font-semibold text-lg">Patrick</span>
+                </div>
+                <button onClick={handleSettings}>
+                    <Settings sx={{ fontSize: 28 }} className='!text-purple-dark'/>
+                </button>
+            </ProfileAppBar>
             <div className="max-w-md mx-auto px-4 pb-20">
                 <div className="max-w-xl m-auto">
                     <img
