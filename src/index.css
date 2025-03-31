@@ -138,10 +138,17 @@
 }
 
 @theme {
+  --breakpoint-xs: 30rem;
   --font-Noto: 'Noto Sans', sans-serif;
   --font-Lilita: 'Lilita One';
   --color-purple-light: #d4c3e2;
   --color-purple: #c19ee0;
   --color-purple-semi-dark: #7f4591;
   --color-purple-dark: #5e1969;
+}
+
+@layer components {
+  .element-base {
+    @apply bg-neutral-100 border-gray-400 rounded-md shadow-md;
+  }
 }

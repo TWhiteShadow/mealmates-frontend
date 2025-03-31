@@ -12,9 +12,28 @@ import AddCircleIcon from '@mui/icons-material/AddCircle';
 import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOutlined';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import AccountCircleOutlinedIcon from '@mui/icons-material/AccountCircleOutlined';
+import { useNavigate } from 'react-router';
 
-export default function SimpleBottomNavigation() {
-  const [value, setValue] = React.useState(0);
+const getValueFromPath = (path: string) => {
+  switch (path) {
+    case '/app/discover':
+      return 0;
+    case '/app/browse':
+      return 1;
+    case '/app/sell':
+      return 2;
+    case '/app/messages':
+      return 3;
+    case '/app/profile':
+      return 4;
+    default:
+      return 0;
+  }
+};
+
+const SimpleBottomNavigation = () => {
+  const [value, setValue] = React.useState(getValueFromPath(window.location.pathname));
+  const navigate = useNavigate();
 
   return (
     <Box
@@ -31,6 +50,7 @@ export default function SimpleBottomNavigation() {
           color: 'var(--color-purple-dark)',
         },
       }}
+      className='z-10'
     >
       <BottomNavigation
         showLabels
@@ -43,11 +63,19 @@ export default function SimpleBottomNavigation() {
         <BottomNavigationAction
           label='Découvrir'
           icon={value === 0 ? <ExploreIcon /> : <ExploreOutlinedIcon />}
+          onClick={() => {
+            navigate('/app/discover', { replace: true });
+          }
+          }
         />
         <BottomNavigationAction
           label='Parcourir'
           icon={
             value === 1 ? <ManageSearchIcon /> : <ManageSearchOutlinedIcon />
+          }
+          onClick={() => {
+            navigate('/app/browse', { replace: true });
+          }
           }
         />
         <BottomNavigationAction
@@ -65,8 +93,14 @@ export default function SimpleBottomNavigation() {
           icon={
             value === 4 ? <AccountCircleIcon /> : <AccountCircleOutlinedIcon />
           }
+          onClick={() => {
+            navigate('/app/profile', { replace: true });
+          }
+          }
         />
       </BottomNavigation>
     </Box>
   );
 }
+
+export default SimpleBottomNavigation;
