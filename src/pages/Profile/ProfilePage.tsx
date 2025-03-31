@@ -1,4 +1,3 @@
-import Navbar from "@/components/ui/Navbar";
 import ProfileAppBar from "@/components/ProfileAppBar";
 import MealMatesLogo from '../../assets/MealMatesLogo.png';
 import OrderCard from "@/components/OrderCard";
@@ -71,7 +70,6 @@ const ProfilePage = () => {
                 MealMates 0.0.1
                 </p>
             </div>
-            <Navbar />
         </div>
     );
 };

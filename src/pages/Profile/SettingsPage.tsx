@@ -1,4 +1,3 @@
-import Navbar from "@/components/ui/Navbar";
 import ProfileAppBar from "@/components/ProfileAppBar";
 import { ArrowBackIosOutlined, Mail, Person } from "@mui/icons-material";
 import { Avatar } from "@mui/material";
@@ -44,7 +43,6 @@ const SettingsPage = () => {
               </div>
             </section>
         </div>
-        <Navbar />
     </div>
 );
 };

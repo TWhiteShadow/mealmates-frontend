@@ -1,7 +1,6 @@
 import { useState, useCallback } from 'react';
 import Browse from '@/components/Browse/Browse';
 import SearchBar from '@/components/Browse/SearchBar';
-import Navbar from '@/components/ui/Navbar';
 import "../assets/browse-map.css";
 import RadiusControl from '@/components/Browse/map/RadiusControl';
 import SearchFilter, { AdvancedFilterState } from '@/components/Browse/SearchFilter';
@@ -111,8 +110,6 @@ function BrowsePage() {
         radius={filters.distance} 
         filters={filters}
       />
-      
-      <Navbar />
     </div>
   );
 }
