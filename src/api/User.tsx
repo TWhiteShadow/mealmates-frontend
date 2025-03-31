@@ -169,11 +169,12 @@ export async function getUserData(token: string) {
   return response.json();
 }
 
+// _ veux dire que c'est une variable qu'on va utiliser plus tard (pour TypeScript)
 export async function getProductsArroundMe(
-  lat: number, 
-  lng: number, 
-  radius: number, 
-  filters?: {
+  _lat: number, 
+  _lng: number, 
+  _radius: number, 
+  _filters?: {
     productTypes?: string[];
     expirationDate?: string;
     minPrice?: number;
