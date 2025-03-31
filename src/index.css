@@ -146,3 +146,9 @@
   --color-purple-semi-dark: #7f4591;
   --color-purple-dark: #5e1969;
 }
+
+@layer components {
+  .element-base {
+    @apply bg-neutral-100 border-gray-400 rounded-md shadow-md;
+  }
+}

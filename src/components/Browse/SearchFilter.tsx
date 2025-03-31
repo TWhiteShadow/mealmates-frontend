@@ -141,49 +141,49 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
             label="Fruits"
             selected={filters.productTypes.includes('fruits')}
             onClick={() => toggleProductType('fruits')}
-            icon={<SpaIcon sx={{ fontSize: 24 }} />}
+            icon={<SpaIcon sx={{ fontSize: 24, margin: 0 }} />}
           />
           <IconFilterButton
             label="Légumes"
             selected={filters.productTypes.includes('vegetables')}
             onClick={() => toggleProductType('vegetables')}
-            icon={<SpaIcon sx={{ fontSize: 24 }} />}
+            icon={<SpaIcon sx={{ fontSize: 24, margin: 0 }} />}
           />
           <IconFilterButton
             label="Plats"
             selected={filters.productTypes.includes('meals')}
             onClick={() => toggleProductType('meals')}
-            icon={<RestaurantIcon sx={{ fontSize: 24 }} />}
+            icon={<RestaurantIcon sx={{ fontSize: 24, margin: 0 }} />}
           />
           <IconFilterButton
             label="Pain"
             selected={filters.productTypes.includes('bakery')}
             onClick={() => toggleProductType('bakery')}
-            icon={<BakeryDiningIcon sx={{ fontSize: 24 }} />}
+            icon={<BakeryDiningIcon sx={{ fontSize: 24, margin: 0 }} />}
           />
           <IconFilterButton
             label="Épicerie"
             selected={filters.productTypes.includes('grocery')}
             onClick={() => toggleProductType('grocery')}
-            icon={<LocalGroceryStoreIcon sx={{ fontSize: 24 }} />}
+            icon={<LocalGroceryStoreIcon sx={{ fontSize: 24, margin: 0 }} />}
           />
           <IconFilterButton
             label="Produits laitiers"
             selected={filters.productTypes.includes('dairy')}
             onClick={() => toggleProductType('dairy')}
-            icon={<EggIcon sx={{ fontSize: 24 }} />}
+            icon={<EggIcon sx={{ fontSize: 24, margin: 0 }} />}
           />
           <IconFilterButton
             label="Surgelés"
             selected={filters.productTypes.includes('frozen')}
             onClick={() => toggleProductType('frozen')}
-            icon={<KitchenIcon sx={{ fontSize: 24 }} />}
+            icon={<KitchenIcon sx={{ fontSize: 24, margin: 0 }} />}
           />
           <IconFilterButton
             label="Traiteur"
             selected={filters.productTypes.includes('catering')}
             onClick={() => toggleProductType('catering')}
-            icon={<RoomServiceIcon sx={{ fontSize: 24 }} />}
+            icon={<RoomServiceIcon sx={{ fontSize: 24, margin: 0 }} />}
           />
         </div>
       </FilterSection>
@@ -194,19 +194,19 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
             label="Aujourd'hui"
             selected={filters.expirationDate === 'today'}
             onClick={() => updateFilter('expirationDate', filters.expirationDate === 'today' ? '' : 'today')}
-            icon={<CalendarTodayIcon sx={{ fontSize: 18, marginRight: 1 }} />}
+            icon={<CalendarTodayIcon sx={{ fontSize: 18 }} />}
           />
           <FilterButton
             label="Demain"
             selected={filters.expirationDate === 'tomorrow'}
             onClick={() => updateFilter('expirationDate', filters.expirationDate === 'tomorrow' ? '' : 'tomorrow')}
-            icon={<CalendarTodayIcon sx={{ fontSize: 18, marginRight: 1 }} />}
+            icon={<CalendarTodayIcon sx={{ fontSize: 18 }} />}
           />
           <FilterButton
             label="Cette semaine"
             selected={filters.expirationDate === 'week'}
             onClick={() => updateFilter('expirationDate', filters.expirationDate === 'week' ? '' : 'week')}
-            icon={<CalendarTodayIcon sx={{ fontSize: 18, marginRight: 1 }} />}
+            icon={<CalendarTodayIcon sx={{ fontSize: 18 }} />}
           />
         </div>
       </FilterSection>

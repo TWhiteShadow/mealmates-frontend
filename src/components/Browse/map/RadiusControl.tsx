@@ -50,7 +50,7 @@ const RadiusControl: React.FC<RadiusControlProps> = ({
             step="500"
             value={searchRadius}
             onChange={handleRadiusChange}
-            className="w-full accent-purple-dark"
+            className="w-full accent-purple-dark cursor-pointer"
           />
           <div className="flex justify-between text-xs text-gray-500 mt-1">
             <span>0.5 km</span>

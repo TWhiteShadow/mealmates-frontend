@@ -14,8 +14,25 @@ import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import AccountCircleOutlinedIcon from '@mui/icons-material/AccountCircleOutlined';
 import { useNavigate } from 'react-router';
 
-export default function SimpleBottomNavigation() {
-  const [value, setValue] = React.useState(0);
+const getValueFromPath = (path: string) => {
+  switch (path) {
+    case '/app/discover':
+      return 0;
+    case '/app/browse':
+      return 1;
+    case '/app/sell':
+      return 2;
+    case '/app/messages':
+      return 3;
+    case '/app/profile':
+      return 4;
+    default:
+      return 0;
+  }
+};
+
+const SimpleBottomNavigation = () => {
+  const [value, setValue] = React.useState(getValueFromPath(window.location.pathname));
   const navigate = useNavigate();
 
   return (
@@ -85,3 +102,5 @@ export default function SimpleBottomNavigation() {
     </Box>
   );
 }
+
+export default SimpleBottomNavigation;
