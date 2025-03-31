@@ -37,7 +37,6 @@ function BrowsePage() {
 
   const handleApplyFilters = useCallback((newFilters: AdvancedFilterState) => {
     setFilters(newFilters);
-    console.log("Filtres appliqués:", newFilters);
   }, []);
 
   const setSearchRadius = useCallback((value: number) => {
