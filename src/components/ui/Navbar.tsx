@@ -33,6 +33,7 @@ export default function SimpleBottomNavigation() {
           color: 'var(--color-purple-dark)',
         },
       }}
+      className='z-10'
     >
       <BottomNavigation
         showLabels
