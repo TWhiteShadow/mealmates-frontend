@@ -45,11 +45,19 @@ export default function SimpleBottomNavigation() {
         <BottomNavigationAction
           label='Découvrir'
           icon={value === 0 ? <ExploreIcon /> : <ExploreOutlinedIcon />}
+          onClick={() => {
+            navigate('/app/discover', { replace: true });
+          }
+          }
         />
         <BottomNavigationAction
           label='Parcourir'
           icon={
             value === 1 ? <ManageSearchIcon /> : <ManageSearchOutlinedIcon />
+          }
+          onClick={() => {
+            navigate('/app/browse', { replace: true });
+          }
           }
         />
         <BottomNavigationAction

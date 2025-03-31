@@ -138,6 +138,7 @@
 }
 
 @theme {
+  --breakpoint-xs: 30rem;
   --font-Noto: 'Noto Sans', sans-serif;
   --font-Lilita: 'Lilita One';
   --color-purple-light: #d4c3e2;
