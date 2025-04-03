@@ -20,7 +20,7 @@ const Login = () => {
 
     try {
       const data = await loginUser(email, password);
-      localStorage.setItem('token', data.token);
+      localStorage.setItem('jwt_token', data.token);
       navigate('/app/discover', { replace: true });
     } catch (err) {
       console.error(err);

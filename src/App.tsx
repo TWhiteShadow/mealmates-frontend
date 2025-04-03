@@ -1,4 +1,4 @@
-import { Routes, Route, Outlet } from 'react-router';
+import { Routes, Route, Outlet, useNavigate, useLocation } from 'react-router';
 import MobileApp from './pages/MobileApp';
 import LandingPage from './pages/LandingPage';
 
@@ -12,6 +12,8 @@ import AuthCallbackPage from './pages/AuthCallbackPage';
 import ProfilePage from './pages/Profile/ProfilePage';
 import SettingsPage from './pages/Profile/SettingsPage';
 import Navbar from "@/components/ui/Navbar";
+import { useEffect } from 'react';
+import { navigationRef, locationRef } from './utils/navigateRef';
 
 function NavbarLayout() {
   return (
@@ -23,6 +25,14 @@ function NavbarLayout() {
 }
 
 function App() {
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  useEffect(() => {
+    navigationRef.navigate = navigate;
+    locationRef.location = location.pathname;
+  }, [navigate, location]);
+
   return (
     <Routes>
       <Route index element={<LandingPage />} />
