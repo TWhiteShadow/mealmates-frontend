@@ -1,6 +1,7 @@
 // api.js
 import axios from 'axios';
 import { locationRef, navigationRef } from '../utils/navigateRef';
+import { refreshToken } from './User';
 
 const baseURL = import.meta.env.VITE_BACKEND_URL;
 
@@ -10,15 +11,15 @@ const api = axios.create({
 });
 
 api.interceptors.response.use(
-  (response) => response,
-  async (error) => {
+  (response: any) => response,
+  async (error: any) => {
     const originalRequest = error.config;
 
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
 
       try {
-        await axios.post(`${baseURL}/api/v1/token/refresh`);
+        await refreshToken();
         return api(originalRequest);
       } catch (refreshError) {
         if (navigationRef.navigate) {

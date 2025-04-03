@@ -70,24 +70,15 @@ export async function loginUser(
   }
 }
 
-// Refresh Token
-export async function refreshToken(
-  refresh_token: string,
-  provider: string
-): Promise<RefreshTokenResponse> {
-  const response = await fetch(`${API_BASE_URL}/token/refresh`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ refresh_token, provider }),
-  });
+export async function refreshToken(): Promise<RefreshTokenResponse> {
+  try {
+    const response = await axios.post(`/token/refresh`, { withCredentials: true});
 
-  if (!response.ok) {
-    throw new Error('Failed to refresh token');
+    return response.data;
+  } catch (error) {
+    console.error('Error during login:', error);
+    throw new Error('Invalid credentials');
   }
-
-  return response.json();
 }
 
 // Register User

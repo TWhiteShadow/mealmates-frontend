@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
-import { MapContainer, TileLayer, Marker, Popup, Circle, ZoomControl } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Popup, Circle, ZoomControl, useMapEvents } from 'react-leaflet';
 import { LatLngExpression } from 'leaflet';
 import MarkerClusterGroup from 'react-leaflet-markercluster';
 import { getProductsArroundMe } from '@/api/User';
@@ -10,6 +10,7 @@ import LocationButton from './map/LocationButton';
 import SetViewOnLocation from './map/SetViewOnLocation';
 import { geocodeAddress } from '@/utils/geoUtils';
 import { AdvancedFilterState } from './SearchFilter';
+import { RecenterButton } from './map/RecenterButton';
 
 interface BrowseProps {
   searchValue: string;
@@ -37,6 +38,7 @@ const Browse: React.FC<BrowseProps> = ({
   const [products, setProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [locationError, setLocationError] = useState<string | null>(null);
+  const [zoomLevel, setZoomLevel] = useState(5);
   
   const searchRadius = useMemo(() => filters.distance || radius || 1000, [filters.distance, radius]);
 
@@ -184,6 +186,19 @@ const Browse: React.FC<BrowseProps> = ({
     return filtersActive ? filteredProducts : products;
   }, [products, filteredProducts, filters]);
 
+
+  const ZoomLevelCatcher = () => {
+    const mapEvents = useMapEvents({
+      zoomend: () => {
+          setZoomLevel(mapEvents.getZoom());
+      },
+    });
+
+    return null;
+  }
+
+
+
   return (
     <div className="m-auto max-w-md w-full h-full relative margin-auto z-0">
       <div className="w-full h-full relative">
@@ -193,7 +208,7 @@ const Browse: React.FC<BrowseProps> = ({
           </div>
         ) : userLocation ? (
           <MapContainer 
-            center={userLocation} 
+            center={userLocation}
             zoom={13} 
             style={{ height: "100%", width: "100%", zIndex: 0 }}
             scrollWheelZoom={true}
@@ -212,10 +227,13 @@ const Browse: React.FC<BrowseProps> = ({
 
             <Marker 
               position={userLocation}
-              icon={createUserLocationIcon()}
+              icon={createUserLocationIcon(zoomLevel)}
             >
               <Popup>Votre position</Popup>
             </Marker>
+
+            <RecenterButton userLocation={userLocation} />
+            <ZoomLevelCatcher />
 
             <MarkerClusterGroup
               iconCreateFunction={createClusterIcon}
