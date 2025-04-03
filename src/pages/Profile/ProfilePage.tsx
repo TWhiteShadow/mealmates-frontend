@@ -17,6 +17,7 @@ const ProfilePage = () => {
     useEffect(() => {
         const fetchUserData = async () => {
             const userData = await getUserData();
+            console.log('here');
             if (!userData) {
                 navigate('/app/login');
                 return;
@@ -68,7 +69,7 @@ const ProfilePage = () => {
                 <section className="mb-8">
                     <div className="flex items-center justify-between mb-4">
                         <h2 className="text-lg font-semibold">Vos dernières commandes</h2>
-                        <a href="#" className="text-purple-700 text-sm">Voir plus</a>
+                        <a href="#" className="text-purple-dark underline-offset-2 underline text-sm">Voir plus</a>
                     </div>
 
                     <OrderCard
@@ -83,13 +84,15 @@ const ProfilePage = () => {
                         title="CO2 évité"
                         value="51"
                         unit="KW/h"
-                        icon={<BoltRounded sx={{ fontSize: 80, color: '#6D28D9' }} />}
+                        className="text-purple-dark"
+                        icon={<BoltRounded sx={{ fontSize: 80 }} />}
                     />
                     <StatCard
                         title="Argent économisé"
                         value="32"
                         unit="EUR"
-                        icon={<Euro sx={{ fontSize: 80, color: '#6D28D9' }} />}
+                        className="text-purple-dark"
+                        icon={<Euro sx={{ fontSize: 80 }} />}
                     />
                 </div>
 
