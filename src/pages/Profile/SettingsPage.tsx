@@ -1,4 +1,4 @@
-import ProfileAppBar from '@/components/ProfileAppBar';
+import { useState } from 'react';
 import {
   AddCircleOutline,
   ArrowBackIosOutlined,
@@ -7,9 +7,18 @@ import {
   Person,
   Delete,
 } from '@mui/icons-material';
-import { Avatar } from '@mui/material';
-import AccordionItem from '@/components/AccordionItem';
-import { useState } from 'react';
+
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+
+import ProfileAppBar from '@/components/ProfileAppBar';
 
 type Address = {
   id: string;
@@ -54,7 +63,7 @@ const SettingsPage = () => {
       isEditing: false,
     },
   ]);
-  
+
   const [newAddress, setNewAddress] = useState<Address | null>(null);
 
   const addNewAddress = () => {
@@ -70,8 +79,7 @@ const SettingsPage = () => {
   };
 
   const handleNewAddressChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (!newAddress) 
-    {
+    if (!newAddress) {
       return;
     }
 
@@ -83,8 +91,7 @@ const SettingsPage = () => {
 
   const handleAddressChange = (id: string, e: React.ChangeEvent<HTMLInputElement>) => {
     setAddresses(addresses.map(addr => {
-      if (addr.id === id) 
-      {
+      if (addr.id === id) {
         return {
           ...addr,
           [e.target.name]: e.target.value,
@@ -95,11 +102,10 @@ const SettingsPage = () => {
   };
 
   const saveNewAddress = () => {
-    if (!newAddress) 
-    {
+    if (!newAddress) {
       return;
     }
-    
+
     setAddresses([...addresses, { ...newAddress, isEditing: false }]);
     setNewAddress(null);
   };
@@ -110,8 +116,7 @@ const SettingsPage = () => {
 
   const toggleEditMode = (id: string) => {
     setAddresses(addresses.map(addr => {
-      if (addr.id === id) 
-      {
+      if (addr.id === id) {
         return {
           ...addr,
           isEditing: !addr.isEditing,
@@ -123,8 +128,7 @@ const SettingsPage = () => {
 
   const saveExistingAddress = (id: string) => {
     setAddresses(addresses.map(addr => {
-      if (addr.id === id) 
-      {
+      if (addr.id === id) {
         return {
           ...addr,
           isEditing: false,
@@ -142,15 +146,16 @@ const SettingsPage = () => {
     <div className='h-screen relative bg-gray-100 overflow-x-hidden'>
       <ProfileAppBar>
         <div className='relative flex items-center w-full h-full justify-center'>
-          <button
-            className='absolute left-3'
+          <Button
+            variant="ghost"
+            className='absolute left-3 p-1'
             onClick={() => window.history.back()}
           >
             <ArrowBackIosOutlined
               sx={{ fontSize: 28 }}
               className='!text-purple-dark'
             />
-          </button>
+          </Button>
           <span className='text-lg font-Lilita font-bold text-purple-dark'>
             Votre compte
           </span>
@@ -158,223 +163,263 @@ const SettingsPage = () => {
       </ProfileAppBar>
       <div className='max-w-md mx-auto px-4 pb-20'>
         <div className='max-w-xl m-auto'>
-          <Avatar
-            src='https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80'
-            alt='Profile'
-            sx={{ width: 100, height: 100 }}
-            className='my-7 mx-auto drop-shadow-lg'
-          />
+          <Avatar className='my-7 mx-auto w-24 h-24 drop-shadow-lg'>
+            <AvatarImage
+              src='https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80'
+              alt="Profile"
+            />
+            <AvatarFallback>User</AvatarFallback>
+          </Avatar>
+          <span className='font-semibold text-lg text-purple-dark mx-auto block text-center'>
+
+          </span>
         </div>
         <section className='my-8'>
           <div className='flex items-center justify-between mb-4'>
             <h2 className='text-lg font-semibold'>Informations personnelles</h2>
           </div>
-          <div>
-            <AccordionItem
-              title='Nom et prénom'
-              icon={
-                <Person
-                  sx={{ width: 24, height: 24 }}
-                  className='!text-purple-dark !bg-transparent'
-                />
-              }
-            >
-              <label
-                htmlFor='lastname'
-                className='block text-sm font-medium text-gray-700'
-              >
-                Nom
-              </label>
-              <input
-                type='text'
-                name='lastname'
-                id='lastname'
-                className='mt-1 py-2 px-2 block w-full h-11 element-base focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm'
-              />
-              <label
-                htmlFor='firstname'
-                className='block text-sm font-medium text-gray-700 mt-4'
-              >
-                Prénom
-              </label>
-              <input
-                type='text'
-                name='firstname'
-                id='firstname'
-                className='mt-1 block w-full h-11 element-base focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm'
-              />
-            </AccordionItem>
-          </div>
-          <div>
-            <AccordionItem
-              title='Adresse mail'
-              required={true}
-              icon={
-                <Mail
-                  sx={{ width: 24, height: 24 }}
-                  className='!text-purple-dark !bg-transparent'
-                />
-              }
-            >
-              <input
-                type='email'
-                name='email'
-                id='email'
-                placeholder='azerty@gmail.com'
-                className='mt-1 py-2 px-2 block w-full h-11 element-base focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm'
-              />
-            </AccordionItem>
-          </div>
-          <div>
-            <AccordionItem
-              title='Adresses'
-              required={true}
-              icon={
-                <Home
-                  sx={{ width: 24, height: 24 }}
-                  className='!text-purple-dark !bg-transparent'
-                />
-              }
-            >
-              {addresses.map((address) => (
-                <AccordionItem 
-                  key={address.id} 
-                  title={formatAddressTitle(address)}
-                  actions={
-                    <button 
-                      onClick={() => {
-                        deleteAddress(address.id);
-                      }}
-                      className="text-red-500"
+          <Accordion type="multiple" className="w-full">
+            <AccordionItem value="name" className="border rounded-lg mb-4 shadow-sm bg-white">
+              <AccordionTrigger className="px-4 py-3 hover:bg-purple-50 transition-colors duration-200">
+                <div className="flex items-center">
+                  <Person
+                    sx={{ width: 24, height: 24 }}
+                    className='!text-purple-dark !bg-transparent mr-2'
+                  />
+                  <span className="font-medium">Nom et prénom</span>
+                </div>
+              </AccordionTrigger>
+              <AccordionContent className="px-4 pb-4 pt-2">
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <label
+                      htmlFor='lastname'
+                      className='block text-sm font-medium text-gray-700'
                     >
-                      <Delete sx={{ fontSize: 20 }} />
-                    </button>
-                  }
-                >
-                  <div className='flex justify-between gap-4'>
-                    <input
+                      Nom
+                    </label>
+                    <Input
                       type='text'
-                      name='address'
-                      value={address.address || ''}
-                      onChange={(e) => handleAddressChange(address.id, e)}
-                      placeholder='30 rue de Meaux'
-                      className='mt-1 py-2 px-2 block w-full h-11 element-base focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm'
-                    />
-                    <input
-                      type='text'
-                      name='city'
-                      value={address.city || ''}
-                      onChange={(e) => handleAddressChange(address.id, e)}
-                      placeholder='Senlis'
-                      className='mt-1 py-2 px-2 block w-full h-11 element-base focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm'
+                      name='lastname'
+                      id='lastname'
+                      className='h-11'
                     />
                   </div>
-                  <div className='flex justify-between gap-4 mt-2'>
-                    <input
+                  <div className="space-y-2">
+                    <label
+                      htmlFor='firstname'
+                      className='block text-sm font-medium text-gray-700'
+                    >
+                      Prénom
+                    </label>
+                    <Input
                       type='text'
-                      name='region'
-                      value={address.region || ''}
-                      onChange={(e) => handleAddressChange(address.id, e)}
-                      placeholder='Hauts-de-France'
-                      className='mt-1 py-2 px-2 block w-full h-11 element-base focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm'
-                    />
-                    <input
-                      type='text'
-                      name='zipCode'
-                      value={address.zipCode || ''}
-                      onChange={(e) => handleAddressChange(address.id, e)}
-                      placeholder='60300'
-                      className='mt-1 py-2 px-2 block w-full h-11 element-base focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm'
+                      name='firstname'
+                      id='firstname'
+                      className='h-11'
                     />
                   </div>
-                  {address.isEditing && (
-                    <div className="flex justify-end space-x-2 mt-4">
-                      <button 
-                        onClick={() => toggleEditMode(address.id)} 
-                        className="px-4 py-2 border border-gray-300 rounded-md text-gray-700"
-                      >
-                        Annuler
-                      </button>
-                      <button 
-                        onClick={() => saveExistingAddress(address.id)} 
-                        className="px-4 py-2 bg-purple-dark text-white rounded-md"
-                      >
-                        Enregistrer
-                      </button>
-                    </div>
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="email" className="border rounded-lg mb-4 shadow-sm bg-white">
+              <AccordionTrigger className="px-4 py-3 hover:bg-purple-50 transition-colors duration-200">
+                <div className="flex items-center">
+                  <Mail
+                    sx={{ width: 24, height: 24 }}
+                    className='!text-purple-dark !bg-transparent mr-2'
+                  />
+                  <span className="font-medium">Adresse mail <span className="text-red-500">*</span></span>
+                </div>
+              </AccordionTrigger>
+              <AccordionContent className="px-4 pb-4 pt-2">
+                <Input
+                  type='email'
+                  name='email'
+                  id='email'
+                  placeholder='azerty@gmail.com'
+                  className='h-11'
+                />
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="addresses" className="border rounded-lg mb-4 shadow-sm bg-white">
+              <AccordionTrigger className="px-4 py-3 hover:bg-purple-50 transition-colors duration-200">
+                <div className="flex items-center">
+                  <Home
+                    sx={{ width: 24, height: 24 }}
+                    className='!text-purple-dark !bg-transparent mr-2'
+                  />
+                  <span className="font-medium">Adresses <span className="text-red-500">*</span></span>
+                </div>
+              </AccordionTrigger>
+              <AccordionContent className="px-4 pb-4 pt-2">
+                <Accordion type="multiple" className="w-full">
+                  {addresses.map((address) => (
+                    <AccordionItem key={address.id} value={address.id} className="border rounded-lg mb-2 shadow-sm">
+                      <div className="flex items-center justify-between px-4 py-3 hover:bg-purple-50 transition-colors duration-200">
+                        <AccordionTrigger className="flex-1">
+                          <span className="font-medium">{formatAddressTitle(address)}</span>
+                        </AccordionTrigger>
+                        <Button
+                          variant="ghost"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            deleteAddress(address.id);
+                          }}
+                          className="text-red-500 p-1 hover:bg-red-50 hover:text-red-800"
+                        >
+                          <Delete sx={{ fontSize: 20 }} />
+                        </Button>
+                      </div>
+                      <AccordionContent className="px-4 pb-4 pt-2">
+                        <div className='grid grid-cols-2 gap-4'>
+                          <div>
+                            <Input
+                              type='text'
+                              name='address'
+                              value={address.address || ''}
+                              onChange={(e) => handleAddressChange(address.id, e)}
+                              placeholder='30 rue de Meaux'
+                              className='h-11'
+                            />
+                          </div>
+                          <div>
+                            <Input
+                              type='text'
+                              name='city'
+                              value={address.city || ''}
+                              onChange={(e) => handleAddressChange(address.id, e)}
+                              placeholder='Senlis'
+                              className='h-11'
+                            />
+                          </div>
+                        </div>
+                        <div className='grid grid-cols-2 gap-4 mt-2'>
+                          <div>
+                            <Input
+                              type='text'
+                              name='region'
+                              value={address.region || ''}
+                              onChange={(e) => handleAddressChange(address.id, e)}
+                              placeholder='Hauts-de-France'
+                              className='h-11'
+                            />
+                          </div>
+                          <div>
+                            <Input
+                              type='text'
+                              name='zipCode'
+                              value={address.zipCode || ''}
+                              onChange={(e) => handleAddressChange(address.id, e)}
+                              placeholder='60300'
+                              className='h-11'
+                            />
+                          </div>
+                        </div>
+                        {address.isEditing && (
+                          <div className="flex justify-end space-x-2 mt-4">
+                            <Button
+                              variant="outline"
+                              onClick={() => toggleEditMode(address.id)}
+                            >
+                              Annuler
+                            </Button>
+                            <Button
+                              onClick={() => saveExistingAddress(address.id)}
+                              className="bg-purple-dark hover:bg-purple-dark/90"
+                            >
+                              Enregistrer
+                            </Button>
+                          </div>
+                        )}
+                      </AccordionContent>
+                    </AccordionItem>
+                  ))}
+
+                  {newAddress && (
+                    <AccordionItem value="new-address" className="border rounded-lg mb-2 shadow-sm">
+                      <AccordionTrigger className="px-4 py-3 hover:bg-purple-50 transition-colors duration-200">
+                        <span className="font-medium">{formatAddressTitle(newAddress)}</span>
+                      </AccordionTrigger>
+                      <AccordionContent className="px-4 pb-4 pt-2">
+                        <div className='grid grid-cols-2 gap-4'>
+                          <div>
+                            <Input
+                              type='text'
+                              name='address'
+                              value={newAddress.address || ''}
+                              onChange={handleNewAddressChange}
+                              placeholder='30 rue de Meaux'
+                              className='h-11'
+                            />
+                          </div>
+                          <div>
+                            <Input
+                              type='text'
+                              name='city'
+                              value={newAddress.city || ''}
+                              onChange={handleNewAddressChange}
+                              placeholder='Senlis'
+                              className='h-11'
+                            />
+                          </div>
+                        </div>
+                        <div className='grid grid-cols-2 gap-4 mt-2'>
+                          <div>
+                            <Input
+                              type='text'
+                              name='region'
+                              value={newAddress.region || ''}
+                              onChange={handleNewAddressChange}
+                              placeholder='Hauts-de-France'
+                              className='h-11'
+                            />
+                          </div>
+                          <div>
+                            <Input
+                              type='text'
+                              name='zipCode'
+                              value={newAddress.zipCode || ''}
+                              onChange={handleNewAddressChange}
+                              placeholder='60300'
+                              className='h-11'
+                            />
+                          </div>
+                        </div>
+                        <div className="flex justify-end space-x-2 mt-4">
+                          <Button
+                            variant="outline"
+                            onClick={cancelNewAddress}
+                          >
+                            Annuler
+                          </Button>
+                          <Button
+                            onClick={saveNewAddress}
+                            className="bg-purple-dark hover:bg-purple-dark/90"
+                          >
+                            Enregistrer
+                          </Button>
+                        </div>
+                      </AccordionContent>
+                    </AccordionItem>
                   )}
-                </AccordionItem>
-              ))}
+                </Accordion>
 
-              {newAddress && (
-                <AccordionItem title={formatAddressTitle(newAddress)}>
-                  <div className='flex justify-between gap-4'>
-                    <input
-                      type='text'
-                      name='address'
-                      value={newAddress.address || ''}
-                      onChange={handleNewAddressChange}
-                      placeholder='30 rue de Meaux'
-                      className='mt-1 py-2 px-2 block w-full h-11 element-base focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm'
-                    />
-                    <input
-                      type='text'
-                      name='city'
-                      value={newAddress.city || ''}
-                      onChange={handleNewAddressChange}
-                      placeholder='Senlis'
-                      className='mt-1 py-2 px-2 block w-full h-11 element-base focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm'
-                    />
-                  </div>
-                  <div className='flex justify-between gap-4 mt-2'>
-                    <input
-                      type='text'
-                      name='region'
-                      value={newAddress.region || ''}
-                      onChange={handleNewAddressChange}
-                      placeholder='Hauts-de-France'
-                      className='mt-1 py-2 px-2 block w-full h-11 element-base focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm'
-                    />
-                    <input
-                      type='text'
-                      name='zipCode'
-                      value={newAddress.zipCode || ''}
-                      onChange={handleNewAddressChange}
-                      placeholder='60300'
-                      className='mt-1 py-2 px-2 block w-full h-11 element-base focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm'
-                    />
-                  </div>
-                  <div className="flex justify-end space-x-2 mt-4">
-                    <button 
-                      onClick={cancelNewAddress} 
-                      className="px-4 py-2 border border-gray-300 rounded-md text-gray-700"
-                    >
-                      Annuler
-                    </button>
-                    <button 
-                      onClick={saveNewAddress} 
-                      className="px-4 py-2 bg-purple-dark text-white rounded-md"
-                    >
-                      Enregistrer
-                    </button>
-                  </div>
-                </AccordionItem>
-              )}
-
-              <button
-                onClick={addNewAddress}
-                disabled={!!newAddress}
-                className={`w-full bg-purple-dark text-white hover:bg-white hover:outline-2 hover:outline-purple-dark group py-2 px-6 rounded-lg shadow-lg flex items-center justify-center ${
-                  newAddress ? 'opacity-50 cursor-not-allowed' : ''
-                }`}
-              >
-                <AddCircleOutline
-                  sx={{ fontSize: '2rem' }}
-                  className='group-hover:text-purple-dark'
-                />
-              </button>
+                <Button
+                  onClick={addNewAddress}
+                  disabled={!!newAddress}
+                  className={`w-full bg-purple-dark text-white hover:bg-white hover:text-purple-dark hover:border-2 hover:border-purple-dark group py-2 px-6 mt-4 ${newAddress ? 'opacity-50 cursor-not-allowed' : ''}`}
+                >
+                  <AddCircleOutline
+                    sx={{ fontSize: '2rem' }}
+                    className='group-hover:text-purple-dark'
+                  />
+                </Button>
+              </AccordionContent>
             </AccordionItem>
-          </div>
+          </Accordion>
         </section>
       </div>
     </div>

@@ -5,11 +5,11 @@ import Rating from '@mui/material/Rating';
 
 function HeroSection() {
   return (
-    <section className='relative transition-[background] duration-150 md:bg-[linear-gradient(45deg,var(--color-purple-light)_51%,var(--color-purple-dark)_100%)] bg-[linear-gradient(125deg,var(--color-purple-light)_51%,var(--color-purple-dark)_100%)] py-20'>
+    <section className='relative overflow-x-hidden transition-[background] duration-150 md:bg-[linear-gradient(45deg,var(--color-purple-light)_51%,var(--color-purple-dark)_100%)] bg-[linear-gradient(125deg,var(--color-purple-light)_51%,var(--color-purple-dark)_100%)] py-20 pb-30'>
       <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
         <div className='grid grid-cols-1 md:grid-cols-2 gap-12 items-center'>
           <div>
-            <h1 className='text-4xl md:text-5xl font-bold text-primary leading-tight'>
+            <h1 className='text-4xl md:text-5xl font-bold text-primary leading-tight font-Lilita tracking-wide'>
               Arrêter le gaspillage, Économiser de l'argent, Sauvez la Planète.
             </h1>
             <p className='mt-4 text-lg text-gray-700'>
@@ -45,6 +45,7 @@ function HeroSection() {
                 defaultValue={4.5}
                 precision={0.25}
                 readOnly
+                sx={{ color: '#5E1969' }}
               />
               <p className='text-sm font-medium text-gray-900 mt-1 flex'>
                 Aimé par plus de{' '}

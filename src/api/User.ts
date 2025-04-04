@@ -72,7 +72,9 @@ export async function loginUser(
 
 export async function refreshToken(): Promise<RefreshTokenResponse> {
   try {
-    const response = await axios.post(`/token/refresh`, { withCredentials: true});
+    const response = await axios.post(`/token/refresh`, {
+      withCredentials: true,
+    });
 
     return response.data;
   } catch (error) {
@@ -162,11 +164,9 @@ export async function addUserAddress(
   return response.json();
 }
 
-// Get User Data (Assuming there's an endpoint like /api/v1/user)
-
-export async function getUserData() {
+export async function getUserData(): Promise<UserData> {
   const response = await axios.get(`${API_BASE_URL}/user`, {
-    withCredentials: true, // Ensures cookies (including httpOnly JWT tokens) are sent with the request
+    withCredentials: true,
     headers: {
       'Content-Type': 'application/json',
     },
@@ -174,7 +174,6 @@ export async function getUserData() {
   return response.data;
 }
 
-// _ veux dire que c'est une variable qu'on va utiliser plus tard (pour TypeScript)
 export async function getProductsArroundMe(
   _lat: number,
   _lng: number,

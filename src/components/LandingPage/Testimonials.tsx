@@ -9,13 +9,13 @@ interface TestimonialCardProps {
 
 function TestimonialCard({ text, name, title, initial }: TestimonialCardProps) {
   return (
-    <div className='bg-purple-light bg-opacity-20 p-6 rounded-lg'>
+    <div className='bg-gray-100 border border-purple-200 bg-opacity-20 p-6 rounded-lg'>
       <div className='flex mb-4'>
-        <Star className='h-5 w-5 text-yellow-400' fill='#FBBF24' />
-        <Star className='h-5 w-5 text-yellow-400' fill='#FBBF24' />
-        <Star className='h-5 w-5 text-yellow-400' fill='#FBBF24' />
-        <Star className='h-5 w-5 text-yellow-400' fill='#FBBF24' />
-        <Star className='h-5 w-5 text-yellow-400' fill='#FBBF24' />
+        <Star className='h-5 w-5 text-[#5e1969]' fill='#5e1969' />
+        <Star className='h-5 w-5 text-[#5e1969]' fill='#5e1969' />
+        <Star className='h-5 w-5 text-[#5e1969]' fill='#5e1969' />
+        <Star className='h-5 w-5 text-[#5e1969]' fill='#5e1969' />
+        <Star className='h-5 w-5 text-[#5e1969]' fill='#5e1969' />
       </div>
       <p className='text-gray-700 mb-4'>{text}</p>
       <div className='flex items-center'>
@@ -24,7 +24,7 @@ function TestimonialCard({ text, name, title, initial }: TestimonialCardProps) {
         </div>
         <div className='ml-3'>
           <h4 className='text-sm font-semibold text-primary'>{name}</h4>
-          <p className='text-xs text-gray-500'>{title}</p>
+          <p className='text-xs text-gray-600'>{title}</p>
         </div>
       </div>
     </div>
@@ -34,10 +34,10 @@ function TestimonialCard({ text, name, title, initial }: TestimonialCardProps) {
 function Testimonials() {
   return (
     <section className='py-20 bg-white'>
-      <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
+      <div className='max-w-7xl mx-auto px-4 sm:Quepx-6 lg:px-8'>
         <div className='text-center mb-16'>
-          <h2 className='text-3xl font-bold text-primary font-Lilita'>
-            Ce Que Disent Nos Utilisateurs
+          <h2 className='text-4xl tracking-wide font-bold text-primary font-Lilita'>
+            Ce que Disent nos Utilisateurs
           </h2>
           <p className='mt-4 text-lg text-gray-600 max-w-2xl mx-auto'>
             Rejoignez des milliers d'utilisateurs satisfaits qui font la

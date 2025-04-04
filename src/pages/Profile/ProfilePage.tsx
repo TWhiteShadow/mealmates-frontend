@@ -5,29 +5,20 @@ import { BoltRounded, Euro, Settings } from "@mui/icons-material";
 import StatCard from "@/components/StatCard";
 import { Avatar } from "@mui/material";
 import { useNavigate } from "react-router";
-import { useEffect, useState } from "react";
-import { getUserData, UserData } from "@/api/User";
+import { getUserData } from "@/api/User";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useQuery } from '@tanstack/react-query'
 
+function useUserData() {
+    return useQuery({
+        queryKey: ['userData'],
+        queryFn: getUserData,
+    })
+}
 const ProfilePage = () => {
-    const [userData, setUserData] = useState<UserData | null>(null);
-    const [isLoading, setIsLoading] = useState(true);
+    const { isLoading, data: userData } = useUserData();
 
     const navigate = useNavigate();
-    useEffect(() => {
-        const fetchUserData = async () => {
-            const userData = await getUserData();
-            console.log('here');
-            if (!userData) {
-                navigate('/app/login');
-                return;
-            }
-            setUserData(userData);
-            setIsLoading(false);
-        };
-        fetchUserData();
-    }, [userData?.id]);
-
 
     const handleSettings = () => {
         navigate('/app/profile/settings');
