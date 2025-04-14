@@ -2,6 +2,12 @@ import { Product } from './Product';
 // @ts-expect-error (TS 7016) - Cannot find module '@/assets/fakeProducts'
 import { products as fakeProducts } from '@/assets/fakeProducts.js';
 import axios from './Axios';
+import {
+  QueryKey,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from '@tanstack/react-query';
 const API_BASE_URL = import.meta.env.VITE_BACKEND_URL + '/api/v1';
 
 export interface AuthResponse {
@@ -225,4 +231,42 @@ export async function getProductsArroundMe(
   // return response.json();
 
   return fakeProducts;
+}
+
+// Update User Data with axios
+export async function updateUserDataWithAxios(
+  userData: unknown
+): Promise<UserData> {
+  try {
+    const response = await axios.put(`${API_BASE_URL}/user/update`, userData);
+
+    return response.data;
+  } catch (error) {
+    console.error('Error updating user data:', error);
+    throw new Error('Failed to update user data');
+  }
+}
+
+const queryKey: QueryKey = ['userData'];
+
+// Tanstack Query Wrapper
+export function useUpdateUserDataMutation() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (userData: unknown) => updateUserDataWithAxios(userData),
+    mutationKey: ['userData'],
+    onSuccess: async () => {
+      // Invalidate the 'userData' query to trigger a refetch
+      await queryClient.invalidateQueries({ queryKey });
+    },
+  });
+}
+
+// Get User Data
+export function useUserData() {
+  return useQuery({
+    queryKey: ['userData'],
+    queryFn: () => getUserData(),
+  });
 }

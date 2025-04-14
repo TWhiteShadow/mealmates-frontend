@@ -19,6 +19,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
 import ProfileAppBar from '@/components/ProfileAppBar';
+import { useQuery } from '@tanstack/react-query';
+import { useUpdateUserDataMutation, useUserData } from "@/api/User";
+import { Skeleton } from '@/components/ui/skeleton';
+import { toast } from "sonner"
+
+
 
 type Address = {
   id: string;
@@ -142,11 +148,52 @@ const SettingsPage = () => {
     setAddresses(addresses.filter(addr => addr.id !== id));
   };
 
+  const { isLoading, data: userData } = useUserData();
+
+  const mutation = useUpdateUserDataMutation();
+
+  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+
+    const formData = new FormData(e.currentTarget);
+    const updatedFields: Record<string, string> = {};
+
+    const email = formData.get('email') as string;
+    const lastName = formData.get('lastname') as string;
+    const firstName = formData.get('firstname') as string;
+
+    if (lastName !== userData?.last_name) {
+      updatedFields.lastName = lastName;
+    }
+    if (firstName !== userData?.first_name) {
+      updatedFields.firstName = firstName;
+    }
+    if (email !== userData?.email) {
+      updatedFields.email = email;
+    }
+
+    if (Object.keys(updatedFields).length > 0) {
+      mutation.mutate(updatedFields, {
+        onSuccess: () => {
+          console.log('User data updated successfully');
+          toast.success('Vos informations ont été mises à jour avec succès');
+        },
+        onError: (error: unknown) => {
+          console.error('Error updating user data:', error);
+          toast.error('Une erreur est survenue lors de la mise à jour de vos informations');
+        },
+      });
+    } else {
+      toast.info('Aucune modification détectée');
+    }
+  }
+
   return (
-    <div className='h-screen relative bg-gray-100 overflow-x-hidden'>
+    <form onSubmit={handleSubmit} className='h-screen relative bg-gray-100 overflow-x-hidden'>
       <ProfileAppBar>
         <div className='relative flex items-center w-full h-full justify-center'>
           <Button
+            type="button"
             variant="ghost"
             className='absolute left-3 p-1'
             onClick={() => window.history.back()}
@@ -187,6 +234,13 @@ const SettingsPage = () => {
                     className='!text-purple-dark !bg-transparent mr-2'
                   />
                   <span className="font-medium">Nom et prénom</span>
+                  {isLoading ? (
+                    <Skeleton className="h-4 w-[150px] ml-2" />
+                  ) : (
+                    <span className="text-gray-500 text-sm ml-2">
+                      {userData?.last_name} {userData?.first_name}
+                    </span>
+                  )}
                 </div>
               </AccordionTrigger>
               <AccordionContent className="px-4 pb-4 pt-2">
@@ -196,13 +250,17 @@ const SettingsPage = () => {
                       htmlFor='lastname'
                       className='block text-sm font-medium text-gray-700'
                     >
-                      Nom
+
+                      Nom <span className="text-red-500">*</span>
                     </label>
                     <Input
                       type='text'
                       name='lastname'
                       id='lastname'
                       className='h-11'
+                      defaultValue={userData?.last_name}
+                      placeholder='Dupont'
+
                     />
                   </div>
                   <div className="space-y-2">
@@ -210,15 +268,25 @@ const SettingsPage = () => {
                       htmlFor='firstname'
                       className='block text-sm font-medium text-gray-700'
                     >
-                      Prénom
+                      Prénom <span className="text-red-500">*</span>
                     </label>
                     <Input
                       type='text'
                       name='firstname'
                       id='firstname'
                       className='h-11'
+                      defaultValue={userData?.first_name}
+                      placeholder='Jean'
                     />
                   </div>
+                </div>
+                <div className="flex justify-end space-x-2 mt-4">
+                  <Button
+                    type='submit'
+                    className="bg-purple-dark hover:bg-purple-dark/90"
+                  >
+                    Enregistrer
+                  </Button>
                 </div>
               </AccordionContent>
             </AccordionItem>
@@ -240,7 +308,16 @@ const SettingsPage = () => {
                   id='email'
                   placeholder='azerty@gmail.com'
                   className='h-11'
+                  defaultValue={userData?.email}
                 />
+                <div className="flex justify-end space-x-2 mt-4">
+                  <Button
+                    type='submit'
+                    className="bg-purple-dark hover:bg-purple-dark/90"
+                  >
+                    Enregistrer
+                  </Button>
+                </div>
               </AccordionContent>
             </AccordionItem>
 
@@ -422,7 +499,7 @@ const SettingsPage = () => {
           </Accordion>
         </section>
       </div>
-    </div>
+    </form>
   );
 };
 
