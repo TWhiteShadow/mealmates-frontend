@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { AxiosError } from 'axios';
 import {
   AddCircleOutline,
   ArrowBackIosOutlined,
@@ -19,8 +20,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
 import ProfileAppBar from '@/components/ProfileAppBar';
-import { useQuery } from '@tanstack/react-query';
-import { useUpdateUserDataMutation, useUserData } from "@/api/User";
+import { useUpdateUserDataMutation, useUserData, ApiErrorResponse } from "@/api/User";
 import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from "sonner"
 
@@ -59,6 +59,9 @@ const formatAddressTitle = (address: Address | null): string => {
 };
 
 const SettingsPage = () => {
+
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+
   const [addresses, setAddresses] = useState<Address[]>([
     {
       id: '1',
@@ -154,6 +157,7 @@ const SettingsPage = () => {
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    setFieldErrors({});
 
     const formData = new FormData(e.currentTarget);
     const updatedFields: Record<string, string> = {};
@@ -175,13 +179,25 @@ const SettingsPage = () => {
     if (Object.keys(updatedFields).length > 0) {
       mutation.mutate(updatedFields, {
         onSuccess: () => {
-          console.log('User data updated successfully');
+          setFieldErrors({});
           toast.success('Vos informations ont été mises à jour avec succès');
         },
         onError: (error: unknown) => {
-          console.error('Error updating user data:', error);
-          toast.error('Une erreur est survenue lors de la mise à jour de vos informations');
+          const axiosError = error as AxiosError<ApiErrorResponse>;
+          const apiErrs = axiosError?.response?.data?.errors;
+          if (apiErrs) {
+            const formatted: Record<string, string> = {};
+            Object.entries(apiErrs).forEach(([apiKey, msg]) => {
+              const fieldName = apiKey.replace('_', '').toLowerCase();
+              formatted[fieldName] = msg;
+            });
+            setFieldErrors(formatted);
+          } else {
+            console.error('Error updating user data:', error);
+            toast.error('Une erreur est survenue lors de la mise à jour de vos informations');
+          }
         },
+        
       });
     } else {
       toast.info('Aucune modification détectée');
@@ -262,23 +278,27 @@ const SettingsPage = () => {
                       placeholder='Dupont'
 
                     />
+                    {fieldErrors.lastname && (
+                      <p className="mt-1 text-red-600 text-sm">{fieldErrors.lastname}</p>
+                    )}
                   </div>
                   <div className="space-y-2">
-                    <label
-                      htmlFor='firstname'
-                      className='block text-sm font-medium text-gray-700'
-                    >
+                    <label htmlFor="firstname" className="block text-sm font-medium text-gray-700">
                       Prénom <span className="text-red-500">*</span>
                     </label>
                     <Input
-                      type='text'
-                      name='firstname'
-                      id='firstname'
-                      className='h-11'
+                      type="text"
+                      name="firstname"
+                      id="firstname"
                       defaultValue={userData?.first_name}
-                      placeholder='Jean'
+                      placeholder="Jean"
+                      className="h-11"
                     />
+                    {fieldErrors.firstname && (
+                      <p className="mt-1 text-red-600 text-sm">{fieldErrors.firstname}</p>
+                    )}
                   </div>
+
                 </div>
                 <div className="flex justify-end space-x-2 mt-4">
                   <Button

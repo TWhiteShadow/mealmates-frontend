@@ -57,6 +57,10 @@ export type UserData = {
   isVerified: boolean;
 };
 
+export interface ApiErrorResponse {
+  errors?: Record<string, string>;
+}
+
 // export function getLocalToken(): string | null {
 //   return sessionStorage.getItem('oAuth_access_token') ||
 // }
@@ -234,18 +238,11 @@ export async function getProductsArroundMe(
 }
 
 // Update User Data with axios
-export async function updateUserDataWithAxios(
-  userData: unknown
-): Promise<UserData> {
-  try {
-    const response = await axios.put(`${API_BASE_URL}/user/update`, userData);
-
-    return response.data;
-  } catch (error) {
-    console.error('Error updating user data:', error);
-    throw new Error('Failed to update user data');
-  }
+export async function updateUserDataWithAxios(userData: unknown): Promise<UserData> {
+  const response = await axios.put(`${API_BASE_URL}/user/update`, userData);
+  return response.data;
 }
+
 
 const queryKey: QueryKey = ['userData'];
 
