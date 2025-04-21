@@ -57,6 +57,12 @@ export type UserData = {
   isVerified: boolean;
 };
 
+export type UserDataResponse = {
+  success: boolean;
+  message: string;
+  user: UserData;
+};
+
 export interface ApiErrorResponse {
   errors?: Record<string, string>;
 }
@@ -238,7 +244,7 @@ export async function getProductsArroundMe(
 }
 
 // Update User Data with axios
-export async function updateUserDataWithAxios(userData: unknown): Promise<UserData> {
+export async function updateUserDataWithAxios(userData: unknown): Promise<UserDataResponse> {
   const response = await axios.put(`${API_BASE_URL}/user/update`, userData);
   return response.data;
 }
@@ -254,7 +260,6 @@ export function useUpdateUserDataMutation() {
     mutationFn: (userData: unknown) => updateUserDataWithAxios(userData),
     mutationKey: ['userData'],
     onSuccess: async () => {
-      // Invalidate the 'userData' query to trigger a refetch
       await queryClient.invalidateQueries({ queryKey });
     },
   });

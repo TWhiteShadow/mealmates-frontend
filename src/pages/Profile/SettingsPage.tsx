@@ -159,23 +159,22 @@ const SettingsPage = () => {
     setFieldErrors({});
 
     const formData = new FormData(e.currentTarget);
-    const updatedFields: Record<string, string> = {};
 
-    const lastName = formData.get('lastname') as string;
-    const firstName = formData.get('firstname') as string;
+    const updatedUserData = {
+      ...userData,
+      last_name: formData.get('lastname') as string,
+      first_name: formData.get('firstname') as string,
+    };
 
-    if (lastName !== userData?.last_name) {
-      updatedFields.lastName = lastName;
-    }
-    if (firstName !== userData?.first_name) {
-      updatedFields.firstName = firstName;
-    }
-
-    if (Object.keys(updatedFields).length > 0) {
-      mutation.mutate(updatedFields, {
-        onSuccess: () => {
+    if (updatedUserData && Object.keys(updatedUserData).length > 0) {
+      mutation.mutate(updatedUserData, {
+        onSuccess: (data) => {
           setFieldErrors({});
-          toast.success('Vos informations ont été mises à jour avec succès');
+          if (data.success === true) {
+            toast.success(data.message);
+          } else {
+            toast.error(data.message);
+          }
         },
         onError: (error: unknown) => {
           const axiosError = error as AxiosError<ApiErrorResponse>;
