@@ -4,7 +4,6 @@ import {
   AddCircleOutline,
   ArrowBackIosOutlined,
   Home,
-  Mail,
   Person,
   Delete,
 } from '@mui/icons-material';
@@ -162,7 +161,6 @@ const SettingsPage = () => {
     const formData = new FormData(e.currentTarget);
     const updatedFields: Record<string, string> = {};
 
-    const email = formData.get('email') as string;
     const lastName = formData.get('lastname') as string;
     const firstName = formData.get('firstname') as string;
 
@@ -171,9 +169,6 @@ const SettingsPage = () => {
     }
     if (firstName !== userData?.first_name) {
       updatedFields.firstName = firstName;
-    }
-    if (email !== userData?.email) {
-      updatedFields.email = email;
     }
 
     if (Object.keys(updatedFields).length > 0) {
@@ -197,7 +192,7 @@ const SettingsPage = () => {
             toast.error('Une erreur est survenue lors de la mise à jour de vos informations');
           }
         },
-        
+
       });
     } else {
       toast.info('Aucune modification détectée');
@@ -311,35 +306,6 @@ const SettingsPage = () => {
               </AccordionContent>
             </AccordionItem>
 
-            <AccordionItem value="email" className="border rounded-lg mb-4 shadow-sm bg-white">
-              <AccordionTrigger className="px-4 py-3 hover:bg-purple-50 transition-colors duration-200">
-                <div className="flex items-center">
-                  <Mail
-                    sx={{ width: 24, height: 24 }}
-                    className='!text-purple-dark !bg-transparent mr-2'
-                  />
-                  <span className="font-medium">Adresse mail <span className="text-red-500">*</span></span>
-                </div>
-              </AccordionTrigger>
-              <AccordionContent className="px-4 pb-4 pt-2">
-                <Input
-                  type='email'
-                  name='email'
-                  id='email'
-                  placeholder='azerty@gmail.com'
-                  className='h-11'
-                  defaultValue={userData?.email}
-                />
-                <div className="flex justify-end space-x-2 mt-4">
-                  <Button
-                    type='submit'
-                    className="bg-purple-dark hover:bg-purple-dark/90"
-                  >
-                    Enregistrer
-                  </Button>
-                </div>
-              </AccordionContent>
-            </AccordionItem>
 
             <AccordionItem value="addresses" className="border rounded-lg mb-4 shadow-sm bg-white">
               <AccordionTrigger className="px-4 py-3 hover:bg-purple-50 transition-colors duration-200">
