@@ -29,7 +29,6 @@ import {
 import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from "sonner";
 import AddressInput from '@/components/AddressInput';
-import { console } from 'inspector';
 
 interface AddressWithEditing extends Address {
   isEditing?: boolean;
@@ -62,18 +61,24 @@ const SettingsPage = () => {
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [addresses, setAddresses] = useState<AddressWithEditing[]>([]);
   const [newAddress, setNewAddress] = useState<AddressWithEditing | null>(null);
+  const [firstName, setFirstName] = useState<string>('');
+  const [lastName, setLastName] = useState<string>('');
 
   const { isLoading, data: userData } = useUserData();
   const updateUserMutation = useUpdateUserDataMutation();
   const deleteAddressMutation = useDeleteAddressMutation();
 
-  // Initialize addresses from userData when it loads
+  // Initialize form data from userData when it loads
   useEffect(() => {
-    if (userData?.address) {
-      setAddresses(userData.address.map(addr => ({
-        ...addr,
-        isEditing: false
-      })));
+    if (userData) {
+      setFirstName(userData.first_name || '');
+      setLastName(userData.last_name || '');
+      if (userData.address) {
+        setAddresses(userData.address.map(addr => ({
+          ...addr,
+          isEditing: false
+        })));
+      }
     }
   }, [userData]);
 
@@ -172,15 +177,17 @@ const SettingsPage = () => {
     e.preventDefault();
     setFieldErrors({});
 
-    const formData = new FormData(e.currentTarget);
-
     if (!userData) return;
 
     const updatedUserData = {
       ...userData,
-      last_name: formData.get('lastname') as string,
-      first_name: formData.get('firstname') as string,
-      address: addresses.map(({ isEditing: _, ...addr }) => addr), // Use _ to indicate intentionally unused variable
+      last_name: lastName,
+      first_name: firstName,
+      address: addresses.map(addr => {
+        const addressData = { ...addr };
+        delete addressData.isEditing;
+        return addressData;
+      }),
       allergen: userData?.allergen || []
     };
 
@@ -272,12 +279,13 @@ const SettingsPage = () => {
                       Nom <span className="text-red-500">*</span>
                     </label>
                     <Input
-                      type='text'
-                      name='lastname'
-                      id='lastname'
-                      className='h-11'
-                      defaultValue={userData?.last_name}
-                      placeholder='Dupont'
+                      type="text"
+                      name="lastname"
+                      id="lastname"
+                      value={lastName}
+                      onChange={(e) => setLastName(e.target.value)}
+                      placeholder="Dupont"
+                      className="h-11"
                     />
                     {fieldErrors.lastname && (
                       <p className="mt-1 text-red-600 text-sm">{fieldErrors.lastname}</p>
@@ -291,7 +299,8 @@ const SettingsPage = () => {
                       type="text"
                       name="firstname"
                       id="firstname"
-                      defaultValue={userData?.first_name}
+                      value={firstName}
+                      onChange={(e) => setFirstName(e.target.value)}
                       placeholder="Jean"
                       className="h-11"
                     />
