@@ -185,10 +185,10 @@ export async function getUserData(): Promise<UserData> {
 }
 
 export async function getProductsArroundMe(
-  _lat: number,
-  _lng: number,
-  _radius: number,
-  _filters?: {
+  lat: number,
+  lng: number,
+  radius: number,
+  filters?: {
     productTypes?: string[];
     expirationDate?: string;
     minPrice?: number;
@@ -197,44 +197,44 @@ export async function getProductsArroundMe(
     dietaryPreferences?: string[];
   }
 ): Promise<Product[]> {
-  // let url = `${API_BASE_URL}/products/nearby?lat=${lat}&lng=${lng}&radius=${radius}`;
+  let url = `${API_BASE_URL}/products/nearby?lat=${lat}&lng=${lng}&radius=${radius}`;
 
-  // // Ajout des filtres optionnels
-  // if (filters) {
-  //   if (filters.productTypes && filters.productTypes.length > 0) {
-  //     url += `&types=${filters.productTypes.join(',')}`;
-  //   }
+  // Ajout des filtres optionnels
+  if (filters) {
+    if (filters.productTypes && filters.productTypes.length > 0) {
+      url += `&types=${filters.productTypes.join(',')}`;
+    }
 
-  //   if (filters.expirationDate) {
-  //     url += `&expirationDate=${filters.expirationDate}`;
-  //   }
+    if (filters.expirationDate) {
+      url += `&expirationDate=${filters.expirationDate}`;
+    }
 
-  //   if (filters.minPrice !== undefined) {
-  //     url += `&minPrice=${filters.minPrice}`;
-  //   }
+    if (filters.minPrice !== undefined) {
+      url += `&minPrice=${filters.minPrice}`;
+    }
 
-  //   if (filters.maxPrice !== undefined) {
-  //     url += `&maxPrice=${filters.maxPrice}`;
-  //   }
+    if (filters.maxPrice !== undefined) {
+      url += `&maxPrice=${filters.maxPrice}`;
+    }
 
-  //   if (filters.minSellerRating !== undefined && filters.minSellerRating > 0) {
-  //     url += `&minSellerRating=${filters.minSellerRating}`;
-  //   }
+    if (filters.minSellerRating !== undefined && filters.minSellerRating > 0) {
+      url += `&minSellerRating=${filters.minSellerRating}`;
+    }
 
-  //   if (filters.dietaryPreferences && filters.dietaryPreferences.length > 0) {
-  //     url += `&dietaryPreferences=${filters.dietaryPreferences.join(',')}`;
-  //   }
-  // }
+    if (filters.dietaryPreferences && filters.dietaryPreferences.length > 0) {
+      url += `&dietaryPreferences=${filters.dietaryPreferences.join(',')}`;
+    }
+  }
 
-  // const response = await fetch(url);
+  const response = await fetch(url);
 
-  // if (!response.ok) {
-  //   throw new Error('Failed to fetch nearby products');
-  // }
+  if (!response.ok) {
+    throw new Error('Failed to fetch nearby products');
+  }
 
-  // return response.json();
+  return response.json();
 
-  return fakeProducts;
+  // return fakeProducts;
 }
 
 // Update User Data with axios

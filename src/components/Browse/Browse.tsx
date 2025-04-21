@@ -266,7 +266,7 @@ const Browse: React.FC<BrowseProps> = ({
                         {offer.seller && (
                           <div className="flex justify-between">
                             <span>Vendeur:</span>
-                            <span>{offer.seller?.name}</span>
+                            <span>{offer.seller.first_name} {offer.seller.last_name}</span>
                           </div>
                         )}
                         {offer.sellerRating && (

@@ -18,9 +18,8 @@ export interface Product {
 
   seller?: {
     id: number;
-    name: string;
-    rating: number;
-    profilePicture?: string;
+    first_name: string|null;
+    last_name: string|null;
   };
   images?: string[];
   originalPrice?: number;
