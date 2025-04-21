@@ -31,7 +31,6 @@ const Browse: React.FC<BrowseProps> = ({
       max: 50
     },
     minSellerRating: 0,
-    pickupOptions: []
   } 
 }) => {
   const [userLocation, setUserLocation] = useState<LatLngExpression | null>(null);
@@ -147,14 +146,9 @@ const Browse: React.FC<BrowseProps> = ({
         }
       }
 
-      if (filters.pickupOptions.length > 0 && 
-          !filters.pickupOptions.some(option => product.pickupOptions?.includes(option))) {
-        return false;
-      }
-
       return true;
     });
-  }, [products, filters.expirationDate, filters.pickupOptions]);
+  }, [products, filters.expirationDate]);
 
   const handleLocationRequest = useCallback(() => {
     if (navigator.geolocation) {
@@ -175,8 +169,7 @@ const Browse: React.FC<BrowseProps> = ({
   }, []);
 
   const displayedProducts = useMemo(() => {
-    const filtersActive = filters.expirationDate || 
-                          filters.pickupOptions.length > 0 || 
+    const filtersActive = filters.expirationDate ||
                           filters.productTypes.length > 0 ||
                           filters.dietaryPreferences.length > 0 ||
                           filters.minSellerRating > 0 ||

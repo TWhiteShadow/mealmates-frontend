@@ -13,7 +13,6 @@ export interface Product {
   dietaryTags: string[];
   sellerRating: number;
   isSoldOut: boolean;
-  pickupOptions: string[];
   pickupDetails: string;
 
   seller?: {

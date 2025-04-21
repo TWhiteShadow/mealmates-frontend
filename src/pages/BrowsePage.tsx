@@ -18,8 +18,7 @@ function BrowsePage() {
       min: 0,
       max: 50
     },
-    minSellerRating: 0,
-    pickupOptions: []
+    minSellerRating: 0
   });
 
   const handleSearch = useCallback((value: string) => {
@@ -58,9 +57,6 @@ function BrowsePage() {
       count++;
     }
     if (filters.minSellerRating > 0) {
-      count++;
-    }
-    if (filters.pickupOptions.length > 0) {
       count++;
     }
     
