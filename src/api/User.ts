@@ -1,6 +1,4 @@
 import { Product } from './Product';
-// @ts-expect-error (TS 7016) - Cannot find module '@/assets/fakeProducts'
-import { products as fakeProducts } from '@/assets/fakeProducts.js';
 import axios from './Axios';
 import {
   QueryKey,
@@ -182,6 +180,27 @@ export async function addUserAddress(
   return response.json();
 }
 
+// Delete address
+export async function deleteUserAddress(addressId: number): Promise<UserData> {
+  const response = await axios.delete(
+    `${API_BASE_URL}/user/address/${addressId}`
+  );
+  return response.data.user;
+}
+
+// Hook for address deletion
+export function useDeleteAddressMutation() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (addressId: number) => deleteUserAddress(addressId),
+    mutationKey: ['userData'],
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ['userData'] });
+    },
+  });
+}
+
 export async function getUserData(): Promise<UserData> {
   const response = await axios.get(`${API_BASE_URL}/user`, {
     withCredentials: true,
@@ -192,7 +211,7 @@ export async function getUserData(): Promise<UserData> {
   return response.data;
 }
 
-export async function getProductsArroundMe(
+export async function getNearbyProducts(
   lat: number,
   lng: number,
   radius: number,
@@ -241,16 +260,15 @@ export async function getProductsArroundMe(
   }
 
   return response.json();
-
-  // return fakeProducts;
 }
 
 // Update User Data with axios
-export async function updateUserDataWithAxios(userData: unknown): Promise<UserDataResponse> {
+export async function updateUserDataWithAxios(
+  userData: UserData
+): Promise<UserDataResponse> {
   const response = await axios.put(`${API_BASE_URL}/user/update`, userData);
   return response.data;
 }
-
 
 const queryKey: QueryKey = ['userData'];
 
@@ -259,7 +277,7 @@ export function useUpdateUserDataMutation() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (userData: unknown) => updateUserDataWithAxios(userData),
+    mutationFn: (userData: UserData) => updateUserDataWithAxios(userData),
     mutationKey: ['userData'],
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey });

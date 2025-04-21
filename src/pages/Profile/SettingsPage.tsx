@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { AxiosError } from 'axios';
 import {
   AddCircleOutline,
@@ -19,20 +19,21 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
 import ProfileAppBar from '@/components/ProfileAppBar';
-import { useUpdateUserDataMutation, useUserData, ApiErrorResponse } from "@/api/User";
+import {
+  useUpdateUserDataMutation,
+  useUserData,
+  ApiErrorResponse,
+  useDeleteAddressMutation,
+  Address
+} from "@/api/User";
 import { Skeleton } from '@/components/ui/skeleton';
-import { toast } from "sonner"
+import { toast } from "sonner";
+import AddressInput from '@/components/AddressInput';
+import { console } from 'inspector';
 
-
-
-type Address = {
-  id: string;
-  address: string | null;
-  city: string | null;
-  region: string | null;
-  zipCode: string | null;
+interface AddressWithEditing extends Address {
   isEditing?: boolean;
-};
+}
 
 const formatAddressTitle = (address: Address | null): string => {
   if (!address) {
@@ -58,116 +59,133 @@ const formatAddressTitle = (address: Address | null): string => {
 };
 
 const SettingsPage = () => {
-
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+  const [addresses, setAddresses] = useState<AddressWithEditing[]>([]);
+  const [newAddress, setNewAddress] = useState<AddressWithEditing | null>(null);
 
-  const [addresses, setAddresses] = useState<Address[]>([
-    {
-      id: '1',
-      address: '30 rue de Meaux',
-      city: 'Senlis',
-      region: 'Hauts-de-France',
-      zipCode: '60300',
-      isEditing: false,
-    },
-  ]);
+  const { isLoading, data: userData } = useUserData();
+  const updateUserMutation = useUpdateUserDataMutation();
+  const deleteAddressMutation = useDeleteAddressMutation();
 
-  const [newAddress, setNewAddress] = useState<Address | null>(null);
+  // Initialize addresses from userData when it loads
+  useEffect(() => {
+    if (userData?.address) {
+      setAddresses(userData.address.map(addr => ({
+        ...addr,
+        isEditing: false
+      })));
+    }
+  }, [userData]);
 
   const addNewAddress = () => {
-    const emptyAddress: Address = {
-      id: Date.now().toString(),
-      address: null,
-      city: null,
-      region: null,
-      zipCode: null,
+    const emptyAddress: AddressWithEditing = {
+      id: 0,
+      address: '',
+      city: '',
+      region: '',
+      zipCode: '',
+      latitude: 0,
+      longitude: 0,
       isEditing: true,
     };
     setNewAddress(emptyAddress);
   };
 
-  const handleNewAddressChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (!newAddress) {
-      return;
+  const validateAddress = (address: Address): boolean => {
+    if (!address.address || !address.city || !address.zipCode || !address.region) {
+      toast.error("Tous les champs d'adresse sont obligatoires");
+      return false;
     }
-
-    setNewAddress({
-      ...newAddress,
-      [e.target.name]: e.target.value,
-    });
-  };
-
-  const handleAddressChange = (id: string, e: React.ChangeEvent<HTMLInputElement>) => {
-    setAddresses(addresses.map(addr => {
-      if (addr.id === id) {
-        return {
-          ...addr,
-          [e.target.name]: e.target.value,
-        };
-      }
-      return addr;
-    }));
-  };
-
-  const saveNewAddress = () => {
-    if (!newAddress) {
-      return;
-    }
-
-    setAddresses([...addresses, { ...newAddress, isEditing: false }]);
-    setNewAddress(null);
+    return true;
   };
 
   const cancelNewAddress = () => {
     setNewAddress(null);
   };
 
-  const toggleEditMode = (id: string) => {
-    setAddresses(addresses.map(addr => {
-      if (addr.id === id) {
-        return {
-          ...addr,
-          isEditing: !addr.isEditing,
-        };
+  const saveNewAddress = () => {
+    if (!newAddress) return;
+    if (!validateAddress(newAddress)) return;
+
+    // Add new address to local state
+    const addressToAdd = { ...newAddress, isEditing: false };
+    setAddresses([...addresses, addressToAdd]);
+    setNewAddress(null);
+  };
+
+  const deleteAddress = (id: number) => {
+    // If it's a new unsaved address with temporary ID
+    if (id === 0) {
+      setAddresses(addresses.filter(addr => addr.id !== id));
+      return;
+    }
+
+    // Otherwise delete on server
+    deleteAddressMutation.mutate(id, {
+      onSuccess: () => {
+        setAddresses(addresses.filter(addr => addr.id !== id));
+        toast.success('Adresse supprimée avec succès');
+      },
+      onError: (error) => {
+        handleApiError(error, 'adresse');
       }
-      return addr;
-    }));
+    });
   };
 
-  const saveExistingAddress = (id: string) => {
-    setAddresses(addresses.map(addr => {
-      if (addr.id === id) {
-        return {
-          ...addr,
-          isEditing: false,
-        };
-      }
-      return addr;
-    }));
+  const handleApiError = (error: unknown, context: string) => {
+    const axiosError = error as AxiosError<ApiErrorResponse>;
+    const apiErrs = axiosError?.response?.data?.errors;
+
+    if (apiErrs) {
+      const formatted: Record<string, string> = {};
+      Object.entries(apiErrs).forEach(([apiKey, msg]) => {
+        const fieldName = apiKey.replace('_', '').toLowerCase();
+        formatted[fieldName] = msg;
+      });
+      setFieldErrors(formatted);
+    } else {
+      console.error(`Error updating ${context}:`, error);
+      toast.error(`Une erreur est survenue lors de la mise à jour de vos ${context}`);
+    }
   };
 
-  const deleteAddress = (id: string) => {
-    setAddresses(addresses.filter(addr => addr.id !== id));
+  const onAddressSelect = (address: Address) => {
+    if (newAddress) {
+      setNewAddress({
+        ...newAddress,
+        ...address,
+      });
+    } else {
+      setAddresses(addresses.map(addr => {
+        if (addr.isEditing) {
+          return {
+            ...addr,
+            ...address,
+          };
+        }
+        return addr;
+      }));
+    }
   };
 
-  const { isLoading, data: userData } = useUserData();
-
-  const mutation = useUpdateUserDataMutation();
-
-  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setFieldErrors({});
 
     const formData = new FormData(e.currentTarget);
 
+    if (!userData) return;
+
     const updatedUserData = {
       ...userData,
       last_name: formData.get('lastname') as string,
       first_name: formData.get('firstname') as string,
+      address: addresses.map(({ isEditing: _, ...addr }) => addr), // Use _ to indicate intentionally unused variable
+      allergen: userData?.allergen || []
     };
 
     if (updatedUserData && Object.keys(updatedUserData).length > 0) {
-      mutation.mutate(updatedUserData, {
+      updateUserMutation.mutate(updatedUserData, {
         onSuccess: (data) => {
           setFieldErrors({});
           if (data.success === true) {
@@ -177,26 +195,13 @@ const SettingsPage = () => {
           }
         },
         onError: (error: unknown) => {
-          const axiosError = error as AxiosError<ApiErrorResponse>;
-          const apiErrs = axiosError?.response?.data?.errors;
-          if (apiErrs) {
-            const formatted: Record<string, string> = {};
-            Object.entries(apiErrs).forEach(([apiKey, msg]) => {
-              const fieldName = apiKey.replace('_', '').toLowerCase();
-              formatted[fieldName] = msg;
-            });
-            setFieldErrors(formatted);
-          } else {
-            console.error('Error updating user data:', error);
-            toast.error('Une erreur est survenue lors de la mise à jour de vos informations');
-          }
+          handleApiError(error, 'informations');
         },
-
       });
     } else {
       toast.info('Aucune modification détectée');
     }
-  }
+  };
 
   return (
     <form onSubmit={handleSubmit} className='h-screen relative bg-gray-100 overflow-x-hidden'>
@@ -228,7 +233,11 @@ const SettingsPage = () => {
             <AvatarFallback>User</AvatarFallback>
           </Avatar>
           <span className='font-semibold text-lg text-purple-dark mx-auto block text-center'>
-
+            {isLoading ? (
+              <Skeleton className="h-6 w-32 mx-auto" />
+            ) : (
+              `${userData?.last_name} ${userData?.first_name}`
+            )}
           </span>
         </div>
         <section className='my-8'>
@@ -260,7 +269,6 @@ const SettingsPage = () => {
                       htmlFor='lastname'
                       className='block text-sm font-medium text-gray-700'
                     >
-
                       Nom <span className="text-red-500">*</span>
                     </label>
                     <Input
@@ -270,7 +278,6 @@ const SettingsPage = () => {
                       className='h-11'
                       defaultValue={userData?.last_name}
                       placeholder='Dupont'
-
                     />
                     {fieldErrors.lastname && (
                       <p className="mt-1 text-red-600 text-sm">{fieldErrors.lastname}</p>
@@ -292,19 +299,9 @@ const SettingsPage = () => {
                       <p className="mt-1 text-red-600 text-sm">{fieldErrors.firstname}</p>
                     )}
                   </div>
-
-                </div>
-                <div className="flex justify-end space-x-2 mt-4">
-                  <Button
-                    type='submit'
-                    className="bg-purple-dark hover:bg-purple-dark/90"
-                  >
-                    Enregistrer
-                  </Button>
                 </div>
               </AccordionContent>
             </AccordionItem>
-
 
             <AccordionItem value="addresses" className="border rounded-lg mb-4 shadow-sm bg-white">
               <AccordionTrigger className="px-4 py-3 hover:bg-purple-50 transition-colors duration-200">
@@ -317,171 +314,92 @@ const SettingsPage = () => {
                 </div>
               </AccordionTrigger>
               <AccordionContent className="px-4 pb-4 pt-2">
-                <Accordion type="multiple" className="w-full">
-                  {addresses.map((address) => (
-                    <AccordionItem key={address.id} value={address.id} className="border rounded-lg mb-2 shadow-sm">
-                      <div className="flex items-center justify-between px-4 py-3 hover:bg-purple-50 transition-colors duration-200">
-                        <AccordionTrigger className="flex-1">
-                          <span className="font-medium">{formatAddressTitle(address)}</span>
+                {isLoading ? (
+                  <div className="space-y-2">
+                    <Skeleton className="h-16 w-full" />
+                    <Skeleton className="h-16 w-full" />
+                  </div>
+                ) : (
+                  <Accordion type="multiple" className="w-full">
+                    {addresses.map((address) => (
+                      <AccordionItem key={address.id} value={address.id.toString()} className="border rounded-lg mb-2 shadow-sm">
+                        <div className="flex items-center justify-between px-4 py-3 hover:bg-purple-50 transition-colors duration-200">
+                          <AccordionTrigger className="flex-1">
+                            <span className="font-medium">{formatAddressTitle(address)}</span>
+                          </AccordionTrigger>
+                          <Button
+                            variant="ghost"
+                            onClick={(e) => {
+                              e.preventDefault(); // Add this to prevent form submission
+                              e.stopPropagation();
+                              deleteAddress(address.id);
+                            }}
+                            data-id={address.id}
+                            className="text-red-500 p-1 hover:bg-red-50 hover:text-red-800"
+                          >
+                            <Delete sx={{ fontSize: 20 }} />
+                          </Button>
+                        </div>
+                        <AccordionContent className="px-4 pb-4 pt-2">
+                          <AddressInput placeholder={""} onSelect={onAddressSelect} />
+                        </AccordionContent>
+                      </AccordionItem>
+                    ))}
+
+                    {newAddress && (
+                      <AccordionItem value="new-address" className="border rounded-lg mb-2 shadow-sm">
+                        <AccordionTrigger className="px-4 py-3 hover:bg-purple-50 transition-colors duration-200">
+                          <span className="font-medium">{formatAddressTitle(newAddress)}</span>
                         </AccordionTrigger>
-                        <Button
-                          variant="ghost"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            deleteAddress(address.id);
-                          }}
-                          className="text-red-500 p-1 hover:bg-red-50 hover:text-red-800"
-                        >
-                          <Delete sx={{ fontSize: 20 }} />
-                        </Button>
-                      </div>
-                      <AccordionContent className="px-4 pb-4 pt-2">
-                        <div className='grid grid-cols-2 gap-4'>
-                          <div>
-                            <Input
-                              type='text'
-                              name='address'
-                              value={address.address || ''}
-                              onChange={(e) => handleAddressChange(address.id, e)}
-                              placeholder='30 rue de Meaux'
-                              className='h-11'
-                            />
-                          </div>
-                          <div>
-                            <Input
-                              type='text'
-                              name='city'
-                              value={address.city || ''}
-                              onChange={(e) => handleAddressChange(address.id, e)}
-                              placeholder='Senlis'
-                              className='h-11'
-                            />
-                          </div>
-                        </div>
-                        <div className='grid grid-cols-2 gap-4 mt-2'>
-                          <div>
-                            <Input
-                              type='text'
-                              name='region'
-                              value={address.region || ''}
-                              onChange={(e) => handleAddressChange(address.id, e)}
-                              placeholder='Hauts-de-France'
-                              className='h-11'
-                            />
-                          </div>
-                          <div>
-                            <Input
-                              type='text'
-                              name='zipCode'
-                              value={address.zipCode || ''}
-                              onChange={(e) => handleAddressChange(address.id, e)}
-                              placeholder='60300'
-                              className='h-11'
-                            />
-                          </div>
-                        </div>
-                        {address.isEditing && (
-                          <div className="flex justify-end space-x-2 mt-4">
-                            <Button
-                              variant="outline"
-                              onClick={() => toggleEditMode(address.id)}
-                            >
-                              Annuler
-                            </Button>
-                            <Button
-                              onClick={() => saveExistingAddress(address.id)}
-                              className="bg-purple-dark hover:bg-purple-dark/90"
-                            >
-                              Enregistrer
-                            </Button>
-                          </div>
-                        )}
-                      </AccordionContent>
-                    </AccordionItem>
-                  ))}
+                        <AccordionContent className="px-4 pb-4 pt-2">
+                          <AddressInput placeholder={""} onSelect={onAddressSelect} />
+                        </AccordionContent>
+                      </AccordionItem>
+                    )}
+                  </Accordion>
+                )}
 
-                  {newAddress && (
-                    <AccordionItem value="new-address" className="border rounded-lg mb-2 shadow-sm">
-                      <AccordionTrigger className="px-4 py-3 hover:bg-purple-50 transition-colors duration-200">
-                        <span className="font-medium">{formatAddressTitle(newAddress)}</span>
-                      </AccordionTrigger>
-                      <AccordionContent className="px-4 pb-4 pt-2">
-                        <div className='grid grid-cols-2 gap-4'>
-                          <div>
-                            <Input
-                              type='text'
-                              name='address'
-                              value={newAddress.address || ''}
-                              onChange={handleNewAddressChange}
-                              placeholder='30 rue de Meaux'
-                              className='h-11'
-                            />
-                          </div>
-                          <div>
-                            <Input
-                              type='text'
-                              name='city'
-                              value={newAddress.city || ''}
-                              onChange={handleNewAddressChange}
-                              placeholder='Senlis'
-                              className='h-11'
-                            />
-                          </div>
-                        </div>
-                        <div className='grid grid-cols-2 gap-4 mt-2'>
-                          <div>
-                            <Input
-                              type='text'
-                              name='region'
-                              value={newAddress.region || ''}
-                              onChange={handleNewAddressChange}
-                              placeholder='Hauts-de-France'
-                              className='h-11'
-                            />
-                          </div>
-                          <div>
-                            <Input
-                              type='text'
-                              name='zipCode'
-                              value={newAddress.zipCode || ''}
-                              onChange={handleNewAddressChange}
-                              placeholder='60300'
-                              className='h-11'
-                            />
-                          </div>
-                        </div>
-                        <div className="flex justify-end space-x-2 mt-4">
-                          <Button
-                            variant="outline"
-                            onClick={cancelNewAddress}
-                          >
-                            Annuler
-                          </Button>
-                          <Button
-                            onClick={saveNewAddress}
-                            className="bg-purple-dark hover:bg-purple-dark/90"
-                          >
-                            Enregistrer
-                          </Button>
-                        </div>
-                      </AccordionContent>
-                    </AccordionItem>
-                  )}
-                </Accordion>
 
-                <Button
-                  onClick={addNewAddress}
-                  disabled={!!newAddress}
-                  className={`w-full bg-purple-dark text-white hover:bg-white hover:text-purple-dark hover:border-2 hover:border-purple-dark group py-2 px-6 mt-4 ${newAddress ? 'opacity-50 cursor-not-allowed' : ''}`}
-                >
-                  <AddCircleOutline
-                    sx={{ fontSize: '2rem' }}
-                    className='group-hover:text-purple-dark'
-                  />
-                </Button>
+                {!newAddress && (
+                  <Button
+                    onClick={addNewAddress}
+                    disabled={!!newAddress}
+                    className={`w-full bg-purple-dark text-white hover:bg-white hover:text-purple-dark hover:border-2 hover:border-purple-dark group py-2 px-6 mt-4 ${newAddress ? 'opacity-50 cursor-not-allowed' : ''}`}
+                  >
+                    <AddCircleOutline
+                      sx={{ fontSize: '2rem' }}
+                      className='group-hover:text-purple-dark'
+                    />
+                  </Button>
+                )}
+
+                {newAddress && (
+                  <div className="flex justify-end mt-4">
+                    <Button
+                      onClick={cancelNewAddress}
+                      className="bg-gray-300 hover:bg-gray-400 w-1/2 flex-1/2"
+                    >
+                      Annuler
+                    </Button>
+                    <Button
+                      onClick={saveNewAddress}
+                      className="bg-purple-dark hover:bg-purple-dark/90 flex-1/2 ml-2"
+                    >
+                      Enregistrer
+                    </Button>
+                  </div>
+                )}
               </AccordionContent>
             </AccordionItem>
           </Accordion>
+          <div className="flex justify-end space-x-2 mt-4">
+            <Button
+              type='submit'
+              className="bg-purple-dark hover:bg-purple-dark/90"
+            >
+              Enregistrer
+            </Button>
+          </div>
         </section>
       </div>
     </form>
