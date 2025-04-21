@@ -24,7 +24,6 @@ export interface AdvancedFilterState {
     max: number;
   };
   minSellerRating: number;
-  pickupOptions: string[];
 }
 
 interface SearchFilterProps {
@@ -51,7 +50,6 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
         max: 50
       },
       minSellerRating: 0,
-      pickupOptions: []
     }
   );
 
@@ -92,17 +90,6 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
     });
   };
 
-  const togglePickupOption = (option: string) => {
-    setFilters(prev => {
-      const options = [...prev.pickupOptions];
-      if (options.includes(option)) {
-        return { ...prev, pickupOptions: options.filter(o => o !== option) };
-      } else {
-        return { ...prev, pickupOptions: [...options, option] };
-      }
-    });
-  };
-
   const resetFilters = () => {
     setFilters({
       productTypes: [],
@@ -113,8 +100,7 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
         min: 0,
         max: 50
       },
-      minSellerRating: 0,
-      pickupOptions: []
+      minSellerRating: 0
     });
   };
 
@@ -315,31 +301,6 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
             <span>5</span>
             <StarIcon sx={{ fontSize: 14, color: '#FFD700', marginLeft: 0.5 }} />
           </div>
-        </div>
-      </FilterSection>
-
-      <FilterSection title="Conditions de retrait">
-        <div className="grid grid-cols-2 gap-3">
-          <FilterButton
-            label="Sur place"
-            selected={filters.pickupOptions.includes('on-site')}
-            onClick={() => togglePickupOption('on-site')}
-          />
-          <FilterButton
-            label="À emporter"
-            selected={filters.pickupOptions.includes('takeaway')}
-            onClick={() => togglePickupOption('takeaway')}
-          />
-          <FilterButton
-            label="Livraison possible"
-            selected={filters.pickupOptions.includes('delivery')}
-            onClick={() => togglePickupOption('delivery')}
-          />
-          <FilterButton
-            label="Aujourd'hui uniquement"
-            selected={filters.pickupOptions.includes('today-only')}
-            onClick={() => togglePickupOption('today-only')}
-          />
         </div>
       </FilterSection>
     </FilterModal>

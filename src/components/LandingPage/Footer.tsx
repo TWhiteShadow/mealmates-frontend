@@ -4,23 +4,24 @@ function Footer() {
   return (
     <footer className='bg-white py-12'>
       <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
-        <div className='grid grid-cols-1 md:grid-cols-4 gap-8'>
+        <div className='sm:flex items-center justify-center sm:gap-20 grid grid-cols-1 md:grid-cols-4 gap-8'>
           <div>
             <div className='flex items-center'>
               <img
                 src={MealMatesLogo}
                 alt='MealMates Logo'
-                className='h-8 w-8'
+                className='h-12 w-12'
               />
               <span className='ml-2 text-xl font-bold text-primary font-Lilita'>
-                MealMates
+                Meal<span className='text-purple-semi-dark'>Mates</span>
               </span>
             </div>
-            <p className='mt-4 text-gray-600'>
+            <p className='mt-4 text-gray-600 max-w-[30ch]'>
               Partager de la nourriture avec votre entourage, économiser de
               l'argent et réduire les déchets.
             </p>
           </div>
+
 
           <div>
             <h3 className='text-sm font-semibold text-gray-900 tracking-wider uppercase'>
@@ -50,33 +51,6 @@ function Footer() {
             </ul>
           </div>
 
-          <div>
-            <h3 className='text-sm font-semibold text-gray-900 tracking-wider uppercase'>
-              Assistance
-            </h3>
-            <ul className='mt-4 space-y-2'>
-              <li>
-                <a href='#' className='text-gray-600 hover:text-primary'>
-                  Centre d'Aide
-                </a>
-              </li>
-              <li>
-                <a href='#' className='text-gray-600 hover:text-primary'>
-                  Contactez-Nous
-                </a>
-              </li>
-              <li>
-                <a href='#' className='text-gray-600 hover:text-primary'>
-                  Politique de Confidentialité
-                </a>
-              </li>
-              <li>
-                <a href='#' className='text-gray-600 hover:text-primary'>
-                  Conditions d'Utilisation
-                </a>
-              </li>
-            </ul>
-          </div>
 
           <div>
             <h3 className='text-sm font-semibold text-gray-900 tracking-wider uppercase'>
@@ -101,6 +75,34 @@ function Footer() {
               <li>
                 <a href='#' className='text-gray-600 hover:text-primary'>
                   LinkedIn
+                </a>
+              </li>
+            </ul>
+          </div>
+
+          <div>
+            <h3 className='text-sm font-semibold text-gray-900 tracking-wider uppercase'>
+              Assistance
+            </h3>
+            <ul className='mt-4 space-y-2'>
+              <li>
+                <a href='#' className='text-gray-600 hover:text-primary'>
+                  Centre d'Aide
+                </a>
+              </li>
+              <li>
+                <a href='#' className='text-gray-600 hover:text-primary'>
+                  Contactez-Nous
+                </a>
+              </li>
+              <li>
+                <a href='#' className='text-gray-600 hover:text-primary'>
+                  Politique de Confidentialité
+                </a>
+              </li>
+              <li>
+                <a href='#' className='text-gray-600 hover:text-primary'>
+                  Conditions d'Utilisation
                 </a>
               </li>
             </ul>

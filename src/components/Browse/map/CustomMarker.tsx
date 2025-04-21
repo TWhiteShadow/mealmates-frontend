@@ -9,12 +9,17 @@ export const createCustomIcon = (): L.DivIcon => {
   });
 };
 
-export const createUserLocationIcon = (): L.DivIcon => {
+export const createUserLocationIcon = (zoomLevel: number): L.DivIcon => {
+  const baseSize = 16;
+  const sizeFactor = Math.max(1, (20 - zoomLevel) / 10);
+  const width = baseSize * sizeFactor;
+  const border = 3;
+
   return L.divIcon({
-    className: 'user-marker bg-purple-dark',
-    html: `<div style="width: 12px; height: 12px; border-radius: 50%; border: 3px solid white;"></div>`,
-    iconSize: [18, 18],
-    iconAnchor: [9, 9]
+    className: 'user-marker !z-1000',
+    html: `<div style="width: ${width}px; height: ${width}px; border-radius: 50%; border: ${border}px solid white; " class="bg-purple-dark"></div>`,
+    iconSize: [width + border, width + border],
+    iconAnchor: [(width + border)/2, (width + border)/2]
   });
 };
 

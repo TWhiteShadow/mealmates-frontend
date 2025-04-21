@@ -5,8 +5,8 @@ function HowItWorks() {
     <section id='how-it-works' className='py-20 bg-white'>
       <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
         <div className='text-center mb-16'>
-          <h2 className='text-3xl font-bold text-primary font-Lilita'>
-            Comment MealMates Fonctionne
+          <h2 className='text-4xl font-bold text-primary font-Lilita tracking-wide'>
+            Comment Meal<span className='text-purple-semi-dark'>Mates</span> Fonctionne
           </h2>
           <p className='mt-4 text-lg text-gray-600 max-w-2xl mx-auto'>
             Rejoignez la révolution du partage alimentaire en trois étapes

@@ -5,28 +5,20 @@ import { BoltRounded, Euro, Settings } from "@mui/icons-material";
 import StatCard from "@/components/StatCard";
 import { Avatar } from "@mui/material";
 import { useNavigate } from "react-router";
-import { useEffect, useState } from "react";
-import { getUserData, UserData } from "@/api/User";
+import { getUserData } from "@/api/User";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useQuery } from '@tanstack/react-query'
 
+function useUserData() {
+    return useQuery({
+        queryKey: ['userData'],
+        queryFn: getUserData,
+    })
+}
 const ProfilePage = () => {
-    const [userData, setUserData] = useState<UserData | null>(null);
-    const [isLoading, setIsLoading] = useState(true);
+    const { isLoading, data: userData } = useUserData();
 
     const navigate = useNavigate();
-    useEffect(() => {
-        const fetchUserData = async () => {
-            const userData = await getUserData();
-            if (!userData) {
-                navigate('/app/login');
-                return;
-            }
-            setUserData(userData);
-            setIsLoading(false);
-        };
-        fetchUserData();
-    }, [userData?.id]);
-
 
     const handleSettings = () => {
         navigate('/app/profile/settings');
@@ -68,7 +60,7 @@ const ProfilePage = () => {
                 <section className="mb-8">
                     <div className="flex items-center justify-between mb-4">
                         <h2 className="text-lg font-semibold">Vos dernières commandes</h2>
-                        <a href="#" className="text-purple-700 text-sm">Voir plus</a>
+                        <a href="#" className="text-purple-dark underline-offset-2 underline text-sm">Voir plus</a>
                     </div>
 
                     <OrderCard
@@ -83,13 +75,15 @@ const ProfilePage = () => {
                         title="CO2 évité"
                         value="51"
                         unit="KW/h"
-                        icon={<BoltRounded sx={{ fontSize: 80, color: '#6D28D9' }} />}
+                        className="text-purple-dark"
+                        icon={<BoltRounded sx={{ fontSize: 80 }} />}
                     />
                     <StatCard
                         title="Argent économisé"
                         value="32"
                         unit="EUR"
-                        icon={<Euro sx={{ fontSize: 80, color: '#6D28D9' }} />}
+                        className="text-purple-dark"
+                        icon={<Euro sx={{ fontSize: 80 }} />}
                     />
                 </div>
 

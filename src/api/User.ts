@@ -1,7 +1,11 @@
 import { Product } from './Product';
-// @ts-expect-error (TS 7016) - Cannot find module '@/assets/fakeProducts'
-import { products as fakeProducts } from '@/assets/fakeProducts.js';
 import axios from './Axios';
+import {
+  QueryKey,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from '@tanstack/react-query';
 const API_BASE_URL = import.meta.env.VITE_BACKEND_URL + '/api/v1';
 
 export interface AuthResponse {
@@ -27,6 +31,8 @@ export type Address = {
   zipCode: string;
   address: string;
   region: string;
+  longitude: number;
+  latitude: number;
 };
 
 export type Allergen = {
@@ -51,6 +57,16 @@ export type UserData = {
   isVerified: boolean;
 };
 
+export type UserDataResponse = {
+  success: boolean;
+  message: string;
+  user: UserData;
+};
+
+export interface ApiErrorResponse {
+  errors?: Record<string, string>;
+}
+
 // export function getLocalToken(): string | null {
 //   return sessionStorage.getItem('oAuth_access_token') ||
 // }
@@ -70,24 +86,17 @@ export async function loginUser(
   }
 }
 
-// Refresh Token
-export async function refreshToken(
-  refresh_token: string,
-  provider: string
-): Promise<RefreshTokenResponse> {
-  const response = await fetch(`${API_BASE_URL}/token/refresh`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ refresh_token, provider }),
-  });
+export async function refreshToken(): Promise<RefreshTokenResponse> {
+  try {
+    const response = await axios.post(`/token/refresh`, {
+      withCredentials: true,
+    });
 
-  if (!response.ok) {
-    throw new Error('Failed to refresh token');
+    return response.data;
+  } catch (error) {
+    console.error('Error during login:', error);
+    throw new Error('Invalid credentials');
   }
-
-  return response.json();
 }
 
 // Register User
@@ -171,11 +180,30 @@ export async function addUserAddress(
   return response.json();
 }
 
-// Get User Data (Assuming there's an endpoint like /api/v1/user)
+// Delete address
+export async function deleteUserAddress(addressId: number): Promise<UserData> {
+  const response = await axios.delete(
+    `${API_BASE_URL}/user/address/${addressId}`
+  );
+  return response.data.user;
+}
 
-export async function getUserData() {
+// Hook for address deletion
+export function useDeleteAddressMutation() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (addressId: number) => deleteUserAddress(addressId),
+    mutationKey: ['userData'],
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ['userData'] });
+    },
+  });
+}
+
+export async function getUserData(): Promise<UserData> {
   const response = await axios.get(`${API_BASE_URL}/user`, {
-    withCredentials: true, // Ensures cookies (including httpOnly JWT tokens) are sent with the request
+    withCredentials: true,
     headers: {
       'Content-Type': 'application/json',
     },
@@ -183,12 +211,11 @@ export async function getUserData() {
   return response.data;
 }
 
-// _ veux dire que c'est une variable qu'on va utiliser plus tard (pour TypeScript)
-export async function getProductsArroundMe(
-  _lat: number,
-  _lng: number,
-  _radius: number,
-  _filters?: {
+export async function getNearbyProducts(
+  lat: number,
+  lng: number,
+  radius: number,
+  filters?: {
     productTypes?: string[];
     expirationDate?: string;
     minPrice?: number;
@@ -197,42 +224,71 @@ export async function getProductsArroundMe(
     dietaryPreferences?: string[];
   }
 ): Promise<Product[]> {
-  // let url = `${API_BASE_URL}/products/nearby?lat=${lat}&lng=${lng}&radius=${radius}`;
+  let url = `${API_BASE_URL}/products/nearby?lat=${lat}&lng=${lng}&radius=${radius}`;
 
-  // // Ajout des filtres optionnels
-  // if (filters) {
-  //   if (filters.productTypes && filters.productTypes.length > 0) {
-  //     url += `&types=${filters.productTypes.join(',')}`;
-  //   }
+  // Ajout des filtres optionnels
+  if (filters) {
+    if (filters.productTypes && filters.productTypes.length > 0) {
+      url += `&types=${filters.productTypes.join(',')}`;
+    }
 
-  //   if (filters.expirationDate) {
-  //     url += `&expirationDate=${filters.expirationDate}`;
-  //   }
+    if (filters.expirationDate) {
+      url += `&expirationDate=${filters.expirationDate}`;
+    }
 
-  //   if (filters.minPrice !== undefined) {
-  //     url += `&minPrice=${filters.minPrice}`;
-  //   }
+    if (filters.minPrice !== undefined) {
+      url += `&minPrice=${filters.minPrice}`;
+    }
 
-  //   if (filters.maxPrice !== undefined) {
-  //     url += `&maxPrice=${filters.maxPrice}`;
-  //   }
+    if (filters.maxPrice !== undefined) {
+      url += `&maxPrice=${filters.maxPrice}`;
+    }
 
-  //   if (filters.minSellerRating !== undefined && filters.minSellerRating > 0) {
-  //     url += `&minSellerRating=${filters.minSellerRating}`;
-  //   }
+    if (filters.minSellerRating !== undefined && filters.minSellerRating > 0) {
+      url += `&minSellerRating=${filters.minSellerRating}`;
+    }
 
-  //   if (filters.dietaryPreferences && filters.dietaryPreferences.length > 0) {
-  //     url += `&dietaryPreferences=${filters.dietaryPreferences.join(',')}`;
-  //   }
-  // }
+    if (filters.dietaryPreferences && filters.dietaryPreferences.length > 0) {
+      url += `&dietaryPreferences=${filters.dietaryPreferences.join(',')}`;
+    }
+  }
 
-  // const response = await fetch(url);
+  const response = await fetch(url);
 
-  // if (!response.ok) {
-  //   throw new Error('Failed to fetch nearby products');
-  // }
+  if (!response.ok) {
+    throw new Error('Failed to fetch nearby products');
+  }
 
-  // return response.json();
+  return response.json();
+}
 
-  return fakeProducts;
+// Update User Data with axios
+export async function updateUserDataWithAxios(
+  userData: UserData
+): Promise<UserDataResponse> {
+  const response = await axios.put(`${API_BASE_URL}/user/update`, userData);
+  return response.data;
+}
+
+const queryKey: QueryKey = ['userData'];
+
+// Tanstack Query Wrapper
+export function useUpdateUserDataMutation() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (userData: UserData) => updateUserDataWithAxios(userData),
+    mutationKey: ['userData'],
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey });
+    },
+  });
+}
+
+// Get User Data
+export function useUserData() {
+  return useQuery({
+    queryKey: ['userData'],
+    queryFn: () => getUserData(),
+  });
 }

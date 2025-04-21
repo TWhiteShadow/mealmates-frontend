@@ -13,11 +13,16 @@ function Navbar() {
                 <img
                   src={MealMatesLogo}
                   alt='MealMates Logo'
-                  className='h-8 w-8'
+                  className='h-12 w-12'
                 />
-                <span className='ml-2 text-xl font-bold text-primary font-Lilita hidden sm:block'>
-                  MealMates
-                </span>
+                <div className='flex items-center gap-0'>
+                  <span className='ml-2 text-xl text-primary font-Lilita hidden sm:block'>
+                    Meal
+                  </span>
+                  <span className='text-xl text-purple-semi-dark font-Lilita hidden sm:block'>
+                    Mates
+                  </span>
+                </div>
               </a>
             </div>
           </div>
