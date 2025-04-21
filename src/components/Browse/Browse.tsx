@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo, useCallback } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, Circle, ZoomControl, useMapEvents } from 'react-leaflet';
 import { LatLngExpression } from 'leaflet';
 import MarkerClusterGroup from 'react-leaflet-markercluster';
-import { getProductsArroundMe } from '@/api/User';
+import { getNearbyProducts } from '@/api/User';
 import { Product } from '@/api/Product';
 
 import { createCustomIcon, createUserLocationIcon, createClusterIcon } from './map/CustomMarker';
@@ -18,9 +18,9 @@ interface BrowseProps {
   filters?: AdvancedFilterState;
 }
 
-const Browse: React.FC<BrowseProps> = ({ 
-  searchValue, 
-  radius, 
+const Browse: React.FC<BrowseProps> = ({
+  searchValue,
+  radius,
   filters = {
     productTypes: [],
     dietaryPreferences: [],
@@ -31,14 +31,14 @@ const Browse: React.FC<BrowseProps> = ({
       max: 50
     },
     minSellerRating: 0,
-  } 
+  }
 }) => {
   const [userLocation, setUserLocation] = useState<LatLngExpression | null>(null);
   const [products, setProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [locationError, setLocationError] = useState<string | null>(null);
   const [zoomLevel, setZoomLevel] = useState(5);
-  
+
   const searchRadius = useMemo(() => filters.distance || radius || 1000, [filters.distance, radius]);
 
   useEffect(() => {
@@ -79,7 +79,7 @@ const Browse: React.FC<BrowseProps> = ({
         }
       }
     };
-    
+
     searchAddress();
   }, [searchValue]);
 
@@ -99,13 +99,13 @@ const Browse: React.FC<BrowseProps> = ({
           dietaryPreferences: filters.dietaryPreferences
         };
 
-        const products = await getProductsArroundMe(
-          userLocation[0], 
-          userLocation[1], 
+        const products = await getNearbyProducts(
+          userLocation[0],
+          userLocation[1],
           searchRadius,
           serverFilters
         );
-        
+
         setProducts(products);
         setIsLoading(false);
       } catch (error) {
@@ -117,8 +117,8 @@ const Browse: React.FC<BrowseProps> = ({
     if (userLocation) {
       fetchProductsArroundMe();
     }
-  }, [userLocation, searchRadius, filters.productTypes, filters.price.min, filters.price.max, 
-      filters.minSellerRating, filters.dietaryPreferences]);
+  }, [userLocation, searchRadius, filters.productTypes, filters.price.min, filters.price.max,
+    filters.minSellerRating, filters.dietaryPreferences]);
 
   const filteredProducts = useMemo(() => {
     if (!products.length) {
@@ -134,7 +134,7 @@ const Browse: React.FC<BrowseProps> = ({
         endOfWeek.setDate(today.getDate() + 7);
 
         const expiryDate = new Date(product.expiryDate);
-        
+
         if (filters.expirationDate === 'today' && expiryDate.toDateString() !== today.toDateString()) {
           return false;
         }
@@ -170,12 +170,12 @@ const Browse: React.FC<BrowseProps> = ({
 
   const displayedProducts = useMemo(() => {
     const filtersActive = filters.expirationDate ||
-                          filters.productTypes.length > 0 ||
-                          filters.dietaryPreferences.length > 0 ||
-                          filters.minSellerRating > 0 ||
-                          filters.price.min > 0 ||
-                          filters.price.max < 50;
-                          
+      filters.productTypes.length > 0 ||
+      filters.dietaryPreferences.length > 0 ||
+      filters.minSellerRating > 0 ||
+      filters.price.min > 0 ||
+      filters.price.max < 50;
+
     return filtersActive ? filteredProducts : products;
   }, [products, filteredProducts, filters]);
 
@@ -183,7 +183,7 @@ const Browse: React.FC<BrowseProps> = ({
   const ZoomLevelCatcher = () => {
     const mapEvents = useMapEvents({
       zoomend: () => {
-          setZoomLevel(mapEvents.getZoom());
+        setZoomLevel(mapEvents.getZoom());
       },
     });
 
@@ -193,16 +193,16 @@ const Browse: React.FC<BrowseProps> = ({
 
 
   return (
-    <div className="m-auto max-w-md w-full h-full relative margin-auto z-0">
+    <div className="m-auto w-full h-full relative margin-auto z-0">
       <div className="w-full h-full relative">
         {isLoading ? (
           <div className="absolute inset-0 flex items-center justify-center bg-gray-100">
             <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-dark"></div>
           </div>
         ) : userLocation ? (
-          <MapContainer 
+          <MapContainer
             center={userLocation}
-            zoom={13} 
+            zoom={13}
             style={{ height: "100%", width: "100%", zIndex: 0 }}
             scrollWheelZoom={true}
             zoomControl={false}
@@ -212,13 +212,13 @@ const Browse: React.FC<BrowseProps> = ({
               url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             />
 
-            <Circle 
+            <Circle
               center={userLocation}
               radius={searchRadius}
               pathOptions={{ fillColor: '#5E1969', fillOpacity: 0.1, color: '#5E1969', weight: 1 }}
             />
 
-            <Marker 
+            <Marker
               position={userLocation}
               icon={createUserLocationIcon(zoomLevel)}
             >
@@ -236,8 +236,8 @@ const Browse: React.FC<BrowseProps> = ({
               maxClusterRadius={60}
             >
               {displayedProducts.map(offer => (
-                <Marker 
-                  key={offer.id} 
+                <Marker
+                  key={offer.id}
                   position={offer.position as [number, number]}
                   icon={createCustomIcon()}
                 >
@@ -279,7 +279,7 @@ const Browse: React.FC<BrowseProps> = ({
                 </Marker>
               ))}
             </MarkerClusterGroup>
-            
+
             <SetViewOnLocation coords={userLocation} />
             <ZoomControl position="topright" />
           </MapContainer>

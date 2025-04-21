@@ -4,6 +4,7 @@ import SearchBar from '@/components/Browse/SearchBar';
 import "../assets/browse-map.css";
 import RadiusControl from '@/components/Browse/map/RadiusControl';
 import SearchFilter, { AdvancedFilterState } from '@/components/Browse/SearchFilter';
+import { Address } from '@/api/User';
 
 function BrowsePage() {
   const [search, setSearch] = useState<string>('');
@@ -21,8 +22,8 @@ function BrowsePage() {
     minSellerRating: 0
   });
 
-  const handleSearch = useCallback((value: string) => {
-    setSearch(value);
+  const handleSearch = useCallback((value: Address) => {
+    setSearch(value.address);
   }, []);
 
   const handleFilterClick = useCallback(() => {
@@ -43,9 +44,9 @@ function BrowsePage() {
 
   const getActiveFiltersCount = useCallback((): number => {
     let count = 0;
-    
+
     if (filters.productTypes.length > 0) {
-       count++;
+      count++;
     }
     if (filters.dietaryPreferences.length > 0) {
       count++;
@@ -59,7 +60,7 @@ function BrowsePage() {
     if (filters.minSellerRating > 0) {
       count++;
     }
-    
+
     return count;
   }, [filters]);
 
@@ -69,8 +70,8 @@ function BrowsePage() {
     <div className="h-screen relative bg-gray-100 overflow-hidden">
       <div className='fixed top-0 left-0 w-full z-10'>
         <div className='max-w-md mx-auto pt-12 pb-6 px-4 xs:px-9 rounded-b-[20px] bg-purple-dark/10 backdrop-blur-lg'>
-          <SearchBar 
-            onSearch={handleSearch} 
+          <SearchBar
+            onSearch={handleSearch}
             onFilterClick={handleFilterClick}
             onLocationClick={handleLocationClick}
           />
@@ -82,10 +83,10 @@ function BrowsePage() {
             </div>
           )}
         </div>
-        
+
         {showRadiusFilter && (
           <div className="max-w-md mx-auto">
-            <RadiusControl 
+            <RadiusControl
               searchRadius={filters.distance}
               setSearchRadius={setSearchRadius}
               showRadiusFilter={showRadiusFilter}
@@ -94,16 +95,16 @@ function BrowsePage() {
         )}
       </div>
 
-      <SearchFilter 
+      <SearchFilter
         showFilters={showFilters}
         onClose={() => setShowFilters(false)}
         initialFilters={filters}
         onApplyFilters={handleApplyFilters}
       />
 
-      <Browse 
-        searchValue={search} 
-        radius={filters.distance} 
+      <Browse
+        searchValue={search}
+        radius={filters.distance}
         filters={filters}
       />
     </div>
