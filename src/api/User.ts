@@ -33,6 +33,8 @@ export type Address = {
   zipCode: string;
   address: string;
   region: string;
+  longitude: number;
+  latitude: number;
 };
 
 export type Allergen = {
