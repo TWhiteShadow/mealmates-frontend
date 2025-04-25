@@ -84,7 +84,7 @@ const Browse: React.FC<BrowseProps> = ({
   }, [searchValue]);
 
   useEffect(() => {
-    const fetchProductsArroundMe = async () => {
+    const fetchProductsAroundMe = async () => {
       if (!userLocation || !Array.isArray(userLocation) || userLocation.length !== 2) {
         return;
       }
@@ -115,7 +115,7 @@ const Browse: React.FC<BrowseProps> = ({
     };
 
     if (userLocation) {
-      fetchProductsArroundMe();
+      fetchProductsAroundMe();
     }
   }, [userLocation, searchRadius, filters.productTypes, filters.price.min, filters.price.max,
     filters.minSellerRating, filters.dietaryPreferences]);
