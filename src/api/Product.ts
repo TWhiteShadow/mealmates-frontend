@@ -17,10 +17,10 @@ export interface Product {
 
   seller?: {
     id: number;
-    first_name: string|null;
-    last_name: string|null;
+    first_name: string | null;
+    last_name: string | null;
   };
-  images?: string[];
+  images?: { name: string }[];
   originalPrice?: number;
   discount?: number;
   createdAt?: string;
@@ -28,9 +28,7 @@ export interface Product {
 }
 
 export async function getProductsUndetailed(): Promise<Product[]> {
-  const response = await fetch(
-    `${API_BASE_URL}/products/undetailed`
-  );
+  const response = await fetch(`${API_BASE_URL}/products/undetailed`);
 
   if (!response.ok) {
     throw new Error('Failed to fetch products');
