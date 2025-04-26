@@ -2,8 +2,10 @@ import { useState, useEffect, useMemo, useCallback } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, Circle, ZoomControl, useMapEvents } from 'react-leaflet';
 import { LatLngExpression } from 'leaflet';
 import MarkerClusterGroup from 'react-leaflet-markercluster';
-import { getNearbyProducts } from '@/api/User';
+import { useNearbyProducts } from '@/api/User';
 import { Product } from '@/api/Product';
+import { useAtom, useAtomValue, useSetAtom } from 'jotai';
+import { locationAtom, updateLocationAtom, isLoadingLocationAtom, mapViewStateAtom } from '@/atoms/location';
 
 import { createCustomIcon, createUserLocationIcon, createClusterIcon } from './map/CustomMarker';
 import LocationButton from './map/LocationButton';
@@ -33,92 +35,69 @@ const Browse: React.FC<BrowseProps> = ({
     minSellerRating: 0,
   }
 }) => {
-  const [userLocation, setUserLocation] = useState<LatLngExpression | null>(null);
+  const [location, setLocation] = useAtom(locationAtom);
+  const updateLocation = useSetAtom(updateLocationAtom);
+  const isLoadingLocation = useAtomValue(isLoadingLocationAtom);
+  const [mapViewState, setMapViewState] = useAtom(mapViewStateAtom);
   const [products, setProducts] = useState<Product[]>([]);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
   const [locationError, setLocationError] = useState<string | null>(null);
-  const [zoomLevel, setZoomLevel] = useState(5);
+  const [zoomLevel, setZoomLevel] = useState(mapViewState.zoom);
 
   const searchRadius = useMemo(() => filters.distance || radius || 1000, [filters.distance, radius]);
 
+  const serverFilters = useMemo(() => ({
+    productTypes: filters.productTypes,
+    minPrice: filters.price.min,
+    maxPrice: filters.price.max,
+    minSellerRating: filters.minSellerRating > 0 ? filters.minSellerRating : undefined,
+    dietaryPreferences: filters.dietaryPreferences
+  }), [filters.productTypes, filters.price.min, filters.price.max, filters.minSellerRating, filters.dietaryPreferences]);
+
+  const currentLocation: LatLngExpression = useMemo(() => {
+    return [location.latitude, location.longitude];
+  }, [location]);
+
+  const { data: nearbyProducts, error: queryError, isLoading: queryLoading } = useNearbyProducts(
+    location.latitude,
+    location.longitude,
+    searchRadius,
+    serverFilters
+  );
+
   useEffect(() => {
-    if (navigator.geolocation) {
-      setIsLoading(true);
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          const { latitude, longitude } = position.coords;
-          setUserLocation([latitude, longitude]);
-          setIsLoading(false);
-        },
-        (error) => {
-          console.error("Erreur de géolocalisation:", error);
-          setLocationError(`Impossible d'obtenir votre position: ${error.message}`);
-          setIsLoading(false);
-          setUserLocation([48.8566, 2.3522]);
-        },
-        { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
-      );
-    } else {
-      setLocationError("La géolocalisation n'est pas prise en charge par votre navigateur");
-      setIsLoading(false);
-      setUserLocation([48.8566, 2.3522]);
+    const oneHourAgo = Date.now() - (60 * 60 * 1000);
+    if (location.lastUpdated < oneHourAgo) {
+      updateLocation();
     }
-  }, []);
+  }, [location.lastUpdated, updateLocation]);
 
   useEffect(() => {
     const searchAddress = async () => {
       if (searchValue && searchValue.trim()) {
-        setIsLoading(true);
         try {
           const coordinates = await geocodeAddress(searchValue);
-          setUserLocation(coordinates);
+          setLocation({
+            latitude: coordinates[0],
+            longitude: coordinates[1],
+            lastUpdated: Date.now()
+          });
         } catch (error) {
           setLocationError(`Impossible de trouver cette adresse: ${(error as Error).message}`);
-        } finally {
-          setIsLoading(false);
         }
       }
     };
 
     searchAddress();
-  }, [searchValue]);
+  }, [searchValue, setLocation]);
 
   useEffect(() => {
-    const fetchProductsAroundMe = async () => {
-      if (!userLocation || !Array.isArray(userLocation) || userLocation.length !== 2) {
-        return;
-      }
-
-      setIsLoading(true);
-      try {
-        const serverFilters = {
-          productTypes: filters.productTypes,
-          minPrice: filters.price.min,
-          maxPrice: filters.price.max,
-          minSellerRating: filters.minSellerRating > 0 ? filters.minSellerRating : undefined,
-          dietaryPreferences: filters.dietaryPreferences
-        };
-
-        const products = await getNearbyProducts(
-          userLocation[0],
-          userLocation[1],
-          searchRadius,
-          serverFilters
-        );
-
-        setProducts(products);
-        setIsLoading(false);
-      } catch (error) {
-        console.error("Failed to fetch products:", error);
-        setIsLoading(false);
-      }
-    };
-
-    if (userLocation) {
-      fetchProductsAroundMe();
+    if (nearbyProducts) {
+      setProducts(nearbyProducts);
     }
-  }, [userLocation, searchRadius, filters.productTypes, filters.price.min, filters.price.max,
-    filters.minSellerRating, filters.dietaryPreferences]);
+    if (queryError) {
+      console.error("Failed to fetch products:", queryError);
+    }
+  }, [nearbyProducts, queryError]);
 
   const filteredProducts = useMemo(() => {
     if (!products.length) {
@@ -151,22 +130,8 @@ const Browse: React.FC<BrowseProps> = ({
   }, [products, filters.expirationDate]);
 
   const handleLocationRequest = useCallback(() => {
-    if (navigator.geolocation) {
-      setIsLoading(true);
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          const { latitude, longitude } = position.coords;
-          setUserLocation([latitude, longitude]);
-          setIsLoading(false);
-        },
-        (error) => {
-          console.error("Erreur de géolocalisation:", error);
-          setLocationError(`Impossible d'obtenir votre position: ${error.message}`);
-          setIsLoading(false);
-        }
-      );
-    }
-  }, []);
+    updateLocation();
+  }, [updateLocation]);
 
   const displayedProducts = useMemo(() => {
     const filtersActive = filters.expirationDate ||
@@ -179,30 +144,43 @@ const Browse: React.FC<BrowseProps> = ({
     return filtersActive ? filteredProducts : products;
   }, [products, filteredProducts, filters]);
 
-
   const ZoomLevelCatcher = () => {
     const mapEvents = useMapEvents({
       zoomend: () => {
-        setZoomLevel(mapEvents.getZoom());
+        const newZoom = mapEvents.getZoom();
+        setZoomLevel(newZoom);
+        const center = mapEvents.getCenter();
+        setMapViewState({
+          zoom: newZoom,
+          center: [center.lat, center.lng]
+        });
       },
+      moveend: () => {
+        const center = mapEvents.getCenter();
+        setMapViewState(prev => ({
+          ...prev,
+          center: [center.lat, center.lng]
+        }));
+      }
     });
-
     return null;
   }
-
-
 
   return (
     <div className="m-auto w-full h-full relative margin-auto z-0">
       <div className="w-full h-full relative">
-        {isLoading ? (
+        {isLoadingLocation || queryLoading ? (
           <div className="absolute inset-0 flex items-center justify-center bg-gray-100">
             <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-dark"></div>
           </div>
-        ) : userLocation ? (
+        ) : locationError ? (
+          <div className="absolute inset-0 flex items-center justify-center bg-gray-100">
+            <p className="text-red-500 text-center p-4">{locationError}</p>
+          </div>
+        ) : (
           <MapContainer
-            center={userLocation}
-            zoom={13}
+            center={mapViewState.center}
+            zoom={mapViewState.zoom}
             style={{ height: "100%", width: "100%", zIndex: 0 }}
             scrollWheelZoom={true}
             zoomControl={false}
@@ -213,19 +191,19 @@ const Browse: React.FC<BrowseProps> = ({
             />
 
             <Circle
-              center={userLocation}
+              center={currentLocation}
               radius={searchRadius}
               pathOptions={{ fillColor: '#5E1969', fillOpacity: 0.1, color: '#5E1969', weight: 1 }}
             />
 
             <Marker
-              position={userLocation}
+              position={currentLocation}
               icon={createUserLocationIcon(zoomLevel)}
             >
               <Popup>Votre position</Popup>
             </Marker>
 
-            <RecenterButton userLocation={userLocation} />
+            <RecenterButton userLocation={currentLocation} />
             <ZoomLevelCatcher />
 
             <MarkerClusterGroup
@@ -280,13 +258,9 @@ const Browse: React.FC<BrowseProps> = ({
               ))}
             </MarkerClusterGroup>
 
-            <SetViewOnLocation coords={userLocation} />
+            <SetViewOnLocation coords={currentLocation} />
             <ZoomControl position="topright" />
           </MapContainer>
-        ) : (
-          <div className="absolute inset-0 flex items-center justify-center bg-gray-100">
-            <p className="text-red-500 text-center p-4">{locationError || "Impossible de charger la carte"}</p>
-          </div>
         )}
       </div>
 

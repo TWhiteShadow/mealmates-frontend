@@ -224,42 +224,52 @@ export async function getNearbyProducts(
     dietaryPreferences?: string[];
   }
 ): Promise<Product[]> {
-  let url = `${API_BASE_URL}/products/nearby?lat=${lat}&lng=${lng}&radius=${radius}`;
+  let url = `/products/nearby?lat=${lat}&lng=${lng}&radius=${radius}`;
 
-  // Ajout des filtres optionnels
+  // Add optional filters
   if (filters) {
-    if (filters.productTypes && filters.productTypes.length > 0) {
+    if (filters.productTypes?.length) {
       url += `&types=${filters.productTypes.join(',')}`;
     }
-
     if (filters.expirationDate) {
       url += `&expirationDate=${filters.expirationDate}`;
     }
-
     if (filters.minPrice !== undefined) {
       url += `&minPrice=${filters.minPrice}`;
     }
-
     if (filters.maxPrice !== undefined) {
       url += `&maxPrice=${filters.maxPrice}`;
     }
-
     if (filters.minSellerRating !== undefined && filters.minSellerRating > 0) {
       url += `&minSellerRating=${filters.minSellerRating}`;
     }
-
-    if (filters.dietaryPreferences && filters.dietaryPreferences.length > 0) {
+    if (filters.dietaryPreferences?.length) {
       url += `&dietaryPreferences=${filters.dietaryPreferences.join(',')}`;
     }
   }
 
-  const response = await fetch(url);
+  const response = await axios.get(url);
+  return response.data;
+}
 
-  if (!response.ok) {
-    throw new Error('Failed to fetch nearby products');
+// Hook for nearby products
+export function useNearbyProducts(
+  lat: number,
+  lng: number,
+  radius: number,
+  filters?: {
+    productTypes?: string[];
+    expirationDate?: string;
+    minPrice?: number;
+    maxPrice?: number;
+    minSellerRating?: number;
+    dietaryPreferences?: string[];
   }
-
-  return response.json();
+) {
+  return useQuery({
+    queryKey: ['nearbyProducts', lat, lng, radius, filters],
+    queryFn: () => getNearbyProducts(lat, lng, radius, filters),
+  });
 }
 
 // Update User Data with axios

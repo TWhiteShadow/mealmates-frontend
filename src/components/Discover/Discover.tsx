@@ -1,7 +1,9 @@
 import { useState, useEffect, useMemo } from 'react';
-import { getNearbyProducts } from '@/api/User';
+import { useNearbyProducts } from '@/api/User';
 import { Product } from '@/api/Product';
 import { useNavigate } from 'react-router';
+import { useAtomValue, useSetAtom } from 'jotai';
+import { locationAtom, updateLocationAtom, isLoadingLocationAtom } from '@/atoms/location';
 import DiscoverFilters from './DiscoverFilters';
 import DiscoverCard from './DiscoverCard';
 import {
@@ -11,42 +13,37 @@ import {
 } from "@/components/ui/carousel"
 
 const Discover = () => {
+  const location = useAtomValue(locationAtom);
+  const updateLocation = useSetAtom(updateLocationAtom);
+  const isLoadingLocation = useAtomValue(isLoadingLocationAtom);
   const [products, setProducts] = useState<Product[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
   const [sortBy, setSortBy] = useState('recommended');
   const [priceRange, setPriceRange] = useState('all');
 
+  const { data: nearbyProducts, error: queryError, isLoading: queryLoading } = useNearbyProducts(
+    location.latitude,
+    location.longitude,
+    5000
+  );
+
   useEffect(() => {
-    const fetchProducts = async () => {
-      setIsLoading(true);
-      try {
-        const defaultLat = 48.8566;
-        const defaultLng = 2.3522;
-        let lat = defaultLat;
-        let lng = defaultLng;
+    // If location hasn't been updated in the last hour, update it
+    const oneHourAgo = Date.now() - (60 * 60 * 1000);
+    if (location.lastUpdated < oneHourAgo) {
+      updateLocation();
+    }
+  }, [location.lastUpdated, updateLocation]);
 
-        if (navigator.geolocation) {
-          const position = await new Promise<GeolocationPosition>((resolve, reject) => {
-            navigator.geolocation.getCurrentPosition(resolve, reject);
-          });
-          lat = position.coords.latitude;
-          lng = position.coords.longitude;
-        }
-
-        const fetchedProducts = await getNearbyProducts(lat, lng, 5000);
-        setProducts(fetchedProducts);
-      } catch (err) {
-        setError('Unable to fetch products. Please try again later.');
-        console.error('Error fetching products:', err);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchProducts();
-  }, []);
+  useEffect(() => {
+    if (nearbyProducts) {
+      setProducts(nearbyProducts);
+    }
+    if (queryError) {
+      setError('Unable to fetch products. Please try again later.');
+    }
+  }, [nearbyProducts, queryError]);
 
   const handleProductClick = (productId: number) => {
     navigate(`/product/${productId}`);
@@ -57,32 +54,22 @@ const Discover = () => {
   };
 
   const handleFilterChange = (type: string, value: string | string[]) => {
-    if (type === 'priceRange') {
-      setPriceRange(value as string);
+    if (type === 'priceRange' && typeof value === 'string') {
+      console.log('Price range changed:', value);
+      setPriceRange(value);
     }
   };
 
   const filteredAndSortedProducts = useMemo(() => {
     let filtered = [...products];
 
-    // Apply price range filter
     if (priceRange !== 'all') {
-      filtered = filtered.filter(product => {
-        const price = product.price;
-        switch (priceRange) {
-          case 'under5':
-            return price < 5;
-          case '5to10':
-            return price >= 5 && price <= 10;
-          case 'over10':
-            return price > 10;
-          default:
-            return true;
-        }
-      });
+      const [min, max] = priceRange.split('-').map(Number);
+      filtered = filtered.filter(product =>
+        product.price >= min && (!max || product.price <= max)
+      );
     }
 
-    // Apply sorting
     switch (sortBy) {
       case 'price':
         filtered.sort((a, b) => a.price - b.price);
@@ -107,7 +94,7 @@ const Discover = () => {
     return filtered;
   }, [products, sortBy, priceRange]);
 
-  if (isLoading) {
+  if (isLoadingLocation || queryLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-dark"></div>
