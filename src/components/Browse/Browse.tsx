@@ -207,6 +207,7 @@ const Browse: React.FC<BrowseProps> = ({
             <ZoomLevelCatcher />
 
             <MarkerClusterGroup
+              key={JSON.stringify(displayedProducts.map(product => product.id))}
               iconCreateFunction={createClusterIcon}
               showCoverageOnHover={false}
               spiderfyOnMaxZoom={true}
