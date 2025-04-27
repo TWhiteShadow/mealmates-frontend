@@ -24,3 +24,10 @@ export interface Product {
   createdAt?: string;
   updatedAt?: string;
 }
+
+export enum PriceRange {
+  ALL = 'all',
+  UNDER_5 = '0-5',
+  BETWEEN_5_10 = '5-10',
+  OVER_10 = '10-',
+}

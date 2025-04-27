@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useNearbyProducts } from '@/api/User';
-import { Product } from '@/api/Product';
+import { PriceRange, Product } from '@/api/Product';
 import { useNavigate } from 'react-router';
 import { useAtomValue, useSetAtom } from 'jotai';
 import { locationAtom, updateLocationAtom, isLoadingLocationAtom } from '@/atoms/location';
@@ -20,7 +20,7 @@ const Discover = () => {
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
   const [sortBy, setSortBy] = useState('recommended');
-  const [priceRange, setPriceRange] = useState('all');
+  const [priceRange, setPriceRange] = useState(PriceRange.ALL);
 
   const { data: nearbyProducts, error: queryError, isLoading: queryLoading } = useNearbyProducts(
     location.latitude,
@@ -55,19 +55,31 @@ const Discover = () => {
 
   const handleFilterChange = (type: string, value: string | string[]) => {
     if (type === 'priceRange' && typeof value === 'string') {
-      console.log('Price range changed:', value);
-      setPriceRange(value);
+      setPriceRange(value as PriceRange);
     }
   };
 
   const filteredAndSortedProducts = useMemo(() => {
     let filtered = [...products];
 
-    if (priceRange !== 'all') {
-      const [min, max] = priceRange.split('-').map(Number);
-      filtered = filtered.filter(product =>
-        product.price >= min && (!max || product.price <= max)
-      );
+    switch (priceRange) {
+      case PriceRange.UNDER_5: {
+        const [min, max] = PriceRange.UNDER_5.split('-').map(Number);
+        filtered = filtered.filter(product => product.price >= min && product.price <= max);
+        break;
+      }
+      case PriceRange.BETWEEN_5_10: {
+        const [min, max] = PriceRange.BETWEEN_5_10.split('-').map(Number);
+        filtered = filtered.filter(product => product.price >= min && product.price <= max);
+        break;
+      }
+      case PriceRange.OVER_10: {
+        const [min, _] = PriceRange.OVER_10.split('-').map(Number);
+        filtered = filtered.filter(product => product.price >= min);
+        break;
+      }
+      default:
+        break;
     }
 
     switch (sortBy) {

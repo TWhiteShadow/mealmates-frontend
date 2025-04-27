@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
+import { PriceRange } from '@/api/Product';
 
 export interface DiscoverFiltersProps {
     onSortChange: (value: string) => void;
@@ -8,14 +9,14 @@ export interface DiscoverFiltersProps {
 
 const DiscoverFilters = ({ onSortChange, onFilterChange }: DiscoverFiltersProps) => {
     const [activeSort, setActiveSort] = useState('recommended');
-    const [activePriceRange, setActivePriceRange] = useState('all');
+    const [activePriceRange, setActivePriceRange] = useState<PriceRange>(PriceRange.ALL);
 
     const handleSortChange = (value: string) => {
         setActiveSort(value);
         onSortChange(value);
     };
 
-    const handlePriceChange = (value: string) => {
+    const handlePriceChange = (value: PriceRange) => {
         setActivePriceRange(value);
         onFilterChange('priceRange', value);
     };
@@ -61,30 +62,30 @@ const DiscoverFilters = ({ onSortChange, onFilterChange }: DiscoverFiltersProps)
                     <h3 className="text-sm font-medium mb-2 text-gray-700">Price Range</h3>
                     <div className="flex flex-wrap gap-2">
                         <Button
-                            variant={activePriceRange === 'all' ? 'default' : 'outline'}
+                            variant={activePriceRange === PriceRange.ALL ? 'default' : 'outline'}
                             size="sm"
-                            onClick={() => handlePriceChange('all')}
+                            onClick={() => handlePriceChange(PriceRange.ALL)}
                         >
                             All
                         </Button>
                         <Button
-                            variant={activePriceRange === 'under5' ? 'default' : 'outline'}
+                            variant={activePriceRange === PriceRange.UNDER_5 ? 'default' : 'outline'}
                             size="sm"
-                            onClick={() => handlePriceChange('under5')}
+                            onClick={() => handlePriceChange(PriceRange.UNDER_5)}
                         >
                             Under 5€
                         </Button>
                         <Button
-                            variant={activePriceRange === '5to10' ? 'default' : 'outline'}
+                            variant={activePriceRange === PriceRange.BETWEEN_5_10 ? 'default' : 'outline'}
                             size="sm"
-                            onClick={() => handlePriceChange('5to10')}
+                            onClick={() => handlePriceChange(PriceRange.BETWEEN_5_10)}
                         >
                             5€ - 10€
                         </Button>
                         <Button
-                            variant={activePriceRange === 'over10' ? 'default' : 'outline'}
+                            variant={activePriceRange === PriceRange.OVER_10 ? 'default' : 'outline'}
                             size="sm"
-                            onClick={() => handlePriceChange('over10')}
+                            onClick={() => handlePriceChange(PriceRange.OVER_10)}
                         >
                             Over 10€
                         </Button>

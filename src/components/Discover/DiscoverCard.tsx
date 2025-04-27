@@ -2,15 +2,15 @@ import { Product } from '@/api/Product';
 
 interface DiscoverCardProps {
     product: Product;
-    // onClick: (productId: number) => void;
+    onClick: (productId: number) => void;
 }
 
 const backEndUrl = import.meta.env.VITE_BACKEND_URL;
-const DiscoverCard = ({ product }: DiscoverCardProps) => {
+const DiscoverCard = ({ product, onClick }: DiscoverCardProps) => {
     return (
         <div
             className="bg-white w-full rounded-lg shadow-md overflow-hidden cursor-pointer transform transition-transform hover:scale-105"
-        // onClick={() => onClick(product.id)}
+            onClick={() => onClick(product.id)}
         >
             {product.images && product.images.length > 0 && (
                 <div className="relative h-48">
@@ -48,7 +48,7 @@ const DiscoverCard = ({ product }: DiscoverCardProps) => {
 
                 {product.expiryDate && (
                     <div className="mt-2 text-sm text-gray-500">
-                        Expires: {new Date(product.expiryDate).toLocaleDateString()}
+                        Date d'expiration: {new Date(product.expiryDate).toLocaleDateString('fr-FR')}
                     </div>
                 )}
             </div>
