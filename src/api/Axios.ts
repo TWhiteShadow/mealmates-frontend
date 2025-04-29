@@ -2,8 +2,10 @@
 import axios from 'axios';
 import { locationRef, navigationRef } from '../utils/navigateRef';
 import { refreshToken } from './User';
+import { toast } from 'sonner';
 
 const baseURL = import.meta.env.VITE_BACKEND_URL;
+const toastsOnErrors = true;
 
 const api = axios.create({
   baseURL: `${baseURL}/api/v1`,
@@ -11,7 +13,7 @@ const api = axios.create({
 });
 
 api.interceptors.response.use(
-  response => response,
+  (response) => response,
   async (error: any) => {
     const originalRequest = error.config;
 
@@ -35,19 +37,22 @@ api.interceptors.response.use(
     }
 
     // 2) only redirect for final auth failures
-    if (
-      error.response?.status === 401 ||
-      error.response?.status === 403
-    ) {
+    if (error.response?.status === 401 || error.response?.status === 403) {
       if (navigationRef.navigate) {
         navigationRef.navigate('/app/login');
       }
     }
 
     // 3) for all other statuses (400, 404, etc), just pass the error along
+    if (toastsOnErrors && error.response?.data?.success === false) {
+      const errors = error.response?.data?.errors;
+      Object.entries(errors).forEach(([key, value]) => {
+        toast.error(value as string);
+        console.log(`${key}: ${value}`);
+      });
+    }
     return Promise.reject(error);
   }
 );
-
 
 export default api;

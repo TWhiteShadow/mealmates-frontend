@@ -1,5 +1,3 @@
-const API_BASE_URL = import.meta.env.VITE_BACKEND_URL + '/api/v1';
-
 export interface Product {
   id: number;
   name: string;
@@ -17,24 +15,19 @@ export interface Product {
 
   seller?: {
     id: number;
-    first_name: string|null;
-    last_name: string|null;
+    first_name: string | null;
+    last_name: string | null;
   };
-  images?: string[];
+  images?: { name: string }[];
   originalPrice?: number;
   discount?: number;
   createdAt?: string;
   updatedAt?: string;
 }
 
-export async function getProductsUndetailed(): Promise<Product[]> {
-  const response = await fetch(
-    `${API_BASE_URL}/products/undetailed`
-  );
-
-  if (!response.ok) {
-    throw new Error('Failed to fetch products');
-  }
-
-  return response.json();
+export enum PriceRange {
+  ALL = 'all',
+  UNDER_5 = '0-5',
+  BETWEEN_5_10 = '5-10',
+  OVER_10 = '10-',
 }
