@@ -19,7 +19,7 @@ export const locationAtom = atom<LocationState>({
 
 export const isLoadingLocationAtom = atom<boolean>(false);
 
-export const updateLocationAtom = atom(null, (get, set) => {
+export const updateLocationAtom = atom(null, (_, set) => {
   set(isLoadingLocationAtom, true);
   if ('geolocation' in navigator) {
     navigator.geolocation.getCurrentPosition(
