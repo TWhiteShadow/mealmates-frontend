@@ -1,5 +1,7 @@
-import React, { ReactNode } from 'react';
+import React, { ReactNode, useEffect, useState } from 'react';
 import Close from '@mui/icons-material/Close';
+import SaveSearchButton from './SaveSearchButton';
+import { userLogged } from '@/api/User';
 
 interface FilterModalProps {
   title: string;
@@ -8,6 +10,7 @@ interface FilterModalProps {
   children: ReactNode;
   onApply: () => void;
   onReset: () => void;
+  onSaveSearch: (name: string) => void;
   resetLabel?: string;
   applyLabel?: string;
 }
@@ -16,12 +19,26 @@ const FilterModal: React.FC<FilterModalProps> = ({
   title, 
   isOpen, 
   onClose, 
-  children, 
-  onApply, 
+  children,
+  onApply,
   onReset,
+  onSaveSearch,
   resetLabel = "Tout effacer",
   applyLabel = "Appliquer"
 }) => {
+  const [canSaveSearch, setCanSaveSearch] = useState<boolean>(false);
+  
+  useEffect(() => {
+    const fetchUserData = async () => {
+        const logged = await userLogged();
+        setCanSaveSearch(logged?.success && logged?.success === true);
+    };
+    
+    if (isOpen) {
+      fetchUserData();
+    }
+  }, [isOpen]);
+
   if (!isOpen) return null;
 
   return (
@@ -43,12 +60,15 @@ const FilterModal: React.FC<FilterModalProps> = ({
           >
             {resetLabel}
           </button>
-          <button
-            onClick={onApply}
-            className="px-6 py-3 bg-purple-dark text-white font-medium rounded-full min-w-[170px]"
-          >
-            {applyLabel}
-          </button>
+          <div>
+            {canSaveSearch && <SaveSearchButton onSaveSearch={onSaveSearch} />}
+            <button
+              onClick={onApply}
+              className="px-6 py-3 bg-purple-dark text-white font-medium rounded-full min-w-[170px]"
+            >
+              {applyLabel}
+            </button>
+          </div>
         </div>
       </div>
     </div>

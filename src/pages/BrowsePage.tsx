@@ -3,7 +3,7 @@ import Browse from '@/components/Browse/Browse';
 import SearchBar from '@/components/Browse/SearchBar';
 import "../assets/browse-map.css";
 import RadiusControl from '@/components/Browse/map/RadiusControl';
-import SearchFilter, { AdvancedFilterState } from '@/components/Browse/SearchFilter';
+import SearchFilter, { AdvancedFilterState } from '@/components/Browse/filters/SearchFilter';
 import { Address } from '@/api/User';
 
 function BrowsePage() {

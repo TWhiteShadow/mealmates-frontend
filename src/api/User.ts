@@ -302,3 +302,11 @@ export function useUserData() {
     queryFn: () => getUserData(),
   });
 }
+
+// check if user is logged
+export async function userLogged(): Promise<any> {
+  const response = await axios.get(`${API_BASE_URL}/user/logged`, {
+    withCredentials: true,
+  });
+  return response.data;
+}

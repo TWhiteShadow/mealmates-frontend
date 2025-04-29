@@ -9,10 +9,13 @@ import EggIcon from '@mui/icons-material/Egg';
 import StarIcon from '@mui/icons-material/Star';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 
-import FilterModal from './filters/FilterModal';
-import FilterSection from './filters/FilterSection';
-import FilterButton from './filters/FilterButton';
-import IconFilterButton from './filters/IconFilterButton';
+import FilterModal from './FilterModal';
+import FilterSection from './FilterSection';
+import FilterButton from './FilterButton';
+import IconFilterButton from './IconFilterButton';
+import { saveSearch } from '@/api/SavedSearch';
+import { useAtomValue } from 'jotai';
+import { locationAtom } from '@/atoms/location';
 
 export interface AdvancedFilterState {
   productTypes: string[];
@@ -33,12 +36,20 @@ interface SearchFilterProps {
   onApplyFilters?: (filters: AdvancedFilterState) => void;
 }
 
+type saveSearchType = {
+  name: string;
+  latitude: number;
+  longitude: number;
+  filters: AdvancedFilterState;
+};
+
 const SearchFilter: React.FC<SearchFilterProps> = ({
   showFilters,
   onClose = () => {},
   initialFilters,
   onApplyFilters = () => {}
 }) => {
+  const { latitude, longitude } = useAtomValue(locationAtom);
   const [filters, setFilters] = useState<AdvancedFilterState>(
     initialFilters || {
       productTypes: [],
@@ -113,6 +124,23 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
     return `${value}€`;
   };
 
+  const saveSearchFilters = (name: string) => {
+    const search: saveSearchType = {
+      name,
+      latitude,
+      longitude,
+      filters
+    };
+
+    saveSearch(search)
+      .then(() => {
+        console.log('Recherche sauvegardée avec succès');
+      })
+      .catch((error) => {
+        console.error('Erreur lors de la sauvegarde de la recherche:', error);
+      });
+  }
+
   return (
     <FilterModal
       title="Filtres avancés"
@@ -120,6 +148,7 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
       onClose={onClose}
       onApply={applyFilters}
       onReset={resetFilters}
+      onSaveSearch={(name) => saveSearchFilters(name)}
     >
       <FilterSection title="Type de produits">
         <div className="grid grid-cols-4 gap-3">

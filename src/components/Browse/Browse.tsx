@@ -11,7 +11,7 @@ import { createCustomIcon, createUserLocationIcon, createClusterIcon } from './m
 import LocationButton from './map/LocationButton';
 import SetViewOnLocation from './map/SetViewOnLocation';
 import { geocodeAddress } from '@/utils/geoUtils';
-import { AdvancedFilterState } from './SearchFilter';
+import { AdvancedFilterState } from './filters/SearchFilter';
 import { RecenterButton } from './map/RecenterButton';
 
 interface BrowseProps {
