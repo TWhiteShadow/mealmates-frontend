@@ -1,21 +1,22 @@
-import axios from 'axios';
 import { AdvancedFilterState } from '@/components/Browse/filters/SearchFilter';
-
-const API_URL = import.meta.env.VITE_BACKEND_URL || '';
+import api from './Axios';
 
 export interface SavedSearch {
   id?: number;
-  name: string;
   latitude?: number;
   longitude?: number;
   filters: AdvancedFilterState;
 }
 
+type SavedSearchResponse = {
+  success: boolean;
+  message: string;
+  savedSearches: SavedSearch[];
+};
+
 export const getSavedSearches = async (): Promise<SavedSearch[]> => {
   try {
-    const response = await axios.get(`${API_URL}/api/v1/saved-searches`, {
-      withCredentials: true,
-    });
+    const response = await api.get('/saved-searches');
     return response.data;
   } catch (error) {
     console.error('Error fetching saved searches:', error);
@@ -23,34 +24,18 @@ export const getSavedSearches = async (): Promise<SavedSearch[]> => {
   }
 };
 
-export const saveSearch = async (search: SavedSearch): Promise<SavedSearch> => {
-  try {
-    const response = await axios.post(`${API_URL}/api/v1/saved-searches`, search, {
-      withCredentials: true,
-    });
-    return response.data;
-  } catch (error) {
-    console.error('Error saving search:', error);
-    throw error;
-  }
+export const saveSearch = async (search: SavedSearch): Promise<SavedSearchResponse> => {
+  const response = await api.post('/saved-searches', search);
+  return response.data;
 };
 
 export const deleteSavedSearch = async (id: number): Promise<void> => {
-  try {
-    await axios.delete(`${API_URL}/api/v1/saved-searches/${id}`, {
-      withCredentials: true,
-    });
-  } catch (error) {
-    console.error('Error deleting saved search:', error);
-    throw error;
-  }
+  await api.delete(`/saved-searches/${id}`);
 };
 
 export const getSavedSearch = async (id: number): Promise<SavedSearch> => {
   try {
-    const response = await axios.get(`${API_URL}/api/v1/saved-searches/${id}`, {
-      withCredentials: true,
-    });
+    const response = await api.get(`/saved-searches/${id}`);
     return response.data;
   } catch (error) {
     console.error('Error loading saved search:', error);

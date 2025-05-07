@@ -17,17 +17,18 @@ const whitelistURLs = [
 ];
 
 api.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    if (response.data?.success === true && response.data?.message) {
+      toast.success(response.data.message);
+    }
+    return response;
+  },
   async (error: any) => {
     const originalRequest = error.config;
 
     // Check if the request URL is in the whitelist
     const requestURL = originalRequest.url.replace(originalRequest.baseURL, '');
     const isWhitelisted = whitelistURLs.some((url) => requestURL.startsWith(url));
-
-    if (isWhitelisted) {
-      return Promise.resolve(error.response);
-    }
 
     // 1) if 401, try refresh & retry once
     if (
@@ -40,6 +41,10 @@ api.interceptors.response.use(
         await refreshToken();
         return api(originalRequest);
       } catch (refreshError) {
+        if (isWhitelisted) {
+          return Promise.resolve(error.response);
+        }
+
         if (navigationRef.navigate) {
           const redirectURI = locationRef.location;
           navigationRef.navigate(`/app/login?redirectURI=${redirectURI}`);

@@ -37,7 +37,6 @@ interface SearchFilterProps {
 }
 
 type saveSearchType = {
-  name: string;
   latitude: number;
   longitude: number;
   filters: AdvancedFilterState;
@@ -124,21 +123,14 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
     return `${value}€`;
   };
 
-  const saveSearchFilters = (name: string) => {
+  const saveSearchFilters = () => {
     const search: saveSearchType = {
-      name,
       latitude,
       longitude,
       filters
     };
 
-    saveSearch(search)
-      .then(() => {
-        console.log('Recherche sauvegardée avec succès');
-      })
-      .catch((error) => {
-        console.error('Erreur lors de la sauvegarde de la recherche:', error);
-      });
+    saveSearch(search);
   }
 
   return (
@@ -148,7 +140,7 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
       onClose={onClose}
       onApply={applyFilters}
       onReset={resetFilters}
-      onSaveSearch={(name) => saveSearchFilters(name)}
+      onSaveSearch={saveSearchFilters}
     >
       <FilterSection title="Type de produits">
         <div className="grid grid-cols-4 gap-3">
