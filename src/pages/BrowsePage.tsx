@@ -110,9 +110,6 @@ function BrowsePage() {
             <div className="mt-2 flex justify-center">
               <div className="bg-purple-dark/10 text-purple-dark rounded-full text-xs px-3 py-1">
                 {activeFiltersCount} filtre{activeFiltersCount > 1 ? 's' : ''} actif{activeFiltersCount > 1 ? 's' : ''}
-                {currentSearch?.id && (
-                  <span className="ml-2 font-medium">• Recherche sauvegardée</span>
-                )}
               </div>
             </div>
           )}
