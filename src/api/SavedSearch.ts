@@ -1,5 +1,8 @@
 import { AdvancedFilterState } from '@/components/Browse/filters/SearchFilter';
 import api from './Axios';
+import { QueryKey, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+
+const queryKey: QueryKey = ['savedSearches'];
 
 export interface SavedSearch {
   id?: number;
@@ -14,15 +17,29 @@ type SavedSearchResponse = {
   savedSearches: SavedSearch[];
 };
 
+export const useSavedSearches = () => {
+  return useQuery({
+    queryKey: queryKey,
+    queryFn: () => getSavedSearches(),
+  })
+}
+
 export const getSavedSearches = async (): Promise<SavedSearch[]> => {
-  try {
-    const response = await api.get('/saved-searches');
-    return response.data;
-  } catch (error) {
-    console.error('Error fetching saved searches:', error);
-    throw error;
-  }
+  const response = await api.get('/saved-searches');
+  return response.data;
 };
+
+export function useSaveSearchMutation() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (savedSearch: SavedSearch) => saveSearch(savedSearch),
+    mutationKey: queryKey,
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey });
+    },
+  })
+}
 
 export const saveSearch = async (search: SavedSearch): Promise<SavedSearchResponse> => {
   const response = await api.post('/saved-searches', search);

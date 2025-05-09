@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import RestaurantIcon from '@mui/icons-material/Restaurant';
 import LocalGroceryStoreIcon from '@mui/icons-material/LocalGroceryStore';
 import SpaIcon from '@mui/icons-material/Spa';
@@ -13,7 +13,7 @@ import FilterModal from './FilterModal';
 import FilterSection from './FilterSection';
 import FilterButton from './FilterButton';
 import IconFilterButton from './IconFilterButton';
-import { saveSearch } from '@/api/SavedSearch';
+import { useSaveSearchMutation } from '@/api/SavedSearch';
 import { useAtomValue } from 'jotai';
 import { locationAtom } from '@/atoms/location';
 
@@ -50,18 +50,28 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
 }) => {
   const { latitude, longitude } = useAtomValue(locationAtom);
   const [filters, setFilters] = useState<AdvancedFilterState>(
-    initialFilters || {
-      productTypes: [],
-      dietaryPreferences: [],
-      expirationDate: '',
-      distance: 1000, // Par défaut 1km
-      price: {
-        min: 0,
-        max: 50
-      },
-      minSellerRating: 0,
-    }
+    initialFilters !== undefined && initialFilters !== null
+      ? initialFilters
+      : {
+          productTypes: [],
+          dietaryPreferences: [],
+          expirationDate: '',
+          distance: 1000, // Par défaut 1km
+          price: {
+            min: 0,
+            max: 50
+          },
+          minSellerRating: 0,
+        }
   );
+
+  const saveSearchMutation = useSaveSearchMutation();
+
+  useEffect(() => {
+    if (initialFilters) {
+      setFilters(initialFilters);
+    }
+  }, [initialFilters]);
 
   const updateFilter = (key: keyof AdvancedFilterState, value: any) => {
     setFilters(prev => ({ ...prev, [key]: value }));
@@ -130,7 +140,7 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
       filters
     };
 
-    saveSearch(search);
+    saveSearchMutation.mutate(search)
   }
 
   return (

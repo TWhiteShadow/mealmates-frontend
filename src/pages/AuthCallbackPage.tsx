@@ -7,7 +7,7 @@ function AuthCallbackPage() {
 
   useEffect(() => {
     const oauthDataEncoded = searchParams.get('auth_data');
-    console.log(oauthDataEncoded);
+
     if (oauthDataEncoded) {
       try {
         const decodedData = atob(oauthDataEncoded);

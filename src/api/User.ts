@@ -260,6 +260,6 @@ export function useUserData() {
 
 // check if user is logged
 export async function userLogged(): Promise<any> {
-  const response = await api.get(`/user/logged`, { withCredentials: false });
+  const response = await api.get(`/user/logged`);
   return response.data;
 }
