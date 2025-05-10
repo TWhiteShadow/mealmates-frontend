@@ -1,15 +1,20 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import Browse from '@/components/Browse/Browse';
 import SearchBar from '@/components/Browse/SearchBar';
 import "../assets/browse-map.css";
 import RadiusControl from '@/components/Browse/map/RadiusControl';
-import SearchFilter, { AdvancedFilterState } from '@/components/Browse/SearchFilter';
+import SearchFilter, { AdvancedFilterState } from '@/components/Browse/filters/SearchFilter';
 import { Address } from '@/api/User';
+import { useAtom } from 'jotai';
+import { currentSearchAtom } from '@/atoms/savedSearchFilters';
 
 function BrowsePage() {
   const [search, setSearch] = useState<string>('');
   const [showFilters, setShowFilters] = useState<boolean>(false);
   const [showRadiusFilter, setShowRadiusFilter] = useState<boolean>(false);
+  
+  const [currentSearch, setCurrentSearch] = useAtom(currentSearchAtom);
+  
   const [filters, setFilters] = useState<AdvancedFilterState>({
     productTypes: [],
     dietaryPreferences: [],
@@ -21,6 +26,13 @@ function BrowsePage() {
     },
     minSellerRating: 0
   });
+
+  useEffect(() => {
+    if (currentSearch?.filters) {
+      setFilters(currentSearch.filters);
+    }
+
+  }, [currentSearch]);
 
   const handleSearch = useCallback((value: Address) => {
     setSearch(value.address);
@@ -36,11 +48,30 @@ function BrowsePage() {
 
   const handleApplyFilters = useCallback((newFilters: AdvancedFilterState) => {
     setFilters(newFilters);
-  }, []);
+    
+    if (currentSearch) {
+      setCurrentSearch({
+        ...currentSearch,
+        filters: newFilters
+      });
+    } else {
+      setCurrentSearch({
+        filters: newFilters
+      });
+    }
+  }, [currentSearch, setCurrentSearch]);
 
   const setSearchRadius = useCallback((value: number) => {
-    setFilters(prev => ({ ...prev, distance: value }));
-  }, []);
+    const newFilters = { ...filters, distance: value };
+    setFilters(newFilters);
+    
+    if (currentSearch) {
+      setCurrentSearch({
+        ...currentSearch,
+        filters: newFilters
+      });
+    }
+  }, [filters, currentSearch, setCurrentSearch]);
 
   const getActiveFiltersCount = useCallback((): number => {
     let count = 0;

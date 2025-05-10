@@ -129,7 +129,6 @@ const SettingsPage = () => {
     deleteAddressMutation.mutate(id, {
       onSuccess: () => {
         setAddresses(addresses.filter(addr => addr.id !== id));
-        toast.success('Adresse supprimée avec succès');
       },
       onError: (error) => {
         handleApiError(error, 'adresse');
@@ -193,13 +192,8 @@ const SettingsPage = () => {
 
     if (updatedUserData && Object.keys(updatedUserData).length > 0) {
       updateUserMutation.mutate(updatedUserData, {
-        onSuccess: (data) => {
+        onSuccess: () => {
           setFieldErrors({});
-          if (data.success === true) {
-            toast.success(data.message);
-          } else {
-            toast.error(data.message);
-          }
         },
         onError: (error: unknown) => {
           handleApiError(error, 'informations');
