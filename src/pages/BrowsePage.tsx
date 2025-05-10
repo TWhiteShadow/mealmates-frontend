@@ -9,12 +9,12 @@ import { useAtom } from 'jotai';
 import { currentSearchAtom } from '@/atoms/savedSearchFilters';
 
 function BrowsePage() {
-  const [search, setSearch] = useState<string>('');
+  const [search, setSearch] = useState<Address | null>(null);
   const [showFilters, setShowFilters] = useState<boolean>(false);
   const [showRadiusFilter, setShowRadiusFilter] = useState<boolean>(false);
-  
+
   const [currentSearch, setCurrentSearch] = useAtom(currentSearchAtom);
-  
+
   const [filters, setFilters] = useState<AdvancedFilterState>({
     productTypes: [],
     dietaryPreferences: [],
@@ -35,7 +35,7 @@ function BrowsePage() {
   }, [currentSearch]);
 
   const handleSearch = useCallback((value: Address) => {
-    setSearch(value.address);
+    setSearch(value);
   }, []);
 
   const handleFilterClick = useCallback(() => {
@@ -48,7 +48,7 @@ function BrowsePage() {
 
   const handleApplyFilters = useCallback((newFilters: AdvancedFilterState) => {
     setFilters(newFilters);
-    
+
     if (currentSearch) {
       setCurrentSearch({
         ...currentSearch,
@@ -64,7 +64,7 @@ function BrowsePage() {
   const setSearchRadius = useCallback((value: number) => {
     const newFilters = { ...filters, distance: value };
     setFilters(newFilters);
-    
+
     if (currentSearch) {
       setCurrentSearch({
         ...currentSearch,

@@ -8,7 +8,7 @@ import { SavedSearch } from '@/api/SavedSearch';
 interface AddressInputProps {
   placeholder?: string;
   onSelect: (value: Address) => void;
-  savedSearchSelected: (value: SavedSearch) => void;
+  savedSearchSelected?: (value: SavedSearch) => void | null;
   className?: string;
   savedSearches?: SavedSearch[];
 }
@@ -117,30 +117,32 @@ const AddressInput: React.FC<AddressInputProps> = ({
       onSelect(
         suggestions[0]
           ? {
-              id: suggestions[0].properties.id,
-              city: suggestions[0].properties.city,
-              zipCode: suggestions[0].properties.postcode,
-              address: suggestions[0].properties.name,
-              region: suggestions[0].properties.context,
-              longitude: suggestions[0].geometry.coordinates[0],
-              latitude: suggestions[0].geometry.coordinates[1],
-            }
+            id: suggestions[0].properties.id,
+            city: suggestions[0].properties.city,
+            zipCode: suggestions[0].properties.postcode,
+            address: suggestions[0].properties.name,
+            region: suggestions[0].properties.context,
+            longitude: suggestions[0].geometry.coordinates[0],
+            latitude: suggestions[0].geometry.coordinates[1],
+          }
           : {
-              id: 0,
-              city: '',
-              zipCode: '',
-              address: '',
-              region: '',
-              longitude: 0,
-              latitude: 0,
-            }
+            id: 0,
+            city: '',
+            zipCode: '',
+            address: '',
+            region: '',
+            longitude: 0,
+            latitude: 0,
+          }
       );
       setShowSuggestions(false);
     }
   };
 
   const handleSavedSearchClick = (savedSearch: SavedSearch) => {
-    savedSearchSelected(savedSearch);
+    if (savedSearch && savedSearchSelected) {
+      savedSearchSelected(savedSearch);
+    }
 
     if (!savedSearch.latitude || !savedSearch.longitude) {
       return;
@@ -180,14 +182,14 @@ const AddressInput: React.FC<AddressInputProps> = ({
         placeholder={placeholder}
         className='min-h-10 w-full py-2 px-4 text-sm text-gray-700 border border-gray-400 bg-white rounded-xl outline-none placeholder:text-purple-dark'
       />
-      {showSuggestions && (
+      {showSuggestions && (suggestions.length > 0 || (savedSearches && savedSearches.length > 0)) && (
         <div
           className={cn(
             'z-50 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-auto',
             className
           )}
         >
-          {showSuggestions && suggestions.length > 0 && (
+          {suggestions.length > 0 && (
             <div className='border-b pb-2 mt-2'>
               <h2 className='px-4 py-2'>Suggestions d'adresse</h2>
               {suggestions.map((suggestion: Suggestion) => (
@@ -209,21 +211,21 @@ const AddressInput: React.FC<AddressInputProps> = ({
               <h2 className='px-4 py-2'>Recherches sauvegardée</h2>
               <div>
                 {savedSearches.map((search: SavedSearch) => (
-                    <div
-                      key={search.id}
-                      className='px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm'
-                      onClick={() => handleSavedSearchClick(search)}
-                    >
-                      <div className='flex items-center'>
-                        <Search className='w-4 h-4 text-purple-dark mr-2 mt-1 flex-shrink-0' />
-                        <span>
-                          {search.filters?.productTypes?.reduce((type, curType) => curType + ', ' + type, ''  )} -{' '}
-                          {search.filters?.price?.min}€ -{' '}
-                          {search.filters?.price?.max}€
-                        </span>
-                      </div>
+                  <div
+                    key={search.id}
+                    className='px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm'
+                    onClick={() => handleSavedSearchClick(search)}
+                  >
+                    <div className='flex items-center'>
+                      <Search className='w-4 h-4 text-purple-dark mr-2 mt-1 flex-shrink-0' />
+                      <span>
+                        {search.filters?.productTypes?.reduce((type, curType) => curType + ', ' + type, '')} -{' '}
+                        {search.filters?.price?.min}€ -{' '}
+                        {search.filters?.price?.max}€
+                      </span>
                     </div>
-                  )
+                  </div>
+                )
                 )}
               </div>
             </div>

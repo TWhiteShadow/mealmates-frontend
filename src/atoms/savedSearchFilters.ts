@@ -18,7 +18,7 @@ type SavedSearchResponse = {
 };
 
 // Atome pour stocker la liste des recherches sauvegardées
-export const savedSearchesQueryAtom = atomWithQuery((_) => ({
+export const savedSearchesQueryAtom = atomWithQuery(() => ({
   queryKey: ['savedSearches'],
   queryFn: async (): Promise<SavedSearch[]> => {
     const response = await api.get('/saved-searches');
@@ -30,7 +30,7 @@ export const savedSearchesQueryAtom = atomWithQuery((_) => ({
 export const currentSearchAtom = atom<SavedSearch | null>(null);
 
 // Atome pour la mutation de sauvegarde
-export const saveSearchMutationAtom = atomWithMutation((_) => ({
+export const saveSearchMutationAtom = atomWithMutation(() => ({
   mutationKey: ['saveSearch'],
   mutationFn: async (search: SavedSearch): Promise<SavedSearchResponse> => {
     const response = await api.post('/saved-searches', search);
@@ -38,7 +38,7 @@ export const saveSearchMutationAtom = atomWithMutation((_) => ({
   },
 }));
 
-export const deleteSearchMutationAtom = atomWithMutation((_) => ({
+export const deleteSearchMutationAtom = atomWithMutation(() => ({
   mutationKey: ['deleteSearch'],
   mutationFn: async (id: number): Promise<void> => {
     await api.delete(`/saved-searches/${id}`);

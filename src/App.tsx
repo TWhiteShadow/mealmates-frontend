@@ -1,6 +1,7 @@
 import { Routes, Route, Outlet, useNavigate, useLocation } from 'react-router';
 import MobileApp from './pages/MobileApp';
 import LandingPage from './pages/LandingPage';
+import ProductPage from './pages/ProductPage';
 
 import './App.css';
 import Connection from './pages/Connection/ConnectPage';
@@ -46,6 +47,7 @@ function App() {
         <Route path='app/browse' element={<BrowsePage />} />
         <Route path='app/profile' element={<ProfilePage />} />
         <Route path='app/profile/settings' element={<SettingsPage />} />
+        <Route path='app/product/:id' element={<ProductPage />} />
       </Route>
       <Route path='*' element={<div>404</div>} />
     </Routes>

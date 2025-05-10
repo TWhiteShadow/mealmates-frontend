@@ -1,10 +1,12 @@
+import { useQuery } from '@tanstack/react-query';
+import api from './Axios';
+
 export interface Product {
   id: number;
   name: string;
   description: string;
   price: number;
   position: number[];
-
   type: string;
   expiryDate: string;
   quantity: string;
@@ -12,6 +14,8 @@ export interface Product {
   sellerRating: number;
   isSoldOut: boolean;
   pickupDetails: string;
+  food_preferences?: Array<{ id: number; name: string }>;
+  allergens?: Array<{ id: number; name: string }>;
 
   seller?: {
     id: number;
@@ -30,4 +34,16 @@ export enum PriceRange {
   UNDER_5 = '0-5',
   BETWEEN_5_10 = '5-10',
   OVER_10 = '10-',
+}
+
+export async function getProduct(id: number): Promise<Product> {
+  const response = await api.get(`/products/${id}`);
+  return response.data;
+}
+
+export function useProduct(id: number) {
+  return useQuery({
+    queryKey: ['product', id],
+    queryFn: () => getProduct(id),
+  });
 }
