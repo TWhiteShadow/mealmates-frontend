@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo, useCallback } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, Circle, ZoomControl, useMapEvents } from 'react-leaflet';
 import { LatLngExpression } from 'leaflet';
 import MarkerClusterGroup from 'react-leaflet-markercluster';
-import { useNearbyProducts } from '@/api/User';
+import { Address, useNearbyProducts } from '@/api/User';
 import { Product } from '@/api/Product';
 import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { locationAtom, updateLocationAtom, isLoadingLocationAtom, mapViewStateAtom } from '@/atoms/location';
@@ -10,12 +10,11 @@ import { locationAtom, updateLocationAtom, isLoadingLocationAtom, mapViewStateAt
 import { createCustomIcon, createUserLocationIcon, createClusterIcon } from './map/CustomMarker';
 import LocationButton from './map/LocationButton';
 import SetViewOnLocation from './map/SetViewOnLocation';
-import { geocodeAddress } from '@/utils/geoUtils';
-import { AdvancedFilterState } from './SearchFilter';
+import { AdvancedFilterState } from './filters/SearchFilter';
 import { RecenterButton } from './map/RecenterButton';
 
 interface BrowseProps {
-  searchValue: string;
+  searchValue: Address | null;
   radius: number;
   filters?: AdvancedFilterState;
 }
@@ -73,12 +72,11 @@ const Browse: React.FC<BrowseProps> = ({
 
   useEffect(() => {
     const searchAddress = async () => {
-      if (searchValue && searchValue.trim()) {
+      if (searchValue) {
         try {
-          const coordinates = await geocodeAddress(searchValue);
           setLocation({
-            latitude: coordinates[0],
-            longitude: coordinates[1],
+            latitude: searchValue.latitude,
+            longitude: searchValue.longitude,
             lastUpdated: Date.now()
           });
         } catch (error) {

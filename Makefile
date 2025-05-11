@@ -4,3 +4,7 @@ up:
 
 down: 
 	docker compose down
+
+build:
+	clear
+	npm run build

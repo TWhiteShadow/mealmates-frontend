@@ -1,5 +1,8 @@
-import React, { ReactNode } from 'react';
+import React, { ReactNode, useEffect, useState } from 'react';
 import Close from '@mui/icons-material/Close';
+import SaveSearchButton from './SaveSearchButton';
+import { userLogged } from '@/api/User';
+import { Button } from '@/components/ui/button';
 
 interface FilterModalProps {
   title: string;
@@ -8,6 +11,7 @@ interface FilterModalProps {
   children: ReactNode;
   onApply: () => void;
   onReset: () => void;
+  onSaveSearch: () => void;
   resetLabel?: string;
   applyLabel?: string;
 }
@@ -16,12 +20,26 @@ const FilterModal: React.FC<FilterModalProps> = ({
   title, 
   isOpen, 
   onClose, 
-  children, 
-  onApply, 
+  children,
+  onApply,
   onReset,
+  onSaveSearch,
   resetLabel = "Tout effacer",
   applyLabel = "Appliquer"
 }) => {
+  const [canSaveSearch, setCanSaveSearch] = useState<boolean>(false);
+  
+  useEffect(() => {
+    const fetchUserData = async () => {
+        const logged = await userLogged();
+        setCanSaveSearch(logged?.success && logged?.success === true);
+    };
+    
+    if (isOpen) {
+      fetchUserData();
+    }
+  }, [isOpen]);
+
   if (!isOpen) return null;
 
   return (
@@ -37,18 +55,22 @@ const FilterModal: React.FC<FilterModalProps> = ({
         {children}
 
         <div className="flex justify-between mt-12">
-          <button
+          <Button
+            variant="ghost"
             onClick={onReset}
-            className="px-4 py-3 text-purple-dark font-medium"
+            className="text-purple-dark rounded-full h-10 hover:text-purple-dark"
           >
             {resetLabel}
-          </button>
-          <button
-            onClick={onApply}
-            className="px-6 py-3 bg-purple-dark text-white font-medium rounded-full min-w-[170px]"
-          >
-            {applyLabel}
-          </button>
+          </Button>
+          <div className='flex items-center gap-2'>
+            {canSaveSearch && <SaveSearchButton onSaveSearch={onSaveSearch} />}
+            <Button
+              onClick={onApply}
+              className="rounded-full h-10"
+            >
+              {applyLabel}
+            </Button>
+          </div>
         </div>
       </div>
     </div>

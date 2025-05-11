@@ -1,12 +1,11 @@
 import { Product } from './Product';
-import axios from './Axios';
+import api from './Axios';
 import {
   QueryKey,
   useMutation,
   useQuery,
   useQueryClient,
 } from '@tanstack/react-query';
-const API_BASE_URL = import.meta.env.VITE_BACKEND_URL + '/api/v1';
 
 export interface AuthResponse {
   token: string;
@@ -76,27 +75,13 @@ export async function loginUser(
   email: string,
   password: string
 ): Promise<AuthResponse> {
-  try {
-    const response = await axios.post(`/login_check`, { email, password });
-
-    return response.data;
-  } catch (error) {
-    console.error('Error during login:', error);
-    throw new Error('Invalid credentials');
-  }
+  const response = await api.post(`/login_check`, { email, password });
+  return response.data;
 }
 
 export async function refreshToken(): Promise<RefreshTokenResponse> {
-  try {
-    const response = await axios.post(`/token/refresh`, {
-      withCredentials: true,
-    });
-
+    const response = await api.post(`/token/refresh`);
     return response.data;
-  } catch (error) {
-    console.error('Error during login:', error);
-    throw new Error('Invalid credentials');
-  }
 }
 
 // Register User
@@ -106,7 +91,7 @@ export async function registerUser(
   firstName: string,
   lastName: string
 ): Promise<RegisterResponse> {
-  const response = await fetch(`${API_BASE_URL}/register`, {
+  const response = await fetch(`/register`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -128,62 +113,37 @@ export async function verifyEmail(
   expires: string,
   signature: string
 ) {
-  const response = await fetch(
-    `${API_BASE_URL}/verify-email?id=${id}&token=${token}&expires=${expires}&signature=${signature}`
+  const response = await api.get(
+    `/verify-email?id=${id}&token=${token}&expires=${expires}&signature=${signature}`,
+    {
+      withCredentials: false,
+    }
   );
 
-  if (!response.ok) {
-    throw new Error('Invalid or expired token');
-  }
-
-  return response.json();
+  return response.data
 }
 
 // Resend Verification Email
 export async function resendVerificationEmail(email: string) {
-  const response = await fetch(`${API_BASE_URL}/resend-verification-email`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ email }),
-  });
-
-  if (!response.ok) {
-    throw new Error('User not found');
-  }
-
-  return response.json();
+  const response = await api.post(`/resend-verification-email`, { email });
+  return response.data;
 }
 
 // Add User Address
 export async function addUserAddress(
-  token: string,
   address: string,
   zipCode: string,
   city: string,
   region: string
 ): Promise<AddressResponse> {
-  const response = await fetch(`${API_BASE_URL}/user/address`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
-    },
-    body: JSON.stringify({ address, zipCode, city, region }),
-  });
-
-  if (!response.ok) {
-    throw new Error('Invalid address data');
-  }
-
-  return response.json();
+  const response = await api.post(`/user/address`, { address, zipCode, city, region });
+  return response.data;
 }
 
 // Delete address
 export async function deleteUserAddress(addressId: number): Promise<UserData> {
-  const response = await axios.delete(
-    `${API_BASE_URL}/user/address/${addressId}`
+  const response = await api.delete(
+    `/user/address/${addressId}`
   );
   return response.data.user;
 }
@@ -202,12 +162,7 @@ export function useDeleteAddressMutation() {
 }
 
 export async function getUserData(): Promise<UserData> {
-  const response = await axios.get(`${API_BASE_URL}/user`, {
-    withCredentials: true,
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  });
+  const response = await api.get(`/user`);
   return response.data;
 }
 
@@ -248,7 +203,7 @@ export async function getNearbyProducts(
     }
   }
 
-  const response = await axios.get(url);
+  const response = await api.get(url);
   return response.data;
 }
 
@@ -276,7 +231,7 @@ export function useNearbyProducts(
 export async function updateUserDataWithAxios(
   userData: UserData
 ): Promise<UserDataResponse> {
-  const response = await axios.put(`${API_BASE_URL}/user/update`, userData);
+  const response = await api.put(`/user/update`, userData);
   return response.data;
 }
 
@@ -301,4 +256,10 @@ export function useUserData() {
     queryKey: ['userData'],
     queryFn: () => getUserData(),
   });
+}
+
+// check if user is logged
+export async function userLogged(): Promise<any> {
+  const response = await api.get(`/user/logged`);
+  return response.data;
 }
