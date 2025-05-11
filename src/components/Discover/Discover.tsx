@@ -6,11 +6,9 @@ import { useAtomValue, useSetAtom } from 'jotai';
 import { locationAtom, updateLocationAtom, isLoadingLocationAtom } from '@/atoms/location';
 import DiscoverFilters from './DiscoverFilters';
 import DiscoverCard from './DiscoverCard';
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-} from "@/components/ui/carousel"
+import { Swiper, SwiperSlide } from 'swiper/react';
+// @ts-expect-error swiper is installed correctly
+import 'swiper/css';
 
 const Discover = () => {
   const location = useAtomValue(locationAtom);
@@ -46,7 +44,7 @@ const Discover = () => {
   }, [nearbyProducts, queryError]);
 
   const handleProductClick = (productId: number) => {
-    navigate(`/product/${productId}`);
+    navigate(`/app/product/${productId}`);
   };
 
   const handleSortChange = (value: string) => {
@@ -74,7 +72,7 @@ const Discover = () => {
         break;
       }
       case PriceRange.OVER_10: {
-        const [min, _] = PriceRange.OVER_10.split('-').map(Number);
+        const [min] = PriceRange.OVER_10.split('-').map(Number);
         filtered = filtered.filter(product => product.price >= min);
         break;
       }
@@ -130,18 +128,38 @@ const Discover = () => {
       />
 
       <div className="relative">
-        <Carousel className="w-full">
-          <CarouselContent className="py-4">
-            {filteredAndSortedProducts.map((product) => (
-              <CarouselItem key={product.id} className="pl-4 flex basis-[80%] sm:basis-[45%] md:basis-[30%] lg:basis-[23%]">
-                <DiscoverCard
-                  product={product}
-                  onClick={handleProductClick}
-                />
-              </CarouselItem>
-            ))}
-          </CarouselContent>
-        </Carousel>
+        <Swiper
+          className="!py-2"
+          modules={[]}
+          spaceBetween={20}
+          slidesPerView={'auto'}
+          breakpoints={{
+            320: {
+              slidesPerView: 1.2,
+            },
+            640: {
+              slidesPerView: 2.2,
+            },
+            768: {
+              slidesPerView: 3.2,
+            },
+            1024: {
+              slidesPerView: 4.2,
+            },
+          }}
+        >
+          {filteredAndSortedProducts.map((product) => (
+            <SwiperSlide key={product.id} style={{
+              width: 'auto',
+              height: 'auto',
+            }}>
+              <DiscoverCard
+                product={product}
+                onClick={handleProductClick}
+              />
+            </SwiperSlide>
+          ))}
+        </Swiper>
       </div>
 
       {filteredAndSortedProducts.length === 0 && (

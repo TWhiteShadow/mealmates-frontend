@@ -1,8 +1,12 @@
-// components/SearchBar.tsx
 import TuneIcon from '@mui/icons-material/Tune';
 import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined';
 import AddressInput from '@/components/AddressInput'
 import { Address } from '@/api/User';
+import { SavedSearch } from '@/api/SavedSearch';
+import { useAtomValue, useSetAtom } from 'jotai';
+import { currentSearchAtom, savedSearchesQueryAtom } from '@/atoms/savedSearchFilters';
+import { useEffect, useState } from 'react';
+import { userLogged } from '@/api/User';
 
 interface SearchBarProps {
   placeholder?: string;
@@ -17,9 +21,30 @@ const SearchBar: React.FC<SearchBarProps> = ({
   onFilterClick,
   onLocationClick,
 }) => {
+  const [savedSearchesQuery, setSavedSearchesQuery] = useState<any>(null);
+  const setCurrentSearch = useSetAtom(currentSearchAtom);
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      const logged = await userLogged();
+      if (logged?.success) {
+        setSavedSearchesQuery(useAtomValue(savedSearchesQueryAtom));
+      }
+    };
+
+    fetchUserData();
+  }, []);
+
+
+  const savedSearches = savedSearchesQuery ? savedSearchesQuery.data : [];
+
+  const handleSavedSearchSelected = (savedSearch: SavedSearch) => {
+    setCurrentSearch(savedSearch);
+  }
+
   return (
     <div className="flex items-center relative">
-      <AddressInput placeholder={placeholder} onSelect={onSearch} className='absolute' />
+      <AddressInput placeholder={placeholder} onSelect={onSearch} className='absolute' savedSearches={savedSearches} savedSearchSelected={handleSavedSearchSelected} />
 
       <button
         onClick={onFilterClick}

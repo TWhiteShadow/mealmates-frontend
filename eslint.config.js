@@ -5,7 +5,10 @@ import pluginReact from 'eslint-plugin-react';
 
 /** @type {import('eslint').Linter.FlatConfig[]} */
 export default [
-  { files: ['**/*.{js,mjs,cjs,ts,jsx,tsx}'] },
+  {
+    files: ['src/**/*.{js,mjs,cjs,ts,jsx,tsx}'],
+    ignores: ['**/node_modules/**', 'dist/**', 'build/**']
+  },
   { languageOptions: { globals: globals.browser } },
   pluginJs.configs.recommended,
   ...tseslint.configs.recommended,
@@ -13,6 +16,8 @@ export default [
     ...pluginReact.configs.flat.recommended,
     rules: {
       'react/no-unescaped-entities': 'off',
+      "@typescript-eslint/no-explicit-any": "off",
+      "no-console": ["error", { allow: ["warn", "error"] }]
     },
   },
 ];

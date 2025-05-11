@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import RestaurantIcon from '@mui/icons-material/Restaurant';
 import LocalGroceryStoreIcon from '@mui/icons-material/LocalGroceryStore';
 import SpaIcon from '@mui/icons-material/Spa';
@@ -9,10 +9,13 @@ import EggIcon from '@mui/icons-material/Egg';
 import StarIcon from '@mui/icons-material/Star';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 
-import FilterModal from './filters/FilterModal';
-import FilterSection from './filters/FilterSection';
-import FilterButton from './filters/FilterButton';
-import IconFilterButton from './filters/IconFilterButton';
+import FilterModal from './FilterModal';
+import FilterSection from './FilterSection';
+import FilterButton from './FilterButton';
+import IconFilterButton from './IconFilterButton';
+import { useSaveSearchMutation } from '@/api/SavedSearch';
+import { useAtomValue } from 'jotai';
+import { locationAtom } from '@/atoms/location';
 
 export interface AdvancedFilterState {
   productTypes: string[];
@@ -33,25 +36,42 @@ interface SearchFilterProps {
   onApplyFilters?: (filters: AdvancedFilterState) => void;
 }
 
+type saveSearchType = {
+  latitude: number;
+  longitude: number;
+  filters: AdvancedFilterState;
+};
+
 const SearchFilter: React.FC<SearchFilterProps> = ({
   showFilters,
   onClose = () => {},
   initialFilters,
   onApplyFilters = () => {}
 }) => {
+  const { latitude, longitude } = useAtomValue(locationAtom);
   const [filters, setFilters] = useState<AdvancedFilterState>(
-    initialFilters || {
-      productTypes: [],
-      dietaryPreferences: [],
-      expirationDate: '',
-      distance: 1000, // Par défaut 1km
-      price: {
-        min: 0,
-        max: 50
-      },
-      minSellerRating: 0,
-    }
+    initialFilters !== undefined && initialFilters !== null
+      ? initialFilters
+      : {
+          productTypes: [],
+          dietaryPreferences: [],
+          expirationDate: '',
+          distance: 1000, // Par défaut 1km
+          price: {
+            min: 0,
+            max: 50
+          },
+          minSellerRating: 0,
+        }
   );
+
+  const saveSearchMutation = useSaveSearchMutation();
+
+  useEffect(() => {
+    if (initialFilters) {
+      setFilters(initialFilters);
+    }
+  }, [initialFilters]);
 
   const updateFilter = (key: keyof AdvancedFilterState, value: any) => {
     setFilters(prev => ({ ...prev, [key]: value }));
@@ -113,6 +133,16 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
     return `${value}€`;
   };
 
+  const saveSearchFilters = () => {
+    const search: saveSearchType = {
+      latitude,
+      longitude,
+      filters
+    };
+
+    saveSearchMutation.mutate(search)
+  }
+
   return (
     <FilterModal
       title="Filtres avancés"
@@ -120,6 +150,7 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
       onClose={onClose}
       onApply={applyFilters}
       onReset={resetFilters}
+      onSaveSearch={saveSearchFilters}
     >
       <FilterSection title="Type de produits">
         <div className="grid grid-cols-4 gap-3">

@@ -83,6 +83,9 @@ const SimpleBottomNavigation = () => {
           icon={
             value === 2 ? <AddCircleIcon /> : <AddCircleOutlineOutlinedIcon />
           }
+          onClick={() => {
+            navigate('/app/sell', { replace: true });
+          }}
         />
         <BottomNavigationAction
           label='Messages'
