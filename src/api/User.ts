@@ -80,8 +80,8 @@ export async function loginUser(
 }
 
 export async function refreshToken(): Promise<RefreshTokenResponse> {
-    const response = await api.post(`/token/refresh`);
-    return response.data;
+  const response = await api.post(`/token/refresh`);
+  return response.data;
 }
 
 // Register User
@@ -120,7 +120,7 @@ export async function verifyEmail(
     }
   );
 
-  return response.data
+  return response.data;
 }
 
 // Resend Verification Email
@@ -136,15 +136,18 @@ export async function addUserAddress(
   city: string,
   region: string
 ): Promise<AddressResponse> {
-  const response = await api.post(`/user/address`, { address, zipCode, city, region });
+  const response = await api.post(`/user/address`, {
+    address,
+    zipCode,
+    city,
+    region,
+  });
   return response.data;
 }
 
 // Delete address
 export async function deleteUserAddress(addressId: number): Promise<UserData> {
-  const response = await api.delete(
-    `/user/address/${addressId}`
-  );
+  const response = await api.delete(`/user/address/${addressId}`);
   return response.data.user;
 }
 
@@ -203,7 +206,9 @@ export async function getNearbyProducts(
     }
   }
 
-  const response = await api.get(url);
+  const response = await api.get(url, {
+    withCredentials: false,
+  });
   return response.data;
 }
 
