@@ -62,7 +62,12 @@ export default function ProductPage() {
                                         </span>
                                     </div>
                                 )}
-                                <Carousel className="w-full max-w-xl">
+                                <Carousel className="w-full max-w-xl"
+                                    opts={{
+                                        loop: true,
+                                    }}
+
+                                >
                                     <CarouselContent>
                                         {product.images.map((image, index) => (
                                             <CarouselItem key={index}>
