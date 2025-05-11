@@ -12,6 +12,7 @@ import BrowsePage from './pages/BrowsePage';
 import AuthCallbackPage from './pages/AuthCallbackPage';
 import ProfilePage from './pages/Profile/ProfilePage';
 import SettingsPage from './pages/Profile/SettingsPage';
+import SellPage from './pages/SellPage';
 import Navbar from "@/components/ui/Navbar";
 import { useEffect } from 'react';
 import { navigationRef, locationRef } from './utils/navigateRef';
@@ -48,6 +49,7 @@ function App() {
         <Route path='app/profile' element={<ProfilePage />} />
         <Route path='app/profile/settings' element={<SettingsPage />} />
         <Route path='app/product/:id' element={<ProductPage />} />
+        <Route path='app/sell' element={<SellPage />} />
       </Route>
       <Route path='*' element={<div>404</div>} />
     </Routes>
