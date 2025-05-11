@@ -133,6 +133,8 @@ const Discover = () => {
           modules={[]}
           spaceBetween={20}
           slidesPerView={'auto'}
+          slidesOffsetBefore={20}
+          slidesOffsetAfter={20}
           breakpoints={{
             320: {
               slidesPerView: 1.2,
