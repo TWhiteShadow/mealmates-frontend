@@ -91,19 +91,10 @@ export async function registerUser(
   firstName: string,
   lastName: string
 ): Promise<RegisterResponse> {
-  const response = await fetch(`/register`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ email, password, firstName, lastName }),
-  });
-
-  if (!response.ok) {
-    throw new Error('Registration failed');
-  }
-
-  return response.json();
+  const response = await api.post(`/register`, { email, password, firstName, lastName }, {
+    withCredentials: false,
+  }); 
+  return response.data;
 }
 
 // Verify Email
