@@ -35,7 +35,7 @@ export default function ProductPage() {
     const formattedPrice = new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' }).format(product.price);
 
     return (
-        <div className="min-h-screen bg-gray-50">
+        <div className="min-h-screen bg-gray-50 pb-20">
             <ProfileAppBar>
                 <div className='relative flex items-center w-full h-full justify-center'>
                     <Button
