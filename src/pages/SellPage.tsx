@@ -128,7 +128,7 @@ export default function SellPage() {
     };
 
     return (
-        <div className="h-screen relative bg-gray-100 overflow-x-hidden">
+        <div className="h-screen relative bg-gray-100 overflow-x-hidden pb-20">
             <ProfileAppBar>
                 <div className='relative flex items-center w-full h-full justify-center'>
                     <Button
