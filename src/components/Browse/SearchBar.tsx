@@ -3,9 +3,9 @@ import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined';
 import AddressInput from '@/components/AddressInput'
 import { Address } from '@/api/User';
 import { SavedSearch } from '@/api/SavedSearch';
-import { useAtom, useAtomValue, useSetAtom } from 'jotai';
+import { useAtom, useSetAtom } from 'jotai';
 import { currentSearchAtom, savedSearchesQueryAtom } from '@/atoms/savedSearchFilters';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { userLogged } from '@/api/User';
 import { AtomWithQueryResult } from 'jotai-tanstack-query';
 

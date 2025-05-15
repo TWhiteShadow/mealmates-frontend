@@ -6,7 +6,6 @@ import KitchenIcon from '@mui/icons-material/Kitchen';
 import RoomServiceIcon from '@mui/icons-material/RoomService';
 import BakeryDiningIcon from '@mui/icons-material/BakeryDining';
 import EggIcon from '@mui/icons-material/Egg';
-import StarIcon from '@mui/icons-material/Star';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 
 import FilterModal from './FilterModal';
