@@ -101,7 +101,7 @@ const AddressInput: React.FC<AddressInputProps> = ({
       id: suggestion.properties.id,
       city: suggestion.properties.city,
       zipCode: suggestion.properties.postcode,
-      address: suggestion.properties.name,
+      address: suggestion.properties.label,
       region: suggestion.properties.context,
       longitude: suggestion.geometry.coordinates[0],
       latitude: suggestion.geometry.coordinates[1],
@@ -157,7 +157,7 @@ const AddressInput: React.FC<AddressInputProps> = ({
           id: address.properties.id,
           city: address.properties.city,
           zipCode: address.properties.postcode,
-          address: address.properties.name,
+          address: address.properties.label,
           region: address.properties.context,
           longitude: address.geometry.coordinates[0],
           latitude: address.geometry.coordinates[1],
@@ -218,11 +218,16 @@ const AddressInput: React.FC<AddressInputProps> = ({
                   >
                     <div className='flex items-center'>
                       <Search className='w-4 h-4 text-purple-dark mr-2 mt-1 flex-shrink-0' />
-                      <span>
-                        {search.filters?.productTypes?.reduce((type, curType) => curType + ', ' + type, '')} -{' '}
-                        {search.filters?.price?.min}€ -{' '}
-                        {search.filters?.price?.max}€
-                      </span>
+                      
+                      <div>
+                        <span>Préférences: {search.filters?.productTypes?.join(', ')}, {search.filters?.dietaryPreferences?.join(', ')}</span>
+                        <br />
+                        <span>Date d'expiration: {search.filters?.expirationDate}</span>
+                        <br />
+                        <span>Distance: {search.filters?.distance / 1000} km</span>
+                        <br />
+                        <span>Price: {search.filters?.price?.min}€ - {search.filters?.price?.max}€</span>
+                      </div>
                     </div>
                   </div>
                 )
