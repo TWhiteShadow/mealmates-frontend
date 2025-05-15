@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { useEffect } from 'react';
 import Box from '@mui/material/Box';
 import BottomNavigation from '@mui/material/BottomNavigation';
 import BottomNavigationAction from '@mui/material/BottomNavigationAction';
@@ -12,7 +13,11 @@ import AddCircleIcon from '@mui/icons-material/AddCircle';
 import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOutlined';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import AccountCircleOutlinedIcon from '@mui/icons-material/AccountCircleOutlined';
+import { Badge } from '@mui/material';
 import { useNavigate } from 'react-router';
+import { useAtom } from 'jotai';
+import { unreadCountAtom } from '@/atoms/messages';
+import { getUnreadMessagesCount } from '@/api/Message';
 
 const getValueFromPath = (path: string) => {
   switch (path) {
@@ -33,7 +38,27 @@ const getValueFromPath = (path: string) => {
 
 const SimpleBottomNavigation = () => {
   const [value, setValue] = React.useState(getValueFromPath(window.location.pathname));
+  const [unreadCount, setUnreadCount] = useAtom(unreadCountAtom);
   const navigate = useNavigate();
+
+  // Récupérer le nombre de messages non lus au chargement et périodiquement
+  useEffect(() => {
+    const fetchUnreadCount = async () => {
+      try {
+        const count = await getUnreadMessagesCount();
+        setUnreadCount(count);
+      } catch (error) {
+        console.error('Failed to fetch unread count:', error);
+      }
+    };
+
+    fetchUnreadCount();
+
+    // Rafraîchir toutes les minutes
+    const intervalId = setInterval(fetchUnreadCount, 60000);
+
+    return () => clearInterval(intervalId);
+  }, [setUnreadCount]);
 
   return (
     <Box
@@ -65,8 +90,7 @@ const SimpleBottomNavigation = () => {
           icon={value === 0 ? <ExploreIcon /> : <ExploreOutlinedIcon />}
           onClick={() => {
             navigate('/app/discover', { replace: true });
-          }
-          }
+          }}
         />
         <BottomNavigationAction
           label='Parcourir'
@@ -75,8 +99,7 @@ const SimpleBottomNavigation = () => {
           }
           onClick={() => {
             navigate('/app/browse', { replace: true });
-          }
-          }
+          }}
         />
         <BottomNavigationAction
           label='Vendre'
@@ -89,7 +112,18 @@ const SimpleBottomNavigation = () => {
         />
         <BottomNavigationAction
           label='Messages'
-          icon={value === 3 ? <MessageIcon /> : <MessageOutlinedIcon />}
+          icon={
+            value === 3 ? (
+              <MessageIcon />
+            ) : (
+              <Badge badgeContent={unreadCount > 0 ? unreadCount : null} color="error">
+                <MessageOutlinedIcon />
+              </Badge>
+            )
+          }
+          onClick={() => {
+            navigate('/app/messages', { replace: true });
+          }}
         />
         <BottomNavigationAction
           label='Profil'
@@ -98,8 +132,7 @@ const SimpleBottomNavigation = () => {
           }
           onClick={() => {
             navigate('/app/profile', { replace: true });
-          }
-          }
+          }}
         />
       </BottomNavigation>
     </Box>

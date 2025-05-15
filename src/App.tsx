@@ -16,6 +16,7 @@ import SellPage from './pages/SellPage';
 import Navbar from "@/components/ui/Navbar";
 import { useEffect } from 'react';
 import { navigationRef, locationRef } from './utils/navigateRef';
+import MessagesPage from './pages/MessagesPage';
 
 function NavbarLayout() {
   return (
@@ -50,6 +51,7 @@ function App() {
         <Route path='app/profile/settings' element={<SettingsPage />} />
         <Route path='app/product/:id' element={<ProductPage />} />
         <Route path='app/sell' element={<SellPage />} />
+        <Route path='app/messages' element={<MessagesPage />} />
       </Route>
       <Route path='*' element={<div>404</div>} />
     </Routes>
