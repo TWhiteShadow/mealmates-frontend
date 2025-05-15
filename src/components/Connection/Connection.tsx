@@ -28,13 +28,13 @@ const HomePage = () => {
             <img src={googleLogo} className='h-full' alt='Google Logo' />
             <span>Connexion avec Google</span>
           </a>
-          <a
+          {/* <a
             href={`${import.meta.env.VITE_BACKEND_URL}/connect/facebook`}
             className={cn(buttonVariants({ variant: 'facebook' }), 'w-full')}
           >
             <img src={facebookLogo} className='h-full' alt='Facebook Logo' />
             <span>Connexion avec Facebook</span>
-          </a>
+          </a> */}
           <a
             href='login/register'
             className={cn(buttonVariants({ variant: 'default' }), 'w-full')}
