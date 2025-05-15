@@ -26,7 +26,7 @@ export interface AdvancedFilterState {
     min: number;
     max: number;
   };
-  minSellerRating: number;
+  // minSellerRating: number;
 }
 
 interface SearchFilterProps {
@@ -61,7 +61,7 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
             min: 0,
             max: 50
           },
-          minSellerRating: 0,
+          // minSellerRating: 0,
         }
   );
 
@@ -120,7 +120,7 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
         min: 0,
         max: 50
       },
-      minSellerRating: 0
+      // minSellerRating: 0
     });
   };
 
@@ -313,7 +313,7 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
           </div>
         </div>
       </FilterSection>
-
+{/* 
       <FilterSection title={`Note minimum du vendeur: ${filters.minSellerRating > 0 ? filters.minSellerRating + '⭐' : 'Aucune'}`}>
         <div className="flex justify-between items-center px-2">
           <input
@@ -333,7 +333,7 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
             <StarIcon sx={{ fontSize: 14, color: '#FFD700', marginLeft: 0.5 }} />
           </div>
         </div>
-      </FilterSection>
+      </FilterSection> */}
     </FilterModal>
   );
 };

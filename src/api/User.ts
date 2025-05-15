@@ -169,7 +169,7 @@ export async function getNearbyProducts(
     expirationDate?: string;
     minPrice?: number;
     maxPrice?: number;
-    minSellerRating?: number;
+    // minSellerRating?: number;
     dietaryPreferences?: string[];
   }
 ): Promise<Product[]> {
@@ -189,9 +189,9 @@ export async function getNearbyProducts(
     if (filters.maxPrice !== undefined) {
       url += `&maxPrice=${filters.maxPrice}`;
     }
-    if (filters.minSellerRating !== undefined && filters.minSellerRating > 0) {
-      url += `&minSellerRating=${filters.minSellerRating}`;
-    }
+    // if (filters.minSellerRating !== undefined && filters.minSellerRating > 0) {
+    //   url += `&minSellerRating=${filters.minSellerRating}`;
+    // }
     if (filters.dietaryPreferences?.length) {
       url += `&dietaryPreferences=${filters.dietaryPreferences.join(',')}`;
     }
@@ -213,7 +213,7 @@ export function useNearbyProducts(
     expirationDate?: string;
     minPrice?: number;
     maxPrice?: number;
-    minSellerRating?: number;
+    // minSellerRating?: number;
     dietaryPreferences?: string[];
   }
 ) {

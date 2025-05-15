@@ -31,7 +31,7 @@ const Browse: React.FC<BrowseProps> = ({
       min: 0,
       max: 50
     },
-    minSellerRating: 0,
+    // minSellerRating: 0,
   }
 }) => {
   const [location, setLocation] = useAtom(locationAtom);
@@ -48,9 +48,9 @@ const Browse: React.FC<BrowseProps> = ({
     productTypes: filters.productTypes,
     minPrice: filters.price.min,
     maxPrice: filters.price.max,
-    minSellerRating: filters.minSellerRating > 0 ? filters.minSellerRating : undefined,
+    // minSellerRating: filters.minSellerRating > 0 ? filters.minSellerRating : undefined,
     dietaryPreferences: filters.dietaryPreferences
-  }), [filters.productTypes, filters.price.min, filters.price.max, filters.minSellerRating, filters.dietaryPreferences]);
+  }), [filters.productTypes, filters.price.min, filters.price.max, filters.dietaryPreferences]);
 
   const currentLocation: LatLngExpression = useMemo(() => {
     return [location.latitude, location.longitude];
@@ -135,7 +135,7 @@ const Browse: React.FC<BrowseProps> = ({
     const filtersActive = filters.expirationDate ||
       filters.productTypes.length > 0 ||
       filters.dietaryPreferences.length > 0 ||
-      filters.minSellerRating > 0 ||
+      // filters.minSellerRating > 0 ||
       filters.price.min > 0 ||
       filters.price.max < 50;
 
