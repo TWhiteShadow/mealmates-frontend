@@ -6,7 +6,6 @@ import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious
 import { Button } from "@/components/ui/button";
 import ProfileAppBar from '@/components/ProfileAppBar';
 import { ArrowBackIosOutlined } from '@mui/icons-material';
-import StatCard from '@/components/StatCard';
 import { cn } from "@/lib/utils";
 
 dayjs.locale('fr');
