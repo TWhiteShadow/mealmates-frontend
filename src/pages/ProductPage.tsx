@@ -101,7 +101,7 @@ export default function ProductPage() {
                                     Par {product.seller?.first_name} {product.seller?.last_name?.[0]}.
                                 </p>
                             </div>
-                            <p className="text-3xl font-bold text-purple-600">{formattedPrice}</p>
+                            <p className="text-3xl font-bold text-purple-semi-dark">{formattedPrice == "0,00 €" ? "Don" : formattedPrice}</p>
                         </div>
 
                         <div className="mt-6">
@@ -159,7 +159,7 @@ export default function ProductPage() {
                             )}
                         </div>
 
-                        <div className="mt-8 grid grid-cols-3 gap-4">
+                        {/* <div className="mt-8 grid grid-cols-3 gap-4">
                             <StatCard
                                 title="Personnel"
                                 value="217"
@@ -187,11 +187,11 @@ export default function ProductPage() {
                             >
                                 <p className="text-xs text-gray-500">ont trouvé que les produits étaient copieux</p>
                             </StatCard>
-                        </div>
+                        </div> */}
 
                         <div className="mt-8">
                             <Button
-                                className="w-full bg-purple-600 hover:bg-purple-700 text-white py-3 rounded-lg font-medium"
+                                className="w-full bg-purple-dark hover:bg-purple-semi-dark text-white py-3 rounded-lg font-medium"
                             >
                                 Contacter le vendeur
                             </Button>
