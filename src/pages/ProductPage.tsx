@@ -15,7 +15,6 @@ dayjs.locale('fr');
 export default function ProductPage() {
     const { id } = useParams();
     const { data: product, isLoading, error } = useProduct(Number(id));
-    console.log(product);
     if (isLoading) {
         return (
             <div className="flex items-center justify-center min-h-screen">

@@ -5,7 +5,6 @@ import { useAtom } from 'jotai';
 import {
     selectedConversationIdAtom,
     unreadCountAtom,
-    mercureConnectedAtom
 } from '@/atoms/messages';
 import { getUnreadMessagesCount } from '../api/Message';
 import ProfileAppBar from '@/components/ProfileAppBar';
@@ -15,7 +14,6 @@ import { Button } from '@/components/ui/button';
 const MessagesPage: React.FC = () => {
     const [selectedId] = useAtom(selectedConversationIdAtom);
     const [unreadCount, setUnreadCount] = useAtom(unreadCountAtom);
-    const [connected, setConnected] = useAtom(mercureConnectedAtom);
     const [windowWidth, setWindowWidth] = useState(window.innerWidth);
 
     useEffect(() => {
@@ -30,49 +28,10 @@ const MessagesPage: React.FC = () => {
 
         fetchUnreadCount();
 
-        // Interroger le serveur toutes les 30 secondes pour les messages non lus
-        const intervalId = setInterval(fetchUnreadCount, 30000);
-        // Configurer Mercure pour les notifications en temps réel
-        const setupMercureNotifications = () => {
-            const url = new URL(`${import.meta.env.VITE_MERCURE_PUBLIC_URL}`);
-            // S'abonner aux notifications spécifiques à l'utilisateur
-            const userId = localStorage.getItem('userId');
-            url.searchParams.append('topic', `/api/v1/user/${userId}/messages`);
+        // Poll for unread messages every 30 seconds
+        const intervalId = setInterval(fetchUnreadCount, 60000);
 
-            const eventSource = new EventSource(url.toString(), { withCredentials: true });
-
-            eventSource.onopen = () => {
-                setConnected(true);
-                console.log('Mercure connection opened');
-            };
-
-            eventSource.onerror = () => {
-                setConnected(false);
-                console.error('Mercure connection error');
-            };
-
-            eventSource.onmessage = event => {
-                try {
-                    const data = JSON.parse(event.data);
-
-                    // Si c'est une mise à jour du statut de lecture, ignorer pour ce composant
-                    if (data.type === 'read_status_update') {
-                        return;
-                    }
-
-                    // Sinon, rafraîchir le compteur de messages non lus
-                    fetchUnreadCount();
-                } catch (error) {
-                    console.error('Error parsing Mercure event:', error);
-                }
-            };
-
-            return eventSource;
-        };
-
-        const eventSource = setupMercureNotifications();
-
-        // Gérer le redimensionnement de la fenêtre
+        // Handle window resize
         const handleResize = () => {
             setWindowWidth(window.innerWidth);
         };
@@ -81,12 +40,11 @@ const MessagesPage: React.FC = () => {
 
         return () => {
             clearInterval(intervalId);
-            eventSource.close();
             window.removeEventListener('resize', handleResize);
         };
-    }, [setUnreadCount, setConnected]);
+    }, [setUnreadCount]);
 
-    // Affichage pour les mobiles: soit la liste soit la conversation
+    // Display for mobile: either the list or the conversation
     const isMobile = windowWidth < 768;
 
     return (
@@ -111,13 +69,6 @@ const MessagesPage: React.FC = () => {
                             </div>
                         )}
                     </h1>
-
-                    {!connected && (
-                        <div className="absolute right-3 flex items-center">
-                            <span className="text-yellow-600 text-xs mr-1">Hors ligne</span>
-                            <div className="w-2 h-2 rounded-full bg-yellow-600"></div>
-                        </div>
-                    )}
                 </div>
             </ProfileAppBar>
 

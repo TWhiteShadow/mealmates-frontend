@@ -35,8 +35,8 @@ const ConversationList: React.FC = () => {
 
         fetchConversations();
 
-        // Rafraîchir les conversations toutes les 30 secondes
-        const intervalId = setInterval(fetchConversations, 30000);
+        // Refresh conversations every 10 seconds
+        const intervalId = setInterval(fetchConversations, 60000);
 
         return () => clearInterval(intervalId);
     }, [setConversations, setIsLoading]);
@@ -82,7 +82,9 @@ const ConversationList: React.FC = () => {
 
             <div>
                 {conversations.map((conversation) => {
-                    const otherParticipant = conversation.buyer;
+                    const otherParticipant = conversation.buyer.id === conversation.offer.seller.id
+                        ? conversation.buyer
+                        : conversation.offer.seller;
 
                     return (
                         <div

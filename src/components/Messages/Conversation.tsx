@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useAtom } from 'jotai';
 import {
     conversationsAtom,
@@ -6,7 +6,7 @@ import {
     selectedConversationIdAtom,
     isLoadingMessagesAtom
 } from '@/atoms/messages';
-import { getConversation, markConversationAsRead, Message } from '../../api/Message';
+import { getConversation, markConversationAsRead } from '../../api/Message';
 import MessageItem from './MessageItem';
 import MessageInput from './MessageInput';
 import { ArrowLeft } from 'lucide-react';
@@ -14,18 +14,17 @@ import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 
 const Conversation: React.FC = () => {
-    const [selectedId] = useAtom(selectedConversationIdAtom);
+    const [selectedId, setSelectedId] = useAtom(selectedConversationIdAtom);
     const [conversations] = useAtom(conversationsAtom);
     const [messages, setMessages] = useAtom(messagesAtom);
     const [isLoading, setIsLoading] = useAtom(isLoadingMessagesAtom);
     const messagesEndRef = useRef<HTMLDivElement>(null);
-    const [userId] = useState<string | null>(localStorage.getItem('userId'));
-    const [setSelectedId] = useAtom(selectedConversationIdAtom);
+    const userId = localStorage.getItem('userId');
 
     const selectedConversation = conversations.find(c => c.id === selectedId);
     const conversationMessages = selectedId ? messages[selectedId] || [] : [];
 
-    // Fonction pour scroller vers le bas
+    // Function to scroll to bottom
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     };
@@ -39,7 +38,7 @@ const Conversation: React.FC = () => {
                 const data = await getConversation(selectedId);
                 setMessages(prev => ({ ...prev, [selectedId]: data.messages }));
 
-                // Marquer la conversation comme lue
+                // Mark conversation as read
                 await markConversationAsRead(selectedId);
             } catch (error) {
                 console.error('Failed to fetch messages:', error);
@@ -48,47 +47,18 @@ const Conversation: React.FC = () => {
             }
         };
 
+        // Initial fetch
         fetchMessages();
 
-        // Configurer Mercure (SSE) pour les messages en temps réel
-        const setupMercure = () => {
-            const url = new URL(`${import.meta.env.VITE_MERCURE_PUBLIC_URL}`);
-            url.searchParams.append('topic', `/api/v1/conversations/${selectedId}/messages`);
-
-            const eventSource = new EventSource(url.toString(), { withCredentials: true });
-
-            eventSource.onmessage = event => {
-                const message = JSON.parse(event.data) as Message;
-
-                setMessages(prev => {
-                    const existingMessages = prev[selectedId] || [];
-                    // Vérifier si le message existe déjà pour éviter les doublons
-                    if (!existingMessages.some(m => m.id === message.id)) {
-                        return {
-                            ...prev,
-                            [selectedId]: [...existingMessages, message]
-                        };
-                    }
-                    return prev;
-                });
-
-                // Si le message ne vient pas de l'utilisateur actuel, marquer comme lu
-                if (message.sender.id.toString() !== userId) {
-                    markConversationAsRead(selectedId).catch(console.error);
-                }
-            };
-
-            return eventSource;
-        };
-
-        const eventSource = setupMercure();
+        // Poll for new messages every 5 seconds for active conversations
+        const pollInterval = setInterval(fetchMessages, 60000);
 
         return () => {
-            eventSource.close();
+            clearInterval(pollInterval);
         };
-    }, [selectedId, setMessages, setIsLoading, userId]);
+    }, [selectedId, setMessages, setIsLoading]);
 
-    // Scroller vers le bas quand les messages changent
+    // Scroll to bottom when messages change
     useEffect(() => {
         scrollToBottom();
     }, [conversationMessages]);
@@ -101,7 +71,6 @@ const Conversation: React.FC = () => {
         );
     }
 
-    // Trouver l'autre participant
     const otherParticipant = selectedConversation.buyer;
 
     return (
