@@ -52,9 +52,13 @@ export const getConversations = async (): Promise<ConversationPreview[]> => {
 };
 
 export const getConversationMessages = async (
-  id: number
+  id: number,
+  limit: number = 150,
+  offset: number = 0
 ): Promise<Message[]> => {
-  const response = await api.get(`/conversations/${id}/messages?offset=0`);
+  const response = await api.get(
+    `/conversations/${id}/messages?limit=${limit}&offset=${offset}`
+  );
   return response.data;
 };
 

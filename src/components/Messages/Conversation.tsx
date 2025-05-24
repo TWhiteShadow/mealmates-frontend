@@ -1,10 +1,12 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useCallback } from 'react';
 import { useAtom } from 'jotai';
 import {
     conversationsAtom,
     messagesAtom,
     selectedConversationIdAtom,
-    isLoadingMessagesAtom
+    isLoadingMessagesAtom,
+    isLoadingOlderMessagesAtom,
+    hasMoreMessagesAtom
 } from '@/atoms/messages';
 import { getConversationMessages } from '../../api/Message';
 import MessageItem from './MessageItem';
@@ -19,14 +21,25 @@ const Conversation: React.FC = () => {
     const [conversations] = useAtom(conversationsAtom);
     const [messages, setMessages] = useAtom(messagesAtom);
     const [isLoading, setIsLoading] = useAtom(isLoadingMessagesAtom);
+    const [isLoadingOlder, setIsLoadingOlder] = useAtom(isLoadingOlderMessagesAtom);
+    const [hasMore, setHasMore] = useAtom(hasMoreMessagesAtom);
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const messagesContainerRef = useRef<HTMLDivElement>(null);
     const previousMessageCountRef = useRef<number>(0);
+    const previousScrollHeight = useRef<number>(0);
+    const isFirstLoadRef = useRef<boolean>(true);
     const { data: userData } = useUserData();
+
+    const MESSAGES_LIMIT = 150;
 
     useEffect(() => {
         previousMessageCountRef.current = 0;
-    }, [selectedId]);
+        isFirstLoadRef.current = true;
+        if (selectedId) {
+            setHasMore(prev => ({ ...prev, [selectedId]: true }));
+            setIsLoadingOlder(prev => ({ ...prev, [selectedId]: false }));
+        }
+    }, [selectedId, setHasMore, setIsLoadingOlder]);
 
     const selectedConversation = conversations.find(c => c.id === selectedId);
     const conversationMessages = selectedId ? messages[selectedId] || [] : [];
@@ -54,34 +67,135 @@ const Conversation: React.FC = () => {
         }
     };
 
-    let isFirstLoad = true;
+    const loadOlderMessages = useCallback(async () => {
+        if (!selectedId || isLoadingOlder[selectedId] || !hasMore[selectedId]) return;
+
+        setIsLoadingOlder(prev => ({ ...prev, [selectedId]: true }));
+        
+        try {
+            const currentMessages = conversationMessages.length;
+            const olderMessages = await getConversationMessages(selectedId, MESSAGES_LIMIT, currentMessages);
+            // Messages are returned in DESC order, so need to sort them in ASC order
+            const sortedOlderMessages = olderMessages.sort((a, b) => 
+                new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+            );
+            
+            if (olderMessages.length < MESSAGES_LIMIT) {
+                setHasMore(prev => ({ ...prev, [selectedId]: false }));
+            }
+
+            if (sortedOlderMessages.length > 0) {
+                setMessages(prev => ({
+                    ...prev,
+                    [selectedId]: [...sortedOlderMessages, ...(prev[selectedId] || [])]
+                }));
+            }
+        } catch (error) {
+            console.error('Failed to load older messages:', error);
+        } finally {
+            setIsLoadingOlder(prev => ({ ...prev, [selectedId]: false }));
+        }
+    }, [selectedId, conversationMessages.length, isLoadingOlder, hasMore, setIsLoadingOlder, setHasMore, setMessages]);
+
+    const handleScroll = useCallback(() => {
+        const container = messagesContainerRef.current;
+        if (!container || !selectedId) return;
+
+        // Check if we are near the top of the container
+        if (container.scrollTop < 100 && hasMore[selectedId] && !isLoadingOlder[selectedId]) {
+            previousScrollHeight.current = container.scrollHeight;
+            loadOlderMessages();
+        }
+    }, [selectedId, hasMore, isLoadingOlder, loadOlderMessages]);
+
+    useEffect(() => {
+        const container = messagesContainerRef.current;
+        if (!container) return;
+
+        container.addEventListener('scroll', handleScroll);
+        return () => container.removeEventListener('scroll', handleScroll);
+    }, [handleScroll]);
 
     useEffect(() => {
         if (!selectedId) return;
 
         const fetchMessages = async () => {
-            if (isFirstLoad) setIsLoading(true);
+            if (isFirstLoadRef.current) setIsLoading(true);
             try {
-                const data = await getConversationMessages(selectedId);
-                setMessages(prev => ({ ...prev, [selectedId]: data }));
+                const data = await getConversationMessages(selectedId, MESSAGES_LIMIT, 0);
+
+                const sortedData = data.sort((a, b) => 
+                    new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+                );
+                
+                setMessages(prev => ({ ...prev, [selectedId]: sortedData }));
+                
+                // If < MESSAGES_LIMIT, we don't have more messages to load
+                if (data.length < MESSAGES_LIMIT) {
+                    setHasMore(prev => ({ ...prev, [selectedId]: false }));
+                } else {
+                    setHasMore(prev => ({ ...prev, [selectedId]: true }));
+                }
 
             } catch (error) {
                 console.error('Failed to fetch messages:', error);
             } finally {
-                if (isFirstLoad) setIsLoading(false);
-                isFirstLoad = false;
+                if (isFirstLoadRef.current) setIsLoading(false);
+                isFirstLoadRef.current = false;
             }
         }
 
         fetchMessages();
 
-        const pollInterval = setInterval(fetchMessages, 1000);
+        const pollInterval = setInterval(() => {
+            // Only check for new messages (offset 0)
+            if (!isFirstLoadRef.current) {
+                getConversationMessages(selectedId, MESSAGES_LIMIT, 0).then(latestMessages => {
+                    const currentMessages = messages[selectedId] || [];
+                    if (latestMessages.length > 0 && currentMessages.length > 0) {
+                        const sortedLatestMessages = latestMessages.sort((a, b) => 
+                            new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+                        );
+                        
+                        const latestMessageId = sortedLatestMessages[sortedLatestMessages.length - 1].id;
+                        const currentLatestId = currentMessages[currentMessages.length - 1].id;
+                        
+                        if (latestMessageId > currentLatestId) {
+                            const newMessages = sortedLatestMessages.filter(msg => 
+                                !currentMessages.some(existing => existing.id === msg.id)
+                            );
+                            
+                            if (newMessages.length > 0) {
+                                setMessages(prev => ({
+                                    ...prev,
+                                    [selectedId]: [...currentMessages, ...newMessages]
+                                }));
+                            }
+                        }
+                    }
+                }).catch(error => {
+                    console.error('Failed to poll for new messages:', error);
+                });
+            }
+        }, 1000);
 
         return () => {
-            clearInterval(pollInterval);
+            clearInterval(pollInterval); // vu avec Hugo, evite effets de bord
         };
-    }, [selectedId, setMessages]);
+    }, [selectedId, setMessages, setHasMore]);
 
+    useEffect(() => {
+        const container = messagesContainerRef.current;
+        if (!container || !previousScrollHeight.current) return;
+
+        const currentScrollHeight = container.scrollHeight;
+        const scrollDifference = currentScrollHeight - previousScrollHeight.current;
+        
+        if (scrollDifference > 0) {
+            container.scrollTop += scrollDifference;
+            previousScrollHeight.current = 0;
+        }
+    }, [conversationMessages.length]);
 
     useEffect(() => {
         const currentMessages = conversationMessages.length;
@@ -142,6 +256,12 @@ const Conversation: React.FC = () => {
                 ref={messagesContainerRef}
                 className="flex-1 overflow-y-auto p-4 space-y-4"
             >
+                {isLoadingOlder[selectedId] && (
+                    <div className="flex justify-center py-4">
+                        <div className="h-6 w-6 rounded-full border-2 border-purple-dark border-t-transparent animate-spin" />
+                    </div>
+                )}
+
                 {isLoading && conversationMessages.length === 0 ? (
                     <div className="space-y-4">
                         {Array.from({ length: 3 }).map((_, index) => (

@@ -28,8 +28,7 @@ const MessagesPage: React.FC = () => {
 
         fetchUnreadCount();
 
-        // Poll for unread messages every 30 seconds
-        const intervalId = setInterval(fetchUnreadCount, 60000);
+        const intervalId = setInterval(fetchUnreadCount, 1000);
 
         // Handle window resize
         const handleResize = () => {
