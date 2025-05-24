@@ -41,7 +41,6 @@ const SimpleBottomNavigation = () => {
   const [unreadCount, setUnreadCount] = useAtom(unreadCountAtom);
   const navigate = useNavigate();
 
-  // Récupérer le nombre de messages non lus au chargement et périodiquement
   useEffect(() => {
     const fetchUnreadCount = async () => {
       try {
@@ -54,8 +53,7 @@ const SimpleBottomNavigation = () => {
 
     fetchUnreadCount();
 
-    // Rafraîchir toutes les minutes
-    const intervalId = setInterval(fetchUnreadCount, 60000);
+    const intervalId = setInterval(fetchUnreadCount, 1000);
 
     return () => clearInterval(intervalId);
   }, [setUnreadCount]);

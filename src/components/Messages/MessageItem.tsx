@@ -2,8 +2,8 @@ import React from 'react';
 import { Message } from '../../api/Message';
 import dayjs from 'dayjs';
 import 'dayjs/locale/fr';
+import { ZoomableImage } from '../ZoomableImage';
 
-// Initialize French locale
 dayjs.locale('fr');
 
 interface MessageItemProps {
@@ -20,14 +20,16 @@ const MessageItem: React.FC<MessageItemProps> = ({ message, isFromCurrentUser })
                     : 'bg-gray-100 text-gray-800'
                     }`}
             >
-                {message.imageFilename && (
-                    <div className="mb-2">
-                        <img
-                            src={`${import.meta.env.VITE_BACKEND_URL}/images/messages/${message.imageFilename}`}
-                            alt="Uploaded"
-                            className="rounded-lg max-h-64 w-auto"
-                            loading="lazy"
-                        />
+                {(message.images && message.images.length > 0) && (
+                    <div className="mb-2 space-y-2">
+                        {message.images.map((image, index) => (
+                            <ZoomableImage
+                                key={index}
+                                src={`${import.meta.env.VITE_BACKEND_URL}/images/files/${image.name}`}
+                                alt={`Uploaded ${index + 1}`}
+                                className="rounded-lg max-h-64 w-auto"
+                            />
+                        ))}
                     </div>
                 )}
 
@@ -36,7 +38,7 @@ const MessageItem: React.FC<MessageItemProps> = ({ message, isFromCurrentUser })
                 )}
 
                 <div className={`text-xs mt-1 ${isFromCurrentUser ? 'text-purple-100' : 'text-gray-500'}`}>
-                    {dayjs(message.sentAt).format('HH:mm')}
+                    {dayjs(message.createdAt).format('HH:mm')}
                 </div>
             </div>
         </div>

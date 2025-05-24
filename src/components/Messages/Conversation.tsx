@@ -6,12 +6,13 @@ import {
     selectedConversationIdAtom,
     isLoadingMessagesAtom
 } from '@/atoms/messages';
-import { getConversation, markConversationAsRead } from '../../api/Message';
+import { getConversationMessages } from '../../api/Message';
 import MessageItem from './MessageItem';
 import MessageInput from './MessageInput';
 import { ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useUserData } from "@/api/User";
 
 const Conversation: React.FC = () => {
     const [selectedId, setSelectedId] = useAtom(selectedConversationIdAtom);
@@ -19,48 +20,81 @@ const Conversation: React.FC = () => {
     const [messages, setMessages] = useAtom(messagesAtom);
     const [isLoading, setIsLoading] = useAtom(isLoadingMessagesAtom);
     const messagesEndRef = useRef<HTMLDivElement>(null);
-    const userId = localStorage.getItem('userId');
+    const messagesContainerRef = useRef<HTMLDivElement>(null);
+    const previousMessageCountRef = useRef<number>(0);
+    const { data: userData } = useUserData();
+
+    useEffect(() => {
+        previousMessageCountRef.current = 0;
+    }, [selectedId]);
 
     const selectedConversation = conversations.find(c => c.id === selectedId);
     const conversationMessages = selectedId ? messages[selectedId] || [] : [];
 
-    // Function to scroll to bottom
-    const scrollToBottom = () => {
-        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    const isNearBottom = () => {
+        const container = messagesContainerRef.current;
+        if (!container) return true;
+
+        const threshold = 600;
+        const isAtBottom = container.scrollHeight - container.scrollTop - container.clientHeight <= threshold;
+        return isAtBottom;
     };
+
+    const scrollToBottom = (smooth: boolean = true) => {
+        const container = messagesContainerRef.current;
+        if (container) {
+            if (smooth) {
+                container.scrollTo({
+                    top: container.scrollHeight,
+                    behavior: 'smooth'
+                });
+            } else {
+                container.scrollTop = container.scrollHeight;
+            }
+        }
+    };
+
+    let isFirstLoad = true;
 
     useEffect(() => {
         if (!selectedId) return;
 
         const fetchMessages = async () => {
-            setIsLoading(true);
+            if (isFirstLoad) setIsLoading(true);
             try {
-                const data = await getConversation(selectedId);
-                setMessages(prev => ({ ...prev, [selectedId]: data.messages }));
+                const data = await getConversationMessages(selectedId);
+                setMessages(prev => ({ ...prev, [selectedId]: data }));
 
-                // Mark conversation as read
-                await markConversationAsRead(selectedId);
             } catch (error) {
                 console.error('Failed to fetch messages:', error);
             } finally {
-                setIsLoading(false);
+                if (isFirstLoad) setIsLoading(false);
+                isFirstLoad = false;
             }
-        };
+        }
 
-        // Initial fetch
         fetchMessages();
 
-        // Poll for new messages every 5 seconds for active conversations
-        const pollInterval = setInterval(fetchMessages, 60000);
+        const pollInterval = setInterval(fetchMessages, 1000);
 
         return () => {
             clearInterval(pollInterval);
         };
-    }, [selectedId, setMessages, setIsLoading]);
+    }, [selectedId, setMessages]);
 
-    // Scroll to bottom when messages change
+
     useEffect(() => {
-        scrollToBottom();
+        const currentMessages = conversationMessages.length;
+        const previousCount = previousMessageCountRef.current;
+
+        if (previousCount === 0 && currentMessages > 0) {
+            scrollToBottom(false);
+        }
+        else if (currentMessages > previousCount && isNearBottom()) {
+            scrollToBottom(true);
+        }
+
+        previousMessageCountRef.current = currentMessages;
     }, [conversationMessages]);
 
     if (!selectedId || !selectedConversation) {
@@ -71,11 +105,10 @@ const Conversation: React.FC = () => {
         );
     }
 
-    const otherParticipant = selectedConversation.buyer;
+    const otherParticipant = selectedConversation.buyer.id != userData?.id ? selectedConversation.buyer : selectedConversation.seller;
 
     return (
         <div className="flex flex-col h-[calc(100vh-16rem)] bg-white rounded-lg">
-            {/* Header */}
             <div className="p-4 border-b flex items-center justify-between">
                 <div className="flex items-center">
                     <Button
@@ -105,8 +138,10 @@ const Conversation: React.FC = () => {
                 </div>
             </div>
 
-            {/* Messages */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-4">
+            <div
+                ref={messagesContainerRef}
+                className="flex-1 overflow-y-auto p-4 space-y-4"
+            >
                 {isLoading && conversationMessages.length === 0 ? (
                     <div className="space-y-4">
                         {Array.from({ length: 3 }).map((_, index) => (
@@ -123,14 +158,13 @@ const Conversation: React.FC = () => {
                         <MessageItem
                             key={message.id}
                             message={message}
-                            isFromCurrentUser={message.sender.id.toString() === userId}
+                            isFromCurrentUser={message.sender.id === userData?.id}
                         />
                     ))
                 )}
                 <div ref={messagesEndRef} />
             </div>
 
-            {/* Input */}
             <div className="p-4 border-t">
                 <MessageInput conversationId={selectedId} />
             </div>

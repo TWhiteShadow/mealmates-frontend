@@ -2,16 +2,16 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { X } from 'lucide-react';
 
-interface ImagePreviewProps {
+interface SingleImagePreviewProps {
     image: File;
     onRemove: () => void;
 }
 
-const ImagePreview: React.FC<ImagePreviewProps> = ({ image, onRemove }) => {
+const SingleImagePreview: React.FC<SingleImagePreviewProps> = ({ image, onRemove }) => {
     const imageUrl = URL.createObjectURL(image);
 
     return (
-        <div className="mb-2 relative inline-block">
+        <div className="mb-2 relative inline-block mr-2">
             <img
                 src={imageUrl}
                 alt="Preview"
@@ -31,4 +31,23 @@ const ImagePreview: React.FC<ImagePreviewProps> = ({ image, onRemove }) => {
     );
 };
 
-export default ImagePreview;
+interface ImagePreviewProps {
+    images: File[];
+    onRemove: (index: number) => void;
+}
+
+const ImagePreview: React.FC<ImagePreviewProps> = ({ images, onRemove }) => {
+    return (
+        <div className="flex flex-wrap gap-2 mb-2">
+            {images.map((image, index) => (
+                <SingleImagePreview
+                    key={`${image.name}-${index}`}
+                    image={image}
+                    onRemove={() => onRemove(index)}
+                />
+            ))}
+        </div>
+    );
+};
+
+export { ImagePreview };

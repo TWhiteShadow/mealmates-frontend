@@ -17,7 +17,7 @@ export interface Product {
   food_preferences?: Array<{ id: number; name: string }>;
   allergens?: Array<{ id: number; name: string }>;
 
-  seller?: {
+  seller: {
     id: number;
     first_name: string | null;
     last_name: string | null;

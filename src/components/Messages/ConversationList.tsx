@@ -1,17 +1,13 @@
 import React, { useEffect } from 'react';
 import { useAtom } from 'jotai';
-import {
-    conversationsAtom,
-    isLoadingConversationsAtom,
-    selectedConversationIdAtom
-} from '../../atoms/messages';
+import { conversationsAtom, isLoadingConversationsAtom, selectedConversationIdAtom } from '../../atoms/messages';
 import { getConversations, ConversationPreview } from '../../api/Message';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import 'dayjs/locale/fr';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useUserData } from '@/api/User';
 
-// Initialize dayjs plugins
 dayjs.extend(relativeTime);
 dayjs.locale('fr');
 
@@ -19,6 +15,7 @@ const ConversationList: React.FC = () => {
     const [conversations, setConversations] = useAtom(conversationsAtom);
     const [isLoading, setIsLoading] = useAtom(isLoadingConversationsAtom);
     const [selectedId, setSelectedId] = useAtom(selectedConversationIdAtom);
+    const { data: userData } = useUserData();
 
     useEffect(() => {
         const fetchConversations = async () => {
@@ -35,7 +32,6 @@ const ConversationList: React.FC = () => {
 
         fetchConversations();
 
-        // Refresh conversations every 10 seconds
         const intervalId = setInterval(fetchConversations, 60000);
 
         return () => clearInterval(intervalId);
@@ -82,9 +78,7 @@ const ConversationList: React.FC = () => {
 
             <div>
                 {conversations.map((conversation) => {
-                    const otherParticipant = conversation.buyer.id === conversation.offer.seller.id
-                        ? conversation.buyer
-                        : conversation.offer.seller;
+                    const otherParticipant = conversation.buyer.id != userData?.id ? conversation.buyer : conversation.seller;
 
                     return (
                         <div
@@ -107,7 +101,7 @@ const ConversationList: React.FC = () => {
                                         {otherParticipant ? `${otherParticipant.first_name} ${otherParticipant.last_name}` : 'Inconnu'}
                                     </h3>
                                     <span className="text-xs text-gray-500">
-                                        {dayjs(conversation.updatedAt).fromNow()}
+                                        {dayjs(conversation.lastMessage?.createdAt).fromNow()}
                                     </span>
                                 </div>
 
@@ -119,7 +113,7 @@ const ConversationList: React.FC = () => {
 
                                 {conversation.lastMessage && (
                                     <p className="text-xs text-gray-500 mt-1 truncate">
-                                        {conversation.lastMessage.imageFilename
+                                        {conversation.lastMessage.images && conversation.lastMessage.images.length > 0
                                             ? '📷 Image'
                                             : conversation.lastMessage.content}
                                     </p>

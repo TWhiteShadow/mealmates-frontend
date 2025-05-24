@@ -1,3 +1,5 @@
+import api from './Axios';
+
 const API_URL = import.meta.env.VITE_BACKEND_URL || '';
 
 export interface User {
@@ -17,9 +19,9 @@ export interface Offer {
 export interface Message {
   id: number;
   content: string | null;
-  sentAt: string;
+  createdAt: string;
   isRead: boolean;
-  imageFilename: string | null;
+  images?: { name: string }[];
   sender: User;
 }
 
@@ -38,62 +40,28 @@ export interface ConversationPreview {
   offer: Offer;
   buyer: User;
   seller: User;
+  messages: Message[];
   lastMessage?: Message;
   unreadCount: number;
   updatedAt: string;
 }
 
 export const getConversations = async (): Promise<ConversationPreview[]> => {
-  const response = await fetch(`${API_URL}/api/v1/conversations`, {
-    credentials: 'include',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  });
-
-  if (!response.ok) {
-    throw new Error('Failed to fetch conversations');
-  }
-
-  return response.json();
+  const response = await api.get(`/conversations`);
+  return response.data;
 };
 
-export const getConversation = async (id: number): Promise<Conversation> => {
-  const response = await fetch(
-    `${API_URL}/api/v1/conversations/${id}/messages`,
-    {
-      credentials: 'include',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    }
-  );
-
-  if (!response.ok) {
-    throw new Error('Failed to fetch conversation');
-  }
-
-  return response.json();
-};
-
-export const markConversationAsRead = async (id: number): Promise<void> => {
-  const response = await fetch(`${API_URL}/api/v1/conversations/${id}/read`, {
-    method: 'PUT',
-    credentials: 'include',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  });
-
-  if (!response.ok) {
-    throw new Error('Failed to mark conversation as read');
-  }
+export const getConversationMessages = async (
+  id: number
+): Promise<Message[]> => {
+  const response = await api.get(`/conversations/${id}/messages?offset=0`);
+  return response.data;
 };
 
 export const sendMessage = async (
   conversationId: number,
   content: string,
-  image?: File
+  images?: File[]
 ): Promise<Message> => {
   const formData = new FormData();
 
@@ -101,24 +69,18 @@ export const sendMessage = async (
     formData.append('content', content);
   }
 
-  if (image) {
-    formData.append('image', image);
+  if (images && images.length > 0) {
+    // Append each image with array notation for multiple files
+    images.forEach((image) => {
+      formData.append('images[]', image);
+    });
   }
 
-  const response = await fetch(
-    `${API_URL}/api/v1/conversations/${conversationId}/messages`,
-    {
-      method: 'POST',
-      credentials: 'include',
-      body: formData,
-    }
+  const response = await api.post(
+    `/conversations/${conversationId}/messages`,
+    formData
   );
-
-  if (!response.ok) {
-    throw new Error('Failed to send message');
-  }
-
-  return response.json();
+  return response.data;
 };
 
 export const getOrCreateConversation = async (
