@@ -9,7 +9,6 @@ interface SingleImagePreviewProps {
 
 const SingleImagePreview: React.FC<SingleImagePreviewProps> = ({ image, onRemove }) => {
     const imageUrl = URL.createObjectURL(image);
-
     return (
         <div className="mb-2 relative inline-block mr-2">
             <img

@@ -1,5 +1,7 @@
 import React from 'react';
 import { Message } from '../../api/Message';
+import { useAtomValue } from 'jotai';
+import { messageImageBlobsAtom, generateImageBlobKey } from '@/atoms/messages';
 import dayjs from 'dayjs';
 import 'dayjs/locale/fr';
 import { ZoomableImage } from '../ZoomableImage';
@@ -12,6 +14,19 @@ interface MessageItemProps {
 }
 
 const MessageItem: React.FC<MessageItemProps> = ({ message, isFromCurrentUser }) => {
+    const messageImageBlobs = useAtomValue(messageImageBlobsAtom);
+
+    const getImageSrc = (image: any, index: number) => {
+        const blobKey = generateImageBlobKey(message.id, index);
+        const blobUrl = messageImageBlobs[blobKey];
+        if (blobUrl) {
+            return blobUrl;
+        } else {
+            return `${import.meta.env.VITE_BACKEND_URL}/images/files/${image.name}`;
+        }
+    };
+
+
     return (
         <div className={`flex ${isFromCurrentUser ? 'justify-end' : 'justify-start'} mb-4`}>
             <div
@@ -25,7 +40,7 @@ const MessageItem: React.FC<MessageItemProps> = ({ message, isFromCurrentUser })
                         {message.images.map((image, index) => (
                             <ZoomableImage
                                 key={index}
-                                src={`${import.meta.env.VITE_BACKEND_URL}/images/files/${image.name}`}
+                                src={getImageSrc(image, index)}
                                 alt={`Uploaded ${index + 1}`}
                                 className="rounded-lg max-h-64 w-auto"
                             />

@@ -2,7 +2,9 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useAtom, useSetAtom } from 'jotai';
 import {
     messagesAtom,
-    isSendingMessageAtom
+    isSendingMessageAtom,
+    messageImageBlobsAtom,
+    generateImageBlobKey,
 } from '@/atoms/messages';
 import { sendMessage, getPredefinedMessages } from '../../api/Message';
 import { Send, Image as ImageIcon, SmilePlus } from 'lucide-react';
@@ -22,6 +24,7 @@ const MessageInput: React.FC<MessageInputProps> = ({ conversationId }) => {
     const [isSending, setIsSending] = useAtom(isSendingMessageAtom);
     const [showPredefined, setShowPredefined] = useState(false);
     const [predefinedMessages, setPredefinedMessages] = useState<string[]>([]);
+    const setMessageImageBlobs = useSetAtom(messageImageBlobsAtom);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
@@ -79,6 +82,17 @@ const MessageInput: React.FC<MessageInputProps> = ({ conversationId }) => {
                 content,
                 images.length > 0 ? images : undefined
             );
+
+            // Store image blobs in the atom
+            if (images.length > 0) {
+                const imageBlobs: Record<string, string> = {};
+                images.forEach((image, index) => {
+                    const blobUrl = URL.createObjectURL(image);
+                    const key = generateImageBlobKey(newMessage.id, index);
+                    imageBlobs[key] = blobUrl;
+                });
+                setMessageImageBlobs(prev => ({ ...prev, ...imageBlobs }));
+            }
 
             setMessages(prev => {
                 const existingMessages = prev[conversationId] || [];
