@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useCallback } from 'react';
+import React, { useEffect, useRef, useCallback, useState } from 'react';
 import { useAtom } from 'jotai';
 import {
     conversationsAtom,
@@ -11,7 +11,7 @@ import {
 import { getConversationMessages } from '../../api/Message';
 import MessageItem from './MessageItem';
 import MessageInput from './MessageInput';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, ChevronsDownIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useUserData } from "@/api/User";
@@ -23,6 +23,7 @@ const Conversation: React.FC = () => {
     const [isLoading, setIsLoading] = useAtom(isLoadingMessagesAtom);
     const [isLoadingOlder, setIsLoadingOlder] = useAtom(isLoadingOlderMessagesAtom);
     const [hasMore, setHasMore] = useAtom(hasMoreMessagesAtom);
+    const [isNearBottomState, setIsNearBottomState] = useState(true);
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const messagesContainerRef = useRef<HTMLDivElement>(null);
     const previousMessageCountRef = useRef<number>(0);
@@ -44,14 +45,14 @@ const Conversation: React.FC = () => {
     const selectedConversation = conversations.find(c => c.id === selectedId);
     const conversationMessages = selectedId ? messages[selectedId] || [] : [];
 
-    const isNearBottom = () => {
+    const isNearBottom = useCallback(() => {
         const container = messagesContainerRef.current;
         if (!container) return true;
 
-        const threshold = 600;
+        const threshold = 100; // Reduced threshold to make the button appear sooner
         const isAtBottom = container.scrollHeight - container.scrollTop - container.clientHeight <= threshold;
         return isAtBottom;
-    };
+    }, []);
 
     const scrollToBottom = (smooth: boolean = true) => {
         const container = messagesContainerRef.current;
@@ -101,12 +102,15 @@ const Conversation: React.FC = () => {
         const container = messagesContainerRef.current;
         if (!container || !selectedId) return;
 
+        // Update near-bottom state on scroll
+        setIsNearBottomState(isNearBottom());
+
         // Check if we are near the top of the container
         if (container.scrollTop < 100 && hasMore[selectedId] && !isLoadingOlder[selectedId]) {
             previousScrollHeight.current = container.scrollHeight;
             loadOlderMessages();
         }
-    }, [selectedId, hasMore, isLoadingOlder, loadOlderMessages]);
+    }, [selectedId, hasMore, isLoadingOlder, loadOlderMessages, isNearBottom]);
 
     useEffect(() => {
         const container = messagesContainerRef.current;
@@ -267,7 +271,8 @@ const Conversation: React.FC = () => {
 
             <div
                 ref={messagesContainerRef}
-                className="flex-1 overflow-y-auto p-4 space-y-4"
+                className="flex-1 overflow-y-auto p-4 space-y-4 relative"
+                onScroll={handleScroll}
             >
                 {isLoadingOlder[selectedId] && (
                     <div className="flex justify-center py-4">
@@ -296,6 +301,19 @@ const Conversation: React.FC = () => {
                     ))
                 )}
                 <div ref={messagesEndRef} />
+
+                {!isNearBottomState && (
+                    <div className="sticky bottom-4 right-4 z-10 flex justify-end">
+                        <Button
+                            variant="outline"
+                            size="icon"
+                            className="bg-white shadow-lg hover:bg-gray-50 rounded-full"
+                            onClick={() => scrollToBottom(true)}
+                        >
+                            <ChevronsDownIcon className="h-4 w-4" />
+                        </Button>
+                    </div>
+                )}
             </div>
 
             <div className="p-4 border-t">
