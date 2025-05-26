@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
-import { useAtom } from 'jotai';
-import { conversationsAtom, isLoadingConversationsAtom, selectedConversationIdAtom } from '../../atoms/messages';
+import { useAtom, useAtomValue } from 'jotai';
+import { conversationsAtom, isLoadingConversationsAtom, selectedConversationIdAtom, unreadCountAtom } from '../../atoms/messages';
 import { getConversations, ConversationPreview } from '../../api/Message';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
@@ -13,6 +13,7 @@ dayjs.locale('fr');
 
 const ConversationList: React.FC = () => {
     const [conversations, setConversations] = useAtom(conversationsAtom);
+    const unreadCount = useAtomValue(unreadCountAtom);
     const [isLoading, setIsLoading] = useAtom(isLoadingConversationsAtom);
     const [selectedId, setSelectedId] = useAtom(selectedConversationIdAtom);
     const { data: userData } = useUserData();
@@ -119,10 +120,10 @@ const ConversationList: React.FC = () => {
                                     </p>
                                 )}
 
-                                {conversation.unreadCount > 0 && (
+                                {unreadCount > 0 && (
                                     <div className="mt-1">
                                         <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-purple-100 text-purple-800">
-                                            {conversation.unreadCount} non lu{conversation.unreadCount > 1 ? 's' : ''}
+                                            {unreadCount} non lu{unreadCount > 1 ? 's' : ''}
                                         </span>
                                     </div>
                                 )}
