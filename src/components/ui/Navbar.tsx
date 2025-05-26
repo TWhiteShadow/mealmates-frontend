@@ -53,7 +53,7 @@ const SimpleBottomNavigation = () => {
 
     fetchUnreadCount();
 
-    const intervalId = setInterval(fetchUnreadCount, 1000);
+    const intervalId = setInterval(fetchUnreadCount, Number(import.meta.env.VITE_MESSAGES_POLL_INTERVAL) || 10000);
 
     return () => clearInterval(intervalId);
   }, [setUnreadCount]);

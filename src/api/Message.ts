@@ -1,7 +1,5 @@
 import api from './Axios';
 
-const API_URL = import.meta.env.VITE_BACKEND_URL || '';
-
 export interface User {
   id: number;
   email: string;
@@ -91,50 +89,18 @@ export const getOrCreateConversation = async (
   offerId: number,
   userId: number
 ): Promise<Conversation> => {
-  const response = await fetch(
-    `${API_URL}/api/v1/conversations/offer/${offerId}/with/${userId}`,
-    {
-      credentials: 'include',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    }
+  const response = await api.get(
+    `/conversations/offer/${offerId}/with/${userId}`
   );
-
-  if (!response.ok) {
-    throw new Error('Failed to create conversation');
-  }
-
-  return response.json();
+  return response.data;
 };
 
 export const getPredefinedMessages = async (): Promise<string[]> => {
-  const response = await fetch(`${API_URL}/api/v1/messages/predefined`, {
-    credentials: 'include',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  });
-
-  if (!response.ok) {
-    throw new Error('Failed to fetch predefined messages');
-  }
-
-  return response.json();
+  const response = await api.get('/messages/predefined');
+  return response.data;
 };
 
 export const getUnreadMessagesCount = async (): Promise<number> => {
-  const response = await fetch(`${API_URL}/api/v1/messages/unread-count`, {
-    credentials: 'include',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  });
-
-  if (!response.ok) {
-    throw new Error('Failed to fetch unread messages count');
-  }
-
-  const data = await response.json();
-  return data.count;
+  const response = await api.get('/messages/unread-count');
+  return response.data.count;
 };

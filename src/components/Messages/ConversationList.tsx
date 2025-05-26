@@ -32,7 +32,7 @@ const ConversationList: React.FC = () => {
 
         fetchConversations();
 
-        const intervalId = setInterval(fetchConversations, 60000);
+        const intervalId = setInterval(fetchConversations, Number(import.meta.env.VITE_CONVERSATIONS_POLL_INTERVAL) || 60000);
 
         return () => clearInterval(intervalId);
     }, [setConversations, setIsLoading]);

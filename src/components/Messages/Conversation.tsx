@@ -71,15 +71,15 @@ const Conversation: React.FC = () => {
         if (!selectedId || isLoadingOlder[selectedId] || !hasMore[selectedId]) return;
 
         setIsLoadingOlder(prev => ({ ...prev, [selectedId]: true }));
-        
+
         try {
             const currentMessages = conversationMessages.length;
             const olderMessages = await getConversationMessages(selectedId, MESSAGES_LIMIT, currentMessages);
             // Messages are returned in DESC order, so need to sort them in ASC order
-            const sortedOlderMessages = olderMessages.sort((a, b) => 
+            const sortedOlderMessages = olderMessages.sort((a, b) =>
                 new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
             );
-            
+
             if (olderMessages.length < MESSAGES_LIMIT) {
                 setHasMore(prev => ({ ...prev, [selectedId]: false }));
             }
@@ -124,12 +124,12 @@ const Conversation: React.FC = () => {
             try {
                 const data = await getConversationMessages(selectedId, MESSAGES_LIMIT, 0);
 
-                const sortedData = data.sort((a, b) => 
+                const sortedData = data.sort((a, b) =>
                     new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
                 );
-                
+
                 setMessages(prev => ({ ...prev, [selectedId]: sortedData }));
-                
+
                 // If < MESSAGES_LIMIT, we don't have more messages to load
                 if (data.length < MESSAGES_LIMIT) {
                     setHasMore(prev => ({ ...prev, [selectedId]: false }));
@@ -153,18 +153,18 @@ const Conversation: React.FC = () => {
                 getConversationMessages(selectedId, MESSAGES_LIMIT, 0).then(latestMessages => {
                     const currentMessages = messages[selectedId] || [];
                     if (latestMessages.length > 0 && currentMessages.length > 0) {
-                        const sortedLatestMessages = latestMessages.sort((a, b) => 
+                        const sortedLatestMessages = latestMessages.sort((a, b) =>
                             new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
                         );
-                        
+
                         const latestMessageId = sortedLatestMessages[sortedLatestMessages.length - 1].id;
                         const currentLatestId = currentMessages[currentMessages.length - 1].id;
-                        
+
                         if (latestMessageId > currentLatestId) {
-                            const newMessages = sortedLatestMessages.filter(msg => 
+                            const newMessages = sortedLatestMessages.filter(msg =>
                                 !currentMessages.some(existing => existing.id === msg.id)
                             );
-                            
+
                             if (newMessages.length > 0) {
                                 setMessages(prev => ({
                                     ...prev,
@@ -177,7 +177,7 @@ const Conversation: React.FC = () => {
                     console.error('Failed to poll for new messages:', error);
                 });
             }
-        }, 1000);
+        }, Number(import.meta.env.VITE_MESSAGES_POLL_INTERVAL) || 10000);
 
         return () => {
             clearInterval(pollInterval); // vu avec Hugo, evite effets de bord
@@ -190,7 +190,7 @@ const Conversation: React.FC = () => {
 
         const currentScrollHeight = container.scrollHeight;
         const scrollDifference = currentScrollHeight - previousScrollHeight.current;
-        
+
         if (scrollDifference > 0) {
             container.scrollTop += scrollDifference;
             previousScrollHeight.current = 0;

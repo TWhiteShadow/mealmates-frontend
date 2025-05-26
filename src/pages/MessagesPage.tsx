@@ -6,30 +6,16 @@ import {
     selectedConversationIdAtom,
     unreadCountAtom,
 } from '@/atoms/messages';
-import { getUnreadMessagesCount } from '../api/Message';
 import ProfileAppBar from '@/components/ProfileAppBar';
 import { ArrowBackIosOutlined, CircleNotificationsOutlined } from '@mui/icons-material';
 import { Button } from '@/components/ui/button';
 
 const MessagesPage: React.FC = () => {
     const [selectedId] = useAtom(selectedConversationIdAtom);
-    const [unreadCount, setUnreadCount] = useAtom(unreadCountAtom);
+    const [unreadCount] = useAtom(unreadCountAtom);
     const [windowWidth, setWindowWidth] = useState(window.innerWidth);
 
     useEffect(() => {
-        const fetchUnreadCount = async () => {
-            try {
-                const count = await getUnreadMessagesCount();
-                setUnreadCount(count);
-            } catch (error) {
-                console.error('Failed to fetch unread messages count:', error);
-            }
-        };
-
-        fetchUnreadCount();
-
-        const intervalId = setInterval(fetchUnreadCount, 1000);
-
         // Handle window resize
         const handleResize = () => {
             setWindowWidth(window.innerWidth);
@@ -38,10 +24,9 @@ const MessagesPage: React.FC = () => {
         window.addEventListener('resize', handleResize);
 
         return () => {
-            clearInterval(intervalId);
             window.removeEventListener('resize', handleResize);
         };
-    }, [setUnreadCount]);
+    }, []);
 
     // Display for mobile: either the list or the conversation
     const isMobile = windowWidth < 768;
