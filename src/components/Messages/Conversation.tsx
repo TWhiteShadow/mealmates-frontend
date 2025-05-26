@@ -151,27 +151,40 @@ const Conversation: React.FC = () => {
             // Only check for new messages (offset 0)
             if (!isFirstLoadRef.current) {
                 getConversationMessages(selectedId, MESSAGES_LIMIT, 0).then(latestMessages => {
-                    const currentMessages = messages[selectedId] || [];
-                    if (latestMessages.length > 0 && currentMessages.length > 0) {
+                    if (latestMessages.length > 0) {
                         const sortedLatestMessages = latestMessages.sort((a, b) =>
                             new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
                         );
 
-                        const latestMessageId = sortedLatestMessages[sortedLatestMessages.length - 1].id;
-                        const currentLatestId = currentMessages[currentMessages.length - 1].id;
+                        setMessages(prev => {
+                            const currentMessages = prev[selectedId] || [];
 
-                        if (latestMessageId > currentLatestId) {
+                            if (currentMessages.length === 0) {
+                                // If no current messages, set all latest messages
+                                return { ...prev, [selectedId]: sortedLatestMessages };
+                            }
+
+                            // Find messages that exist on server but not locally
+                            const currentMessageIds = new Set(currentMessages.map(msg => msg.id));
                             const newMessages = sortedLatestMessages.filter(msg =>
-                                !currentMessages.some(existing => existing.id === msg.id)
+                                !currentMessageIds.has(msg.id)
                             );
 
                             if (newMessages.length > 0) {
-                                setMessages(prev => ({
+                                // Merge and sort all messages to handle out-of-order scenarios
+                                const allMessages = [...currentMessages, ...newMessages];
+                                const sortedAllMessages = allMessages.sort((a, b) =>
+                                    new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+                                );
+
+                                return {
                                     ...prev,
-                                    [selectedId]: [...currentMessages, ...newMessages]
-                                }));
+                                    [selectedId]: sortedAllMessages
+                                };
                             }
-                        }
+
+                            return prev;
+                        });
                     }
                 }).catch(error => {
                     console.error('Failed to poll for new messages:', error);
