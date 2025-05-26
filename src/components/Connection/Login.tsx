@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { loginUser } from '@/api/User';
 import { cn } from '@/lib/utils';
 import { buttonVariants } from '../ui/button';
-import logo from '../../assets/MealMatesLogo.png';
+import logo from '@/assets/MealMatesLogo.webp';
 import { useNavigate } from 'react-router';
 
 const Login = () => {

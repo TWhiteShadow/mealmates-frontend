@@ -1,5 +1,5 @@
 import ProfileAppBar from "@/components/ProfileAppBar";
-import MealMatesLogo from '../../assets/MealMatesLogo.png';
+import MealMatesLogo from '../../assets/MealMatesLogo.webp';
 import OrderCard from "@/components/OrderCard";
 import { BoltRounded, Euro, Settings } from "@mui/icons-material";
 import StatCard from "@/components/StatCard";

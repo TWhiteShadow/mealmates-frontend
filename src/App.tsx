@@ -17,6 +17,7 @@ import Navbar from "@/components/ui/Navbar";
 import { useEffect } from 'react';
 import { navigationRef, locationRef } from './utils/navigateRef';
 import MessagesPage from './pages/MessagesPage';
+import { useDocumentTitle } from './hooks/use-document-title';
 
 function NavbarLayout() {
   return (
@@ -30,6 +31,7 @@ function NavbarLayout() {
 function App() {
   const navigate = useNavigate();
   const location = useLocation();
+  useDocumentTitle();
 
   useEffect(() => {
     navigationRef.navigate = navigate;
