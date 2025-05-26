@@ -112,7 +112,9 @@ const SimpleBottomNavigation = () => {
           label='Messages'
           icon={
             value === 3 ? (
-              <MessageIcon />
+              <Badge badgeContent={unreadCount > 0 ? unreadCount : null} color="error">
+                <MessageIcon />
+              </Badge>
             ) : (
               <Badge badgeContent={unreadCount > 0 ? unreadCount : null} color="error">
                 <MessageOutlinedIcon />
