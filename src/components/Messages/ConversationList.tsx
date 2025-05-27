@@ -111,7 +111,7 @@ const ConversationList: React.FC = () => {
                                 </div>
 
                                 {conversation.lastMessage && (
-                                    <p className="text-xs text-gray-500 mt-1 truncate">
+                                    <p className="text-xs text-gray-500 mt-1 line-clamp-3">
                                         {conversation.lastMessage.images && conversation.lastMessage.images.length > 0
                                             ? '📷 Image'
                                             : conversation.lastMessage.content}
