@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useCallback, useState } from 'react';
+import React, { useEffect, useRef, useCallback, useState, useMemo } from 'react';
 import { useAtom } from 'jotai';
 import {
     conversationsAtom,
@@ -29,6 +29,7 @@ const Conversation: React.FC = () => {
     const previousMessageCountRef = useRef<number>(0);
     const previousScrollHeight = useRef<number>(0);
     const isFirstLoadRef = useRef<boolean>(true);
+    const currentConversationIdRef = useRef<number | null>(null);
     const { data: userData } = useUserData();
 
     const MESSAGES_LIMIT = 150;
@@ -36,20 +37,24 @@ const Conversation: React.FC = () => {
     useEffect(() => {
         previousMessageCountRef.current = 0;
         isFirstLoadRef.current = true;
+        currentConversationIdRef.current = selectedId;
         if (selectedId) {
             setHasMore(prev => ({ ...prev, [selectedId]: true }));
             setIsLoadingOlder(prev => ({ ...prev, [selectedId]: false }));
+            setIsLoading(false);
         }
-    }, [selectedId, setHasMore, setIsLoadingOlder]);
+    }, [selectedId, setHasMore, setIsLoadingOlder, setIsLoading]);
 
     const selectedConversation = conversations.find(c => c.id === selectedId);
-    const conversationMessages = selectedId ? messages[selectedId] || [] : [];
+    const conversationMessages = useMemo(() => {
+        return selectedId ? messages[selectedId] || [] : [];
+    }, [selectedId, messages]);
 
     const isNearBottom = useCallback(() => {
         const container = messagesContainerRef.current;
         if (!container) return true;
 
-        const threshold = 100; // Reduced threshold to make the button appear sooner
+        const threshold = 100;
         const isAtBottom = container.scrollHeight - container.scrollTop - container.clientHeight <= threshold;
         return isAtBottom;
     }, []);
@@ -72,10 +77,12 @@ const Conversation: React.FC = () => {
         if (!selectedId || isLoadingOlder[selectedId] || !hasMore[selectedId]) return;
 
         setIsLoadingOlder(prev => ({ ...prev, [selectedId]: true }));
+        const conversationIdToFetch = selectedId;
 
         try {
             const currentMessages = conversationMessages.length;
             const olderMessages = await getConversationMessages(selectedId, MESSAGES_LIMIT, currentMessages);
+            if (currentConversationIdRef.current !== conversationIdToFetch) return;
             // Messages are returned in DESC order, so need to sort them in ASC order
             const sortedOlderMessages = olderMessages.sort((a, b) =>
                 new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
@@ -125,8 +132,10 @@ const Conversation: React.FC = () => {
 
         const fetchMessages = async () => {
             if (isFirstLoadRef.current) setIsLoading(true);
+            const conversationIdToFetch = selectedId;
             try {
                 const data = await getConversationMessages(selectedId, MESSAGES_LIMIT, 0);
+                if (currentConversationIdRef.current !== conversationIdToFetch) return;
 
                 const sortedData = data.sort((a, b) =>
                     new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
@@ -153,8 +162,9 @@ const Conversation: React.FC = () => {
 
         const pollInterval = setInterval(() => {
             // Only check for new messages (offset 0)
-            if (!isFirstLoadRef.current) {
+            if (!isFirstLoadRef.current && currentConversationIdRef.current === selectedId) {
                 getConversationMessages(selectedId, MESSAGES_LIMIT, 0).then(latestMessages => {
+                    if (currentConversationIdRef.current !== selectedId) return;
                     if (latestMessages.length > 0) {
                         const sortedLatestMessages = latestMessages.sort((a, b) =>
                             new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()

@@ -101,8 +101,6 @@ export default function SellPage() {
             finalFormData.quantity = parseInt(finalFormData.quantity.toString());
             finalFormData.price = parseFloat(finalFormData.price.toString());
 
-            console.log('Final Form Data:', finalFormData);
-
             // Send the data to the backend using the mutation
             const response = await addProductMutation.mutateAsync(finalFormData);
 
