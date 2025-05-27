@@ -4,6 +4,12 @@ import { MapPin } from 'lucide-react';
 import { useAtom } from 'jotai';
 import { locationAtom } from '@/atoms/location';
 import { calculateDistanceInKm } from '@/utils/geoUtils';
+import dayjs from 'dayjs';
+import 'dayjs/locale/fr';
+import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
+
+dayjs.extend(isSameOrBefore);
+dayjs.locale('fr');
 
 interface DiscoverCardProps {
     product: Product;
@@ -69,16 +75,45 @@ const DiscoverCard = ({ product, onClick }: DiscoverCardProps) => {
                     </div>
 
                     {product.expiryDate && (
-                        <div className="mt-2 text-sm text-gray-500">
-                            Date d'expiration: {new Date(product.expiryDate).toLocaleDateString('fr-FR')}
+                        <div className="mt-2 text-sm">
+                            {(() => {
+                                const today = dayjs().startOf('day');
+                                const expiryDate = dayjs(product.expiryDate).startOf('day');
+                                const daysUntilExpiry = expiryDate.diff(today, 'day');
+
+                                if (expiryDate.isBefore(today)) {
+                                    return <span className="text-red-500 font-semibold">Déjà expiré</span>;
+                                } else if (daysUntilExpiry === 0) {
+                                    return <span className="text-red-500 font-semibold">Expire aujourd'hui</span>;
+                                } else if (daysUntilExpiry === 1) {
+                                    return <span className="text-orange-500 font-semibold">Expire demain</span>;
+                                } else if (daysUntilExpiry <= 3) {
+                                    return <span className="text-orange-500 font-semibold">Expire dans {daysUntilExpiry} jours</span>;
+                                } else {
+                                    return <span className="text-green-500 font-semibold">Expire dans {daysUntilExpiry} jours</span>;
+                                }
+                            })()}
                         </div>
                     )}
                 </div>
 
                 <div>
-                    <Separator className="my-2 h-0 border-t border-dashed bg-transparent" />
+                    <Separator className="h-0 border-t border-dashed bg-transparent" />
                     <div className="p-2 w-full text-right">
-                        <span className="text-lg font-semibold text-purple-dark ">{product.price} €</span>
+                        {product.dynamicPrice ? (
+                            <div className="flex items-center justify-end">
+                                <span className="text-sm font-light line-through text-gray-500 mr-2">
+                                    {product.price.toFixed(2)}€
+                                </span>
+                                <span className="text-lg font-semibold text-purple-dark">
+                                    {product.dynamicPrice.toFixed(2)}€
+                                </span>
+                            </div>
+                        ) : (
+                            <span className="text-lg font-semibold text-purple-dark">
+                                {product.price.toFixed(2)}€
+                            </span>
+                        )}
                     </div>
                 </div>
             </div>
