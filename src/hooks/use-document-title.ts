@@ -19,9 +19,9 @@ export const useDocumentTitle = () => {
     ) as HTMLLinkElement;
     if (favicon) {
       if (unreadCount > 0) {
-        favicon.href = '/MealMatesLogoBadge.webp';
+        favicon.href = '/MealMatesLogoBadge.ico';
       } else {
-        favicon.href = '/MealMatesLogo.webp';
+        favicon.href = '/MealMatesLogo.ico';
       }
     }
   }, [unreadCount]);
