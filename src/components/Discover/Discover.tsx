@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { useNearbyProducts } from '@/api/User';
+import { useNearbyProducts } from '@/api/Product';
 import { useNavigate } from 'react-router';
 import { useAtomValue, useSetAtom } from 'jotai';
 import { locationAtom, updateLocationAtom, isLoadingLocationAtom } from '@/atoms/location';

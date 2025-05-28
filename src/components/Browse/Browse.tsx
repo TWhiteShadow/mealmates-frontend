@@ -2,8 +2,8 @@ import { useState, useEffect, useMemo, useCallback } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, Circle, ZoomControl, useMapEvents } from 'react-leaflet';
 import { LatLngExpression } from 'leaflet';
 import MarkerClusterGroup from 'react-leaflet-markercluster';
-import { Address, useNearbyProducts } from '@/api/User';
-import { Product } from '@/api/Product';
+import { Address } from '@/api/User';
+import { Product, useNearbyProducts } from '@/api/Product';
 import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { locationAtom, updateLocationAtom, isLoadingLocationAtom, mapViewStateAtom } from '@/atoms/location';
 

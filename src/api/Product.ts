@@ -13,7 +13,7 @@ export interface Product {
   quantity: number;
   dietaryTags: string[];
   sellerRating: number;
-  hasBeenSold: boolean;
+  soldAt: Date | null;
   isRecurring: boolean;
   pickupDetails: string;
   food_preferences?: Array<{ id: number; name: string }>;
@@ -88,5 +88,68 @@ export function useAddProductMutation() {
       // Invalidate and refetch relevant queries after successful product addition
       queryClient.invalidateQueries({ queryKey: ['nearbyProducts'] });
     },
+  });
+}
+
+export async function getNearbyProducts(
+  lat: number,
+  lng: number,
+  radius: number,
+  filters?: {
+    productTypes?: string[];
+    expirationDate?: string;
+    minPrice?: number;
+    maxPrice?: number;
+    // minSellerRating?: number;
+    dietaryPreferences?: string[];
+  }
+): Promise<Product[]> {
+  let url = `/products/nearby?lat=${lat}&lng=${lng}&radius=${radius}`;
+
+  // Add optional filters
+  if (filters) {
+    if (filters.productTypes?.length) {
+      url += `&types=${filters.productTypes.join(',')}`;
+    }
+    if (filters.expirationDate) {
+      url += `&expirationDate=${filters.expirationDate}`;
+    }
+    if (filters.minPrice !== undefined) {
+      url += `&minPrice=${filters.minPrice}`;
+    }
+    if (filters.maxPrice !== undefined) {
+      url += `&maxPrice=${filters.maxPrice}`;
+    }
+    // if (filters.minSellerRating !== undefined && filters.minSellerRating > 0) {
+    //   url += `&minSellerRating=${filters.minSellerRating}`;
+    // }
+    if (filters.dietaryPreferences?.length) {
+      url += `&dietaryPreferences=${filters.dietaryPreferences.join(',')}`;
+    }
+  }
+
+  const response = await api.get(url, {
+    withCredentials: false,
+  });
+  return response.data;
+}
+
+// Hook for nearby products
+export function useNearbyProducts(
+  lat: number,
+  lng: number,
+  radius: number,
+  filters?: {
+    productTypes?: string[];
+    expirationDate?: string;
+    minPrice?: number;
+    maxPrice?: number;
+    // minSellerRating?: number;
+    dietaryPreferences?: string[];
+  }
+) {
+  return useQuery({
+    queryKey: ['nearbyProducts', lat, lng, radius, filters],
+    queryFn: () => getNearbyProducts(lat, lng, radius, filters),
   });
 }
