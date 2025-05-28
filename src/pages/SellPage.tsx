@@ -10,6 +10,12 @@ import { useAddProductMutation, ProductFormData } from '@/api/Product';
 import { useAllergens } from '@/api/Allergen';
 import { useFoodPreferences } from '@/api/FoodPreference';
 import { toast } from 'sonner';
+import { MultiSelect } from '@/components/ui/multi-select';
+import { format } from 'date-fns';
+import { CalendarIcon } from 'lucide-react';
+import { Calendar } from '@/components/ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { cn } from '@/lib/utils';
 
 // Set up our form atoms for state management across steps
 export const sellFormDataAtom = atom<{
@@ -146,16 +152,31 @@ export default function SellPage() {
                 {formStep !== 'confirmation' ? (
                     <div className="mb-8">
                         <div className="flex justify-between items-center">
-                            <div className={`w-1/4 text-center ${formStep === 'productInfo' ? 'text-purple-dark font-bold' : 'text-gray-400'}`}>
+                            <div
+                                onClick={() => setFormStep('productInfo')}
+                                className={`w-1/4 text-center cursor-pointer hover:text-purple-dark/80 transition-colors ${formStep === 'productInfo' ? 'text-purple-dark font-bold' : 'text-gray-400'
+                                    }`}
+                            >
                                 Produit
                             </div>
-                            <div className={`w-1/4 text-center ${formStep === 'detailsInfo' ? 'text-purple-dark font-bold' : 'text-gray-400'}`}>
+                            <div
+                                onClick={() => formStep !== 'productInfo' && setFormStep('detailsInfo')}
+                                className={`w-1/4 text-center ${formStep === 'detailsInfo' ? 'text-purple-dark font-bold' : 'text-gray-400'
+                                    } ${formStep !== 'productInfo' ? 'cursor-pointer hover:text-purple-dark/80 transition-colors' : 'opacity-50'}`}
+                            >
                                 Détails
                             </div>
-                            <div className={`w-1/4 text-center ${formStep === 'imageUpload' ? 'text-purple-dark font-bold' : 'text-gray-400'}`}>
+                            <div
+                                onClick={() => (formStep === 'imageUpload' || formStep === 'locationInfo') && setFormStep('imageUpload')}
+                                className={`w-1/4 text-center ${formStep === 'imageUpload' ? 'text-purple-dark font-bold' : 'text-gray-400'
+                                    } ${(formStep === 'imageUpload' || formStep === 'locationInfo') ? 'cursor-pointer hover:text-purple-dark/80 transition-colors' : 'opacity-50'}`}
+                            >
                                 Images
                             </div>
-                            <div className={`w-1/4 text-center ${formStep === 'locationInfo' ? 'text-purple-dark font-bold' : 'text-gray-400'}`}>
+                            <div
+                                className={`w-1/4 text-center ${formStep === 'locationInfo' ? 'text-purple-dark font-bold' : 'text-gray-400'
+                                    } opacity-50`}
+                            >
                                 Lieu
                             </div>
                         </div>
@@ -307,8 +328,8 @@ const ProductInfoStep = () => {
 
 // Step 2: Product Details
 const DetailsInfoStep = () => {
-    const { register } = useFormContext<ProductFormData>();
-    const [formData] = useAtom(sellFormDataAtom);
+    const { register, setValue } = useFormContext<ProductFormData>();
+    const [formData, setFormData] = useAtom(sellFormDataAtom);
 
     // Get allergens and food preferences from API
     const { data: allergens } = useAllergens();
@@ -317,13 +338,25 @@ const DetailsInfoStep = () => {
     // Use API data when available, fallback to default options
     const foodPreferenceOptions = foodPreferences?.map(pref => ({
         id: pref.id,
-        label: pref.name
-    }))
+        label: pref.name,
+        value: pref.id
+    })) || []
 
     const allergenOptions = allergens?.map(allergen => ({
         id: allergen.id,
-        label: allergen.name
-    }))
+        label: allergen.name,
+        value: allergen.id
+    })) || []
+
+    const selectedAllergens = allergenOptions.filter(option =>
+        formData.allergens.includes(option.id)
+    )
+
+    const selectedFoodPreferences = foodPreferenceOptions.filter(option =>
+        formData.food_preferences.includes(option.id)
+    )
+
+    // watch number input
 
     return (
         <div className="space-y-4">
@@ -337,7 +370,9 @@ const DetailsInfoStep = () => {
                     {...register('quantity')}
                     type="number"
                     min="1"
-                    pattern='[0-9]*'
+                    pattern='[+]?(?:0|[1-9]\d*)(?:\.\d+)?'
+                    inputMode='decimal'
+                    autoComplete='off'
                     className="w-full p-3 bg-white border border-gray-300 rounded-lg"
                     placeholder="Ex: 4"
                     defaultValue={formData.quantity}
@@ -348,12 +383,33 @@ const DetailsInfoStep = () => {
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                     Date d'expiration
                 </label>
-                <input
-                    {...register('expiryDate')}
-                    type="date"
-                    className="w-full p-3 bg-white border border-gray-300 rounded-lg"
-                    defaultValue={formData.expiryDate}
-                />
+                <Popover>
+                    <PopoverTrigger asChild>
+                        <Button
+                            variant="outline"
+                            className={cn(
+                                "w-full justify-start text-left font-normal",
+                                !formData.expiryDate && "text-muted-foreground"
+                            )}
+                        >
+                            <CalendarIcon className="mr-2 h-4 w-4" />
+                            {formData.expiryDate ? format(new Date(formData.expiryDate), "PPP") : <span>Choisir une date</span>}
+                        </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                        <Calendar
+                            mode="single"
+                            selected={formData.expiryDate ? new Date(formData.expiryDate) : undefined}
+                            onSelect={(date) => {
+                                const isoDate = date ? date.toISOString() : '';
+                                setFormData(prev => ({ ...prev, expiryDate: isoDate }));
+                                setValue('expiryDate', isoDate);
+                            }}
+                            disabled={(date) => date < new Date()}
+                            initialFocus
+                        />
+                    </PopoverContent>
+                </Popover>
             </div>
 
             <div className="flex items-center mb-4">
@@ -373,46 +429,34 @@ const DetailsInfoStep = () => {
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                     Préférences alimentaires
                 </label>
-                <div className="grid grid-cols-2 gap-2">
-                    {foodPreferenceOptions && foodPreferenceOptions.map((option) => (
-                        <div key={option.id} className="flex items-center">
-                            <input
-                                {...register('food_preferences')}
-                                id={`pref-${option.id}`}
-                                type="checkbox"
-                                value={option.id}
-                                className="h-4 w-4 border-gray-300 rounded text-purple-dark focus:ring-purple-dark"
-                                defaultChecked={formData.food_preferences.includes(option.id)}
-                            />
-                            <label htmlFor={`pref-${option.id}`} className="ml-2 block text-sm text-gray-700">
-                                {option.label}
-                            </label>
-                        </div>
-                    ))}
-                </div>
+                <MultiSelect
+                    options={foodPreferenceOptions}
+                    selected={selectedFoodPreferences}
+                    onChange={(selected) => {
+                        const selectedIds = selected.map(item => item.id);
+                        setFormData({ ...formData, food_preferences: selectedIds });
+                        setValue('food_preferences', selectedIds);
+                    }}
+                    placeholder="Sélectionner des préférences alimentaires..."
+                    className="border-gray-300"
+                />
             </div>
 
             <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                     Allergènes
                 </label>
-                <div className="grid grid-cols-2 gap-2">
-                    {allergenOptions && allergenOptions.map((option) => (
-                        <div key={option.id} className="flex items-center">
-                            <input
-                                {...register('allergens')}
-                                id={`allergen-${option.id}`}
-                                type="checkbox"
-                                value={option.id}
-                                className="h-4 w-4 border-gray-300 rounded text-purple-dark focus:ring-purple-dark"
-                                defaultChecked={formData.allergens.includes(option.id)}
-                            />
-                            <label htmlFor={`allergen-${option.id}`} className="ml-2 block text-sm text-gray-700">
-                                {option.label}
-                            </label>
-                        </div>
-                    ))}
-                </div>
+                <MultiSelect
+                    options={allergenOptions}
+                    selected={selectedAllergens}
+                    onChange={(selected) => {
+                        const selectedIds = selected.map(item => item.id);
+                        setFormData({ ...formData, allergens: selectedIds });
+                        setValue('allergens', selectedIds);
+                    }}
+                    placeholder="Sélectionner des allergènes..."
+                    className="border-gray-300"
+                />
             </div>
         </div>
     );
@@ -658,7 +702,7 @@ const ConfirmationStep = ({ product }: { product: any }) => {
 
                             <div className="flex justify-between">
                                 <span className="text-gray-600">Prix :</span>
-                                <span className="font-bold text-green-600">{product.price} €</span>
+                                <span className="font-bold text-green-600">{product.price == 0 ? "Don" : product.price + " €"} </span>
                             </div>
 
                             {product.quantity && (

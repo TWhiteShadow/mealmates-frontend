@@ -6,7 +6,6 @@ import KitchenIcon from '@mui/icons-material/Kitchen';
 import RoomServiceIcon from '@mui/icons-material/RoomService';
 import BakeryDiningIcon from '@mui/icons-material/BakeryDining';
 import EggIcon from '@mui/icons-material/Egg';
-import StarIcon from '@mui/icons-material/Star';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 
 import FilterModal from './FilterModal';
@@ -26,7 +25,7 @@ export interface AdvancedFilterState {
     min: number;
     max: number;
   };
-  minSellerRating: number;
+  // minSellerRating: number;
 }
 
 interface SearchFilterProps {
@@ -44,25 +43,25 @@ type saveSearchType = {
 
 const SearchFilter: React.FC<SearchFilterProps> = ({
   showFilters,
-  onClose = () => {},
+  onClose = () => { },
   initialFilters,
-  onApplyFilters = () => {}
+  onApplyFilters = () => { }
 }) => {
   const { latitude, longitude } = useAtomValue(locationAtom);
   const [filters, setFilters] = useState<AdvancedFilterState>(
     initialFilters !== undefined && initialFilters !== null
       ? initialFilters
       : {
-          productTypes: [],
-          dietaryPreferences: [],
-          expirationDate: '',
-          distance: 1000, // Par défaut 1km
-          price: {
-            min: 0,
-            max: 50
-          },
-          minSellerRating: 0,
-        }
+        productTypes: [],
+        dietaryPreferences: [],
+        expirationDate: '',
+        distance: 1000, // Par défaut 1km
+        price: {
+          min: 0,
+          max: 50
+        },
+        // minSellerRating: 0,
+      }
   );
 
   const saveSearchMutation = useSaveSearchMutation();
@@ -120,7 +119,7 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
         min: 0,
         max: 50
       },
-      minSellerRating: 0
+      // minSellerRating: 0
     });
   };
 
@@ -313,7 +312,7 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
           </div>
         </div>
       </FilterSection>
-
+      {/* 
       <FilterSection title={`Note minimum du vendeur: ${filters.minSellerRating > 0 ? filters.minSellerRating + '⭐' : 'Aucune'}`}>
         <div className="flex justify-between items-center px-2">
           <input
@@ -333,7 +332,7 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
             <StarIcon sx={{ fontSize: 14, color: '#FFD700', marginLeft: 0.5 }} />
           </div>
         </div>
-      </FilterSection>
+      </FilterSection> */}
     </FilterModal>
   );
 };

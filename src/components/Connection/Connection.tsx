@@ -2,7 +2,6 @@ import { buttonVariants } from '@/components/ui/button';
 import { cn } from '../../lib/utils';
 import logo from '../../assets/mealmates-icon.png';
 import googleLogo from '../../assets/google_logo.svg';
-import facebookLogo from '../../assets/facebook_logo.svg';
 import githubLogo from '../../assets/github_logo.svg';
 
 const HomePage = () => {
@@ -27,13 +26,6 @@ const HomePage = () => {
           >
             <img src={googleLogo} className='h-full' alt='Google Logo' />
             <span>Connexion avec Google</span>
-          </a>
-          <a
-            href={`${import.meta.env.VITE_BACKEND_URL}/connect/facebook`}
-            className={cn(buttonVariants({ variant: 'facebook' }), 'w-full')}
-          >
-            <img src={facebookLogo} className='h-full' alt='Facebook Logo' />
-            <span>Connexion avec Facebook</span>
           </a>
           <a
             href='login/register'

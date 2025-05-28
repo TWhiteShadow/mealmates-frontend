@@ -24,7 +24,7 @@ function BrowsePage() {
       min: 0,
       max: 50
     },
-    minSellerRating: 0
+    // minSellerRating: 0
   });
 
   useEffect(() => {
@@ -88,9 +88,9 @@ function BrowsePage() {
     if (filters.price.min > 0 || filters.price.max < 50) {
       count++;
     }
-    if (filters.minSellerRating > 0) {
-      count++;
-    }
+    // if (filters.minSellerRating > 0) {
+    //   count++;
+    // }
 
     return count;
   }, [filters]);
