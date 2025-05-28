@@ -29,6 +29,8 @@ import {
 import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from "sonner";
 import AddressInput from '@/components/AddressInput';
+import { LogOut } from 'lucide-react';
+import { useNavigate } from 'react-router';
 
 interface AddressWithEditing extends Address {
   isEditing?: boolean;
@@ -67,6 +69,7 @@ const SettingsPage = () => {
   const { isLoading, data: userData } = useUserData();
   const updateUserMutation = useUpdateUserDataMutation();
   const deleteAddressMutation = useDeleteAddressMutation();
+  const navigate = useNavigate();
 
   // Initialize form data from userData when it loads
   useEffect(() => {
@@ -215,13 +218,22 @@ const SettingsPage = () => {
             onClick={() => window.history.back()}
           >
             <ArrowBackIosOutlined
-              sx={{ fontSize: 28 }}
               className='!text-purple-dark'
             />
           </Button>
           <span className='text-lg font-Lilita font-bold text-purple-dark'>
             Votre compte
           </span>
+          <Button
+            type="button"
+            variant="ghost"
+            className='absolute right-3 p-1'
+            onClick={() => navigate('/app/login')}
+          >
+            <LogOut
+              className='!text-purple-dark !h-7 !w-7'
+            />
+          </Button>
         </div>
       </ProfileAppBar>
       <div className='max-w-md mx-auto px-4 pb-20'>
@@ -405,7 +417,7 @@ const SettingsPage = () => {
           </div>
         </section>
       </div>
-    </form>
+    </form >
   );
 };
 

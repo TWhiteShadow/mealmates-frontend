@@ -6,25 +6,34 @@ export interface Product {
   name: string;
   description: string;
   price: number;
+  dynamicPrice?: number | null;
   position: number[];
   type: string;
   expiryDate: string;
-  quantity: string;
+  quantity: number;
   dietaryTags: string[];
   sellerRating: number;
-  isSoldOut: boolean;
+  hasBeenSold: boolean;
+  isRecurring: boolean;
   pickupDetails: string;
   food_preferences?: Array<{ id: number; name: string }>;
   allergens?: Array<{ id: number; name: string }>;
 
-  seller?: {
+  seller: {
     id: number;
     first_name: string | null;
     last_name: string | null;
   };
-  images?: { name: string }[];
-  originalPrice?: number;
-  discount?: number;
+  buyer: {
+    id: number;
+    first_name: string | null;
+    last_name: string | null;
+  } | null;
+  images?: Array<{
+    id: number;
+    name: string;
+  }>;
+  distance?: number;
   createdAt?: string;
   updatedAt?: string;
 }

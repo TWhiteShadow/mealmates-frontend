@@ -1,4 +1,4 @@
-import MealMatesLogo from '/MealMatesLogo.png';
+import MealMatesLogo from '@/assets/MealMatesLogo.webp';
 
 function Footer() {
   return (
