@@ -1,4 +1,3 @@
-import { Product } from './Product';
 import api from './Axios';
 import {
   QueryKey,
@@ -91,9 +90,13 @@ export async function registerUser(
   firstName: string,
   lastName: string
 ): Promise<RegisterResponse> {
-  const response = await api.post(`/register`, { email, password, firstName, lastName }, {
-    withCredentials: false,
-  }); 
+  const response = await api.post(
+    `/register`,
+    { email, password, firstName, lastName },
+    {
+      withCredentials: false,
+    }
+  );
   return response.data;
 }
 
@@ -158,69 +161,6 @@ export function useDeleteAddressMutation() {
 export async function getUserData(): Promise<UserData> {
   const response = await api.get(`/user`);
   return response.data;
-}
-
-export async function getNearbyProducts(
-  lat: number,
-  lng: number,
-  radius: number,
-  filters?: {
-    productTypes?: string[];
-    expirationDate?: string;
-    minPrice?: number;
-    maxPrice?: number;
-    // minSellerRating?: number;
-    dietaryPreferences?: string[];
-  }
-): Promise<Product[]> {
-  let url = `/products/nearby?lat=${lat}&lng=${lng}&radius=${radius}`;
-
-  // Add optional filters
-  if (filters) {
-    if (filters.productTypes?.length) {
-      url += `&types=${filters.productTypes.join(',')}`;
-    }
-    if (filters.expirationDate) {
-      url += `&expirationDate=${filters.expirationDate}`;
-    }
-    if (filters.minPrice !== undefined) {
-      url += `&minPrice=${filters.minPrice}`;
-    }
-    if (filters.maxPrice !== undefined) {
-      url += `&maxPrice=${filters.maxPrice}`;
-    }
-    // if (filters.minSellerRating !== undefined && filters.minSellerRating > 0) {
-    //   url += `&minSellerRating=${filters.minSellerRating}`;
-    // }
-    if (filters.dietaryPreferences?.length) {
-      url += `&dietaryPreferences=${filters.dietaryPreferences.join(',')}`;
-    }
-  }
-
-  const response = await api.get(url, {
-    withCredentials: false,
-  });
-  return response.data;
-}
-
-// Hook for nearby products
-export function useNearbyProducts(
-  lat: number,
-  lng: number,
-  radius: number,
-  filters?: {
-    productTypes?: string[];
-    expirationDate?: string;
-    minPrice?: number;
-    maxPrice?: number;
-    // minSellerRating?: number;
-    dietaryPreferences?: string[];
-  }
-) {
-  return useQuery({
-    queryKey: ['nearbyProducts', lat, lng, radius, filters],
-    queryFn: () => getNearbyProducts(lat, lng, radius, filters),
-  });
 }
 
 // Update User Data with axios

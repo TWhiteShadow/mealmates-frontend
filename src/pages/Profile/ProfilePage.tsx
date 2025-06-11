@@ -1,20 +1,13 @@
 import ProfileAppBar from "@/components/ProfileAppBar";
-import MealMatesLogo from '../../assets/MealMatesLogo.png';
+import MealMatesLogo from '../../assets/MealMatesLogo.webp';
 import OrderCard from "@/components/OrderCard";
 import { BoltRounded, Euro, Settings } from "@mui/icons-material";
 import StatCard from "@/components/StatCard";
 import { Avatar } from "@mui/material";
 import { useNavigate } from "react-router";
-import { getUserData } from "@/api/User";
+import { useUserData } from "@/api/User";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useQuery } from '@tanstack/react-query'
 
-function useUserData() {
-    return useQuery({
-        queryKey: ['userData'],
-        queryFn: getUserData,
-    })
-}
 const ProfilePage = () => {
     const { isLoading, data: userData } = useUserData();
 

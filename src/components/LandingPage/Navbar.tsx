@@ -1,6 +1,6 @@
 import { buttonVariants } from '@/components/ui/button';
 import { cn } from '../../lib/utils';
-import MealMatesLogo from '/MealMatesLogo.png';
+import MealMatesLogo from '@/assets/MealMatesLogo.webp';
 
 function Navbar() {
   return (

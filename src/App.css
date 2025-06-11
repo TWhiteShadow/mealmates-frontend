@@ -23,3 +23,9 @@
 .leaflet-marker-icon.leaflet-marker-icon-cluster:hover {
   transform: scale(1.1);
 }
+
+.MuiBadge-badge {
+  background-color: #5E1969 !important;
+  color: white !important;
+  font-weight: bold !important;
+}

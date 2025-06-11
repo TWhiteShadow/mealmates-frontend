@@ -43,25 +43,25 @@ type saveSearchType = {
 
 const SearchFilter: React.FC<SearchFilterProps> = ({
   showFilters,
-  onClose = () => {},
+  onClose = () => { },
   initialFilters,
-  onApplyFilters = () => {}
+  onApplyFilters = () => { }
 }) => {
   const { latitude, longitude } = useAtomValue(locationAtom);
   const [filters, setFilters] = useState<AdvancedFilterState>(
     initialFilters !== undefined && initialFilters !== null
       ? initialFilters
       : {
-          productTypes: [],
-          dietaryPreferences: [],
-          expirationDate: '',
-          distance: 1000, // Par défaut 1km
-          price: {
-            min: 0,
-            max: 50
-          },
-          // minSellerRating: 0,
-        }
+        productTypes: [],
+        dietaryPreferences: [],
+        expirationDate: '',
+        distance: 1000, // Par défaut 1km
+        price: {
+          min: 0,
+          max: 50
+        },
+        // minSellerRating: 0,
+      }
   );
 
   const saveSearchMutation = useSaveSearchMutation();
@@ -312,7 +312,7 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
           </div>
         </div>
       </FilterSection>
-{/* 
+      {/* 
       <FilterSection title={`Note minimum du vendeur: ${filters.minSellerRating > 0 ? filters.minSellerRating + '⭐' : 'Aucune'}`}>
         <div className="flex justify-between items-center px-2">
           <input

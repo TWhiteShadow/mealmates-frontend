@@ -1,6 +1,6 @@
 up: 
-	docker compose up -d
-	docker compose exec node npm i
+	@docker compose up -d
+	@docker compose logs node | grep -m2 "➜"
 
 down: 
 	docker compose down

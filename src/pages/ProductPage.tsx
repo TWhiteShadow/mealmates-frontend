@@ -6,15 +6,14 @@ import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious
 import { Button } from "@/components/ui/button";
 import ProfileAppBar from '@/components/ProfileAppBar';
 import { ArrowBackIosOutlined } from '@mui/icons-material';
-import StatCard from '@/components/StatCard';
 import { cn } from "@/lib/utils";
+import ContactSellerButton from '@/components/ProductPage/ContactSellerButton';
 
 dayjs.locale('fr');
 
 export default function ProductPage() {
     const { id } = useParams();
     const { data: product, isLoading, error } = useProduct(Number(id));
-
     if (isLoading) {
         return (
             <div className="flex items-center justify-center min-h-screen">
@@ -101,7 +100,7 @@ export default function ProductPage() {
                                     Par {product.seller?.first_name} {product.seller?.last_name?.[0]}.
                                 </p>
                             </div>
-                            <p className="text-3xl font-bold text-purple-600">{formattedPrice}</p>
+                            <p className="text-3xl font-bold text-purple-semi-dark">{formattedPrice == "0,00 €" ? "Don" : formattedPrice}</p>
                         </div>
 
                         <div className="mt-6">
@@ -159,7 +158,7 @@ export default function ProductPage() {
                             )}
                         </div>
 
-                        <div className="mt-8 grid grid-cols-3 gap-4">
+                        {/* <div className="mt-8 grid grid-cols-3 gap-4">
                             <StatCard
                                 title="Personnel"
                                 value="217"
@@ -187,14 +186,15 @@ export default function ProductPage() {
                             >
                                 <p className="text-xs text-gray-500">ont trouvé que les produits étaient copieux</p>
                             </StatCard>
-                        </div>
+                        </div> */}
+
 
                         <div className="mt-8">
-                            <Button
+                            <ContactSellerButton
+                                offerId={product.id}
+                                sellerId={product.seller.id}
                                 className="w-full bg-purple-600 hover:bg-purple-700 text-white py-3 rounded-lg font-medium"
-                            >
-                                Contacter le vendeur
-                            </Button>
+                            />
                         </div>
                     </div>
                 </div>
