@@ -15,9 +15,10 @@ import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import AccountCircleOutlinedIcon from '@mui/icons-material/AccountCircleOutlined';
 import { Badge } from '@mui/material';
 import { useNavigate } from 'react-router';
-import { useAtom } from 'jotai';
+import { useAtom, useSetAtom } from 'jotai';
 import { unreadCountAtom } from '@/atoms/messages';
 import { getUnreadMessagesCount } from '@/api/Message';
+import { getUnreadNotificationsCount } from '@/api/Notification';
 
 const getValueFromPath = (path: string) => {
   switch (path) {
@@ -39,13 +40,18 @@ const getValueFromPath = (path: string) => {
 const SimpleBottomNavigation = () => {
   const [value, setValue] = React.useState(getValueFromPath(window.location.pathname));
   const [unreadCount, setUnreadCount] = useAtom(unreadCountAtom);
+  const setUnreadNotificationsCount = useSetAtom(unreadCountAtom);
+  const setUnreadMessagesCount = useSetAtom(unreadCountAtom);
   const navigate = useNavigate();
 
   useEffect(() => {
     const fetchUnreadCount = async () => {
       try {
-        const count = await getUnreadMessagesCount();
-        setUnreadCount(count);
+        const countMessages = await getUnreadMessagesCount();
+        const countNotifications = await getUnreadNotificationsCount();
+        setUnreadMessagesCount(countMessages);
+        setUnreadNotificationsCount(countNotifications);
+        setUnreadCount(countMessages + countNotifications);
       } catch (error) {
         console.error('Failed to fetch unread count:', error);
       }
