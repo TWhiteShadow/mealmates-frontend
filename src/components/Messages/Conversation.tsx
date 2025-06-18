@@ -15,6 +15,7 @@ import { ArrowLeft, ChevronsDownIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useUserData } from "@/api/User";
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 
 const Conversation: React.FC = () => {
     const [selectedId, setSelectedId] = useAtom(selectedConversationIdAtom);
@@ -262,19 +263,35 @@ const Conversation: React.FC = () => {
                     </Button>
 
                     <div className="flex items-center">
-                        <div className="h-10 w-10 bg-purple-100 rounded-full flex items-center justify-center">
-                            <span className="text-purple-dark font-medium">
-                                {otherParticipant ? otherParticipant.first_name.charAt(0) : '?'}
-                            </span>
-                        </div>
-                        <div className="ml-3">
-                            <h3 className="text-sm font-medium text-gray-900">
-                                {otherParticipant ? `${otherParticipant.first_name} ${otherParticipant.last_name}` : 'Inconnu'}
-                            </h3>
-                            <p className="text-xs text-gray-500">
-                                {selectedConversation.offer.name} - {selectedConversation.offer.price}€
-                            </p>
-                        </div>
+                        {isLoading ? (
+                            <div className="flex items-center gap-3">
+                                <Skeleton className="h-10 w-10 rounded-full" />
+                                <div className="space-y-2">
+                                    <Skeleton className="h-4 w-[150px]" />
+                                    <Skeleton className="h-3 w-[100px]" />
+                                </div>
+                            </div>
+                        ) : (
+                            <>
+                                <Avatar className="h-10 w-10">
+                                    <AvatarImage
+                                        src={`https://api.dicebear.com/9.x/thumbs/svg?seed=${otherParticipant?.first_name || 'default'}&backgroundColor=5e1969&shapeColor=c19ee0`}
+                                        alt={otherParticipant?.first_name || 'Profile'}
+                                    />
+                                    <AvatarFallback>
+                                        {otherParticipant?.first_name?.charAt(0) || '?'}
+                                    </AvatarFallback>
+                                </Avatar>
+                                <div className="ml-3">
+                                    <h3 className="text-sm font-medium text-gray-900">
+                                        {otherParticipant ? `${otherParticipant.first_name} ${otherParticipant.last_name}` : 'Inconnu'}
+                                    </h3>
+                                    <p className="text-xs text-gray-500">
+                                        {selectedConversation.offer.name} - {selectedConversation.offer.price}€
+                                    </p>
+                                </div>
+                            </>
+                        )}
                     </div>
                 </div>
             </div>

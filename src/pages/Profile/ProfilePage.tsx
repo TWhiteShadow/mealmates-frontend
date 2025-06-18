@@ -3,10 +3,10 @@ import MealMatesLogo from '../../assets/MealMatesLogo.webp';
 import OrderCard from "@/components/OrderCard";
 import { BoltRounded, Euro, Settings } from "@mui/icons-material";
 import StatCard from "@/components/StatCard";
-import { Avatar } from "@mui/material";
 import { useNavigate } from "react-router";
 import { useUserData } from "@/api/User";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 
 const ProfilePage = () => {
     const { isLoading, data: userData } = useUserData();
@@ -24,11 +24,13 @@ const ProfilePage = () => {
                 <div className="flex items-center gap-3">
                     {!isLoading ? (
                         <>
-                            <Avatar
-                                src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
-                                alt="Profile"
-                                sx={{ width: 48, height: 48 }}
-                            />
+                            <Avatar className="h-12 w-12">
+                                <AvatarImage
+                                    src={`https://api.dicebear.com/9.x/thumbs/svg?seed=${userData?.first_name || 'default'}&backgroundColor=5e1969&shapeColor=c19ee0`}
+                                    alt="Profile"
+                                />
+                                <AvatarFallback>User</AvatarFallback>
+                            </Avatar>
                             <span className="font-semibold text-lg">{userData?.first_name + " " + userData?.last_name}</span>
                         </>
                     ) : (

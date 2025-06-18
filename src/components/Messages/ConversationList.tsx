@@ -7,6 +7,7 @@ import relativeTime from 'dayjs/plugin/relativeTime';
 import 'dayjs/locale/fr';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useUserData } from '@/api/User';
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 
 dayjs.extend(relativeTime);
 dayjs.locale('fr');
@@ -63,7 +64,7 @@ const ConversationList: React.FC = () => {
                 <div className="text-center py-10">
                     <p className="text-gray-500 mb-4">Vous n'avez pas encore de conversations</p>
                     <p className="text-sm text-gray-400">
-                        Commencez à discuter avec des vendeurs en naviguant sur leurs offres et en cliquant sur "Contacter"
+                        Commencez à discuter avec des vendeurs en navigant sur leurs offres et en cliquant sur "Contacter"
                     </p>
                 </div>
             </div>
@@ -87,11 +88,19 @@ const ConversationList: React.FC = () => {
                             onClick={() => handleSelectConversation(conversation)}
                         >
                             <div className="flex-shrink-0">
-                                <div className="h-12 w-12 bg-purple-100 rounded-full flex items-center justify-center">
-                                    <span className="text-purple-dark font-medium">
-                                        {otherParticipant ? otherParticipant.first_name.charAt(0) : '?'}
-                                    </span>
-                                </div>
+                                {isLoading ? (
+                                    <Skeleton className="h-12 w-12 rounded-full" />
+                                ) : (
+                                    <Avatar className="w-12 h-12">
+                                        <AvatarImage
+                                            src={`https://api.dicebear.com/9.x/thumbs/svg?seed=${otherParticipant?.first_name || 'default'}&backgroundColor=5e1969&shapeColor=c19ee0`}
+                                            alt={otherParticipant?.first_name || 'Profile'}
+                                        />
+                                        <AvatarFallback>
+                                            {otherParticipant?.first_name?.charAt(0) || '?'}
+                                        </AvatarFallback>
+                                    </Avatar>
+                                )}
                             </div>
 
                             <div className="ml-4 flex-1">
