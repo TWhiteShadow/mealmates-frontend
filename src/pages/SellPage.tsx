@@ -16,6 +16,7 @@ import { CalendarIcon } from 'lucide-react';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { cn } from '@/lib/utils';
+import { dateToString, formatStringToDate } from '@/utils/date';
 
 // Set up our form atoms for state management across steps
 export const sellFormDataAtom = atom<{
@@ -103,7 +104,7 @@ export default function SellPage() {
 
             finalFormData.allergens = finalFormData.allergens.map(Number);
             finalFormData.food_preferences = finalFormData.food_preferences.map(Number);
-            finalFormData.expiryDate = new Date(finalFormData.expiryDate).toISOString();
+            finalFormData.expiryDate = finalFormData.expiryDate;
             finalFormData.quantity = parseInt(finalFormData.quantity.toString());
             finalFormData.price = parseFloat(finalFormData.price.toString());
 
@@ -401,9 +402,9 @@ const DetailsInfoStep = () => {
                             mode="single"
                             selected={formData.expiryDate ? new Date(formData.expiryDate) : undefined}
                             onSelect={(date) => {
-                                const isoDate = date ? date.toISOString() : '';
-                                setFormData(prev => ({ ...prev, expiryDate: isoDate }));
-                                setValue('expiryDate', isoDate);
+                                const formattedDate = date ? dateToString(date) : '';
+                                setFormData(prev => ({ ...prev, expiryDate: formattedDate }));
+                                setValue('expiryDate', formattedDate);
                             }}
                             disabled={(date) => date < new Date()}
                             initialFocus
@@ -632,19 +633,6 @@ const ConfirmationStep = ({ product }: { product: any }) => {
     const { data: allergens } = useAllergens();
     const { data: foodPreferences } = useFoodPreferences();
 
-    const formatDate = (dateStr: string) => {
-        try {
-            return new Date(dateStr).toLocaleDateString('fr-FR', {
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric',
-            });
-        } catch {
-            // Silently catch any errors and return original string
-            return dateStr;
-        }
-    };
-
     // Functions to get name from ID
     const getAllergenName = (id: number) => {
         return allergens?.find(a => a.id === id)?.name || `ID: ${id}`;
@@ -715,7 +703,7 @@ const ConfirmationStep = ({ product }: { product: any }) => {
                             {product.expiryDate && (
                                 <div className="flex justify-between">
                                     <span className="text-gray-600">Date d'expiration :</span>
-                                    <span className="font-medium">{formatDate(product.expiryDate)}</span>
+                                    <span className="font-medium">{formatStringToDate(product.expiryDate)}</span>
                                 </div>
                             )}
 
