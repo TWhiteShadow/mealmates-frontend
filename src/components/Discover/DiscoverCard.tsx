@@ -100,7 +100,9 @@ const DiscoverCard = ({ product, onClick }: DiscoverCardProps) => {
                 <div>
                     <Separator className="h-0 border-t border-dashed bg-transparent" />
                     <div className="p-2 w-full text-right">
-                        {product.dynamicPrice ? (
+                        {product.price === 0 ? (
+                            <span className="text-lg font-semibold text-purple-dark">Don</span>
+                        ) : product.dynamicPrice && product.dynamicPrice !== product.price ? (
                             <div className="flex items-center justify-end">
                                 <span className="text-sm font-light line-through text-gray-500 mr-2">
                                     {product.price.toFixed(2)}€
