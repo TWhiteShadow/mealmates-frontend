@@ -76,7 +76,7 @@ const MessagesPage: React.FC = () => {
                                     "text-xs text-purple-dark rounded-full w-5 h-5 flex items-center justify-center",
                                     activeTab === 'messages' ? "bg-white" : "bg-purple-100"
                                     )}>
-                                    {unreadNotificationsCount > 9 ? '9+' : unreadNotificationsCount}
+                                    {unreadMessagesCount > 9 ? '9+' : unreadMessagesCount}
                                 </span>
                             )}
                         </button>

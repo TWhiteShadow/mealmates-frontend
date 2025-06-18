@@ -7,7 +7,6 @@ export const messagesAtom = atom<Record<number, Message[]>>({});
 
 export const unreadCountAtom = atom<number>(0);
 export const unreadMessagesCountAtom = atom<number>(0);
-export const unreadNotificationsCountAtom = atom<number>(0);
 
 export const isLoadingConversationsAtom = atom<boolean>(false);
 export const isLoadingMessagesAtom = atom<boolean>(false);

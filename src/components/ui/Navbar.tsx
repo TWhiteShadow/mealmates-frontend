@@ -16,9 +16,10 @@ import AccountCircleOutlinedIcon from '@mui/icons-material/AccountCircleOutlined
 import { Badge } from '@mui/material';
 import { useNavigate } from 'react-router';
 import { useAtom, useSetAtom } from 'jotai';
-import { unreadCountAtom } from '@/atoms/messages';
+import { unreadCountAtom, unreadMessagesCountAtom } from '@/atoms/messages';
 import { getUnreadMessagesCount } from '@/api/Message';
 import { getUnreadNotificationsCount } from '@/api/Notification';
+import { unreadNotificationsCountAtom } from '@/atoms/notifications';
 
 const getValueFromPath = (path: string) => {
   switch (path) {
@@ -40,8 +41,8 @@ const getValueFromPath = (path: string) => {
 const SimpleBottomNavigation = () => {
   const [value, setValue] = React.useState(getValueFromPath(window.location.pathname));
   const [unreadCount, setUnreadCount] = useAtom(unreadCountAtom);
-  const setUnreadNotificationsCount = useSetAtom(unreadCountAtom);
-  const setUnreadMessagesCount = useSetAtom(unreadCountAtom);
+  const setUnreadNotificationsCount = useSetAtom(unreadNotificationsCountAtom);
+  const setUnreadMessagesCount = useSetAtom(unreadMessagesCountAtom);
   const navigate = useNavigate();
 
   useEffect(() => {
