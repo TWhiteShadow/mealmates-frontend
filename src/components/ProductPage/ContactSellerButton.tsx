@@ -24,9 +24,6 @@ const ContactSellerButton: React.FC<ContactSellerButtonProps> = ({
         try {
             const conversation = await getOrCreateConversation(offerId, sellerId);
             navigate(`/app/messages?conversation=${conversation.id}`);
-        } catch (error) {
-            console.error('Failed to create conversation:', error);
-            alert('Une erreur est survenue lors de la création de la conversation.');
         } finally {
             setIsLoading(false);
         }

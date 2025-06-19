@@ -20,6 +20,7 @@ import { unreadCountAtom, unreadMessagesCountAtom } from '@/atoms/messages';
 import { getUnreadMessagesCount } from '@/api/Message';
 import { getUnreadNotificationsCount } from '@/api/Notification';
 import { unreadNotificationsCountAtom } from '@/atoms/notifications';
+import { userLogged } from '@/api/User';
 
 const getValueFromPath = (path: string) => {
   switch (path) {
@@ -52,6 +53,14 @@ const SimpleBottomNavigation = () => {
 
   useEffect(() => {
     const fetchUnreadCount = async () => {
+      const logged = await userLogged();
+      if (!logged?.success) {
+        setUnreadCount(0);
+        setUnreadMessagesCount(0);
+        setUnreadNotificationsCount(0);
+        return;
+      }
+    
       try {
         const countMessages = await getUnreadMessagesCount();
         const countNotifications = await getUnreadNotificationsCount();
