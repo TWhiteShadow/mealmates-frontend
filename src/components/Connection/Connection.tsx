@@ -9,6 +9,8 @@ const HomePage = () => {
   const [searchParams] = useSearchParams();
   const redirectUri = searchParams.get('redirectURI');
 
+  const redirectParam = redirectUri ? `?redirectURI=${redirectUri}` : '';
+
   return (
     <div className='z-20'>
       <div className='flex flex-col items-center justify-center h-screen relative overflow-hidden'>
@@ -18,21 +20,21 @@ const HomePage = () => {
 
         <div className='flex flex-col items-center mt-8 gap-5'>
           <a
-            href={`${import.meta.env.VITE_BACKEND_URL}/connect/github${redirectUri ? `?redirectURI=${redirectUri}` : ''}`}
+            href={`${import.meta.env.VITE_BACKEND_URL}/connect/github${redirectParam}`}
             className={cn(buttonVariants({ variant: 'github' }), 'w-full')}
           >
             <img src={githubLogo} className='h-full invert' alt='Github Logo' />
             <span>Connexion avec Github</span>
           </a>
           <a
-            href={`${import.meta.env.VITE_BACKEND_URL}/connect/google${redirectUri ? `?redirectURI=${redirectUri}` : ''}`}
+            href={`${import.meta.env.VITE_BACKEND_URL}/connect/google${redirectParam}`}
             className={cn(buttonVariants({ variant: 'google' }), 'w-full')}
           >
             <img src={googleLogo} className='h-full' alt='Google Logo' />
             <span>Connexion avec Google</span>
           </a>
           <a
-            href={`login/login${redirectUri ? `?redirectURI=${redirectUri}` : ''}`}
+            href={`login/login${redirectParam}`}
             className={cn(buttonVariants({ variant: 'default' }), 'w-full')}
           >
             Connexion par mail
