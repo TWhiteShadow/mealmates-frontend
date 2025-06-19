@@ -7,9 +7,9 @@ import { useSearchParams } from 'react-router';
 
 const HomePage = () => {
   const [searchParams] = useSearchParams();
-  const redirectUri = searchParams.get('redirectURI');
+  const redirectURI = searchParams.get('redirectURI');
 
-  const redirectParam = redirectUri ? `?redirectURI=${redirectUri}` : '';
+  const redirectParam = redirectURI ? `?redirectURI=${redirectURI}` : '';
 
   return (
     <div className='z-20'>
