@@ -1,4 +1,4 @@
-import * as React from 'react';
+import { useState } from 'react';
 import { useEffect } from 'react';
 import Box from '@mui/material/Box';
 import BottomNavigation from '@mui/material/BottomNavigation';
@@ -14,7 +14,7 @@ import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOu
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import AccountCircleOutlinedIcon from '@mui/icons-material/AccountCircleOutlined';
 import { Badge } from '@mui/material';
-import { useNavigate } from 'react-router';
+import { useNavigate, useLocation } from 'react-router';
 import { useAtom, useSetAtom } from 'jotai';
 import { unreadCountAtom, unreadMessagesCountAtom } from '@/atoms/messages';
 import { getUnreadMessagesCount } from '@/api/Message';
@@ -39,11 +39,16 @@ const getValueFromPath = (path: string) => {
 };
 
 const SimpleBottomNavigation = () => {
-  const [value, setValue] = React.useState(getValueFromPath(window.location.pathname));
+  const location = useLocation();
+  const [value, setValue] = useState(getValueFromPath(location.pathname));
   const [unreadCount, setUnreadCount] = useAtom(unreadCountAtom);
   const setUnreadNotificationsCount = useSetAtom(unreadNotificationsCountAtom);
   const setUnreadMessagesCount = useSetAtom(unreadMessagesCountAtom);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    setValue(getValueFromPath(location.pathname));
+  }, [location.pathname]);
 
   useEffect(() => {
     const fetchUnreadCount = async () => {
