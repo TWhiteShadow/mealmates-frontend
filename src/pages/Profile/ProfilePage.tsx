@@ -11,9 +11,6 @@ import { useAllUserProducts, useUserBoughtProducts } from "@/api/Product";
 
 const ProfilePage = () => {
     const { isLoading: isLoadingUserData, data: userData } = useUserData();
-    if (!userData) {
-        return null;
-    }
 
     const { isLoading: isLoadingUserProductsData, data: userProductsData } = useAllUserProducts();
 

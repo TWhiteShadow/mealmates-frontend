@@ -38,9 +38,6 @@ const Conversation: React.FC = () => {
     const isFirstLoadRef = useRef<boolean>(true);
     const currentConversationIdRef = useRef<number | null>(null);
     const { data: userData } = useUserData();
-    if (!userData) {
-        return null;
-    }
 
     // Utiliser TanStack Query pour les conversations
     const { data: conversations = [] } = useConversations();

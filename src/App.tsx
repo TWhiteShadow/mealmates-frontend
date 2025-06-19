@@ -18,6 +18,7 @@ import { useEffect } from 'react';
 import { navigationRef, locationRef } from './utils/navigateRef';
 import MessagesPage from './pages/MessagesPage';
 import { useDocumentTitle } from './hooks/use-document-title';
+import ProtectedRoute from './components/ProtectedRoute';
 
 function NavbarLayout() {
   return (
@@ -49,11 +50,27 @@ function App() {
       <Route element={<NavbarLayout />}>
         <Route path='app/discover' element={<DiscoverPage />} />
         <Route path='app/browse' element={<BrowsePage />} />
-        <Route path='app/profile' element={<ProfilePage />} />
-        <Route path='app/profile/settings' element={<SettingsPage />} />
+        <Route path='app/profile' element={
+          <ProtectedRoute>
+            <ProfilePage />
+          </ProtectedRoute>
+        } />
+        <Route path='app/profile/settings' element={
+          <ProtectedRoute>
+            <SettingsPage />
+          </ProtectedRoute>
+        } />
         <Route path='app/product/:id' element={<ProductPage />} />
-        <Route path='app/sell' element={<SellPage />} />
-        <Route path='app/messages' element={<MessagesPage />} />
+        <Route path='app/sell' element={
+          <ProtectedRoute>
+            <SellPage />
+          </ProtectedRoute>
+        } />
+        <Route path='app/messages' element={
+          <ProtectedRoute>
+            <MessagesPage />
+          </ProtectedRoute>
+        } />
       </Route>
       <Route path='*' element={<div>404</div>} />
     </Routes>
