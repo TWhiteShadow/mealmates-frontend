@@ -7,6 +7,7 @@ function AuthCallbackPage() {
 
   useEffect(() => {
     const oauthDataEncoded = searchParams.get('auth_data');
+    const redirectURI = searchParams.get('redirectURI');
 
     if (oauthDataEncoded) {
       try {
@@ -23,7 +24,7 @@ function AuthCallbackPage() {
           oauthData.expires_at.toString()
         );
 
-        navigate('/app/discover');
+        navigate(redirectURI || '/app/discover');
       } catch (error) {
         console.error('Error decoding OAuth data:', error);
       }

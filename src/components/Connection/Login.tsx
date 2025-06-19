@@ -3,13 +3,14 @@ import { loginUser } from '@/api/User';
 import { cn } from '@/lib/utils';
 import { buttonVariants } from '../ui/button';
 import logo from '@/assets/MealMatesLogo.webp';
-import { useNavigate } from 'react-router';
+import { useNavigate, useSearchParams } from 'react-router';
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [searchParams] = useSearchParams();
 
   const navigate = useNavigate();
 
@@ -19,9 +20,10 @@ const Login = () => {
     setLoading(true);
 
     try {
-      const data = await loginUser(email, password);
-      localStorage.setItem('jwt_token', data.token);
-      navigate('/app/discover', { replace: true });
+      await loginUser(email, password);
+
+      const redirectURI = searchParams.get('redirectURI');
+      navigate(redirectURI || '/app/discover', { replace: true });
     } catch (err) {
       console.error(err);
       setError('Email ou mot de passe incorrect.');

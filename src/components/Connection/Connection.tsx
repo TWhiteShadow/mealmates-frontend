@@ -28,7 +28,7 @@ const HomePage = () => {
             <span>Connexion avec Google</span>
           </a>
           <a
-            href='login/register'
+            href='login/login'
             className={cn(buttonVariants({ variant: 'default' }), 'w-full')}
           >
             Connexion par mail
