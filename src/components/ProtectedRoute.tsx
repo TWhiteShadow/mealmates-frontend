@@ -1,12 +1,12 @@
-import React, { useEffect, useState } from 'react';
+import { FC, ReactNode, useEffect, useState } from 'react';
 import { Navigate, useLocation } from 'react-router';
 import { userLogged } from '@/api/User';
 
 interface ProtectedRouteProps {
-  children: React.ReactNode;
+  children: ReactNode;
 }
 
-const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
+const ProtectedRoute: FC<ProtectedRouteProps> = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
   const location = useLocation();
 
