@@ -17,14 +17,16 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
+import { useSearchParams } from 'react-router';
 
 const MessagesPage: React.FC = () => {
-    const [selectedId] = useAtom(selectedConversationIdAtom);
+    const [selectedId, setSelectedId] = useAtom(selectedConversationIdAtom);
     const unreadMessagesCount = useAtomValue(unreadMessagesCountAtom);
     const unreadNotificationsCount = useAtomValue(unreadNotificationsCountAtom);
     const [activeTab, setActiveTab] = useAtom(activeTabAtom);
     const [windowWidth, setWindowWidth] = useState(window.innerWidth);
 
+    const [searchParams] = useSearchParams();
     useEffect(() => {
         // Handle window resize
         const handleResize = () => {
@@ -38,7 +40,17 @@ const MessagesPage: React.FC = () => {
         };
     }, []);
 
+    useEffect(() => {
+        if (searchParams.get('conversation')) {
+            setActiveTab("messages")
+            setSelectedId(parseInt(searchParams.get('conversation') || '0'));
+        }
+    }, [searchParams]);
+
+
     const isMobile = windowWidth < 768;
+
+
 
     return (
         <div className="h-screen relative bg-gray-100 overflow-hidden">
@@ -75,7 +87,7 @@ const MessagesPage: React.FC = () => {
                                 <span className={cn(
                                     "text-xs text-purple-dark rounded-full w-5 h-5 flex items-center justify-center",
                                     activeTab === 'messages' ? "bg-white" : "bg-purple-100"
-                                    )}>
+                                )}>
                                     {unreadMessagesCount > 9 ? '9+' : unreadMessagesCount}
                                 </span>
                             )}
@@ -95,7 +107,7 @@ const MessagesPage: React.FC = () => {
                                 <span className={cn(
                                     "text-xs text-purple-dark rounded-full w-5 h-5 flex items-center justify-center",
                                     activeTab === 'notifications' ? "bg-white" : "bg-purple-100"
-                                    )}>
+                                )}>
                                     {unreadNotificationsCount > 9 ? '9+' : unreadNotificationsCount}
                                 </span>
                             )}

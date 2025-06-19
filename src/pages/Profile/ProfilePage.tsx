@@ -7,9 +7,14 @@ import { useNavigate } from "react-router";
 import { useUserData } from "@/api/User";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { useAllUserProducts, useUserBoughtProducts } from "@/api/Product";
 
 const ProfilePage = () => {
-    const { isLoading, data: userData } = useUserData();
+    const { isLoading: isLoadingUserData, data: userData } = useUserData();
+
+    const { isLoading: isLoadingUserProductsData, data: userProductsData } = useAllUserProducts();
+
+    const { isLoading: isLoadingUserBoughtProductsData, data: userBoughtProductsData } = useUserBoughtProducts();
 
     const navigate = useNavigate();
 
@@ -19,10 +24,10 @@ const ProfilePage = () => {
 
 
     return (
-        <div className="h-screen relative bg-gray-100 overflow-hidden">
+        <div className="h-[calc(100vh+56px)] relative bg-gray-100">
             <ProfileAppBar>
                 <div className="flex items-center gap-3">
-                    {!isLoading ? (
+                    {!isLoadingUserData ? (
                         <>
                             <Avatar className="h-12 w-12">
                                 <AvatarImage
@@ -57,15 +62,58 @@ const ProfilePage = () => {
                         <h2 className="text-lg font-semibold">Vos dernières commandes</h2>
                         <a href="#" className="text-purple-dark underline-offset-2 underline text-sm">Voir plus</a>
                     </div>
-
-                    <OrderCard
-                        image="https://images.unsplash.com/photo-1553909489-cd47e0907980?ixlib=rb-1.2.1&auto=format&fit=crop&w=1025&q=80"
-                        title="Sandwich"
-                        rating={4.1}
-                    />
+                    {isLoadingUserBoughtProductsData ? (
+                        <div className="space-y-4">
+                            <Skeleton className="h-24 bg-red-200 w-full rounded-lg" />
+                            <Skeleton className="h-24 bg-gray-200 w-full rounded-lg" />
+                            <Skeleton className="h-24 bg-green-200 w-full rounded-lg" />
+                        </div>
+                    ) : (
+                        <div className="space-y-4">
+                            {userBoughtProductsData && userBoughtProductsData.length > 0 ? (
+                                userBoughtProductsData.slice(0, 3).map((product) => (
+                                    <OrderCard
+                                        key={product.id}
+                                        product={product}
+                                    />
+                                ))
+                            ) : (
+                                <p className="text-gray-500">Vous n'avez pas encore passé de commandes.</p>
+                            )}
+                        </div>
+                    )}
                 </section>
 
-                <div className="grid grid-cols-2 gap-4">
+                <section className="mt-8">
+                    <div className="flex items-center justify-between mb-4">
+                        <h2 className="text-lg font-semibold">Vos offres</h2>
+                        <a href="#" className="text-purple-dark underline-offset-2 underline text-sm">Voir plus</a>
+                    </div>
+
+                    {isLoadingUserProductsData ? (
+                        <div className="space-y-4">
+                            <Skeleton className="h-24 bg-gray-200 w-full rounded-lg" />
+                            <Skeleton className="h-24 bg-gray-200 w-full rounded-lg" />
+                            <Skeleton className="h-24 bg-gray-200 w-full rounded-lg" />
+                        </div>
+                    ) : (
+                        <div className="space-y-4">
+                            {userProductsData && userProductsData.length > 0 ? (
+                                userProductsData.slice(0, 3).map((product) => (
+                                    <OrderCard
+                                        key={product.id}
+                                        product={product}
+                                    />
+                                ))
+                            ) : (
+                                <p className="text-gray-500">Vous n'avez pas d'offres publiées.</p>
+                            )}
+                        </div>
+                    )}
+                </section>
+
+
+                <div className="grid grid-cols-2 gap-4 mt-8">
                     <StatCard
                         title="CO2 évité"
                         value="51"
@@ -81,10 +129,6 @@ const ProfilePage = () => {
                         icon={<Euro sx={{ fontSize: 80 }} />}
                     />
                 </div>
-
-                <p className="text-center text-gray-500 text-sm mt-8">
-                    MealMates 0.0.1
-                </p>
             </div>
         </div>
     );

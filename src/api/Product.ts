@@ -152,9 +152,7 @@ export function useNearbyProducts(
   });
 }
 
-export async function donateProduct(
-  productId: number
-): Promise<any> {
+export async function donateProduct(productId: number): Promise<any> {
   const response = await api.patch(`/products/${productId}/donate`);
   return response.data;
 }
@@ -167,5 +165,29 @@ export function useDonateProductMutation() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['nearbyProducts'] });
     },
+  });
+}
+
+export async function getAllUserProducts(): Promise<Product[]> {
+  const response = await api.get('/products/my-offers?status=all');
+  return response.data;
+}
+
+export function useAllUserProducts() {
+  return useQuery({
+    queryKey: ['allUserProducts'],
+    queryFn: () => getAllUserProducts(),
+  });
+}
+
+export async function getUserBoughtProducts(): Promise<Product[]> {
+  const response = await api.get('/products/bought-offers');
+  return response.data;
+}
+
+export function useUserBoughtProducts() {
+  return useQuery({
+    queryKey: ['userBoughtProducts'],
+    queryFn: () => getUserBoughtProducts(),
   });
 }
