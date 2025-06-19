@@ -15,6 +15,9 @@ dayjs.locale('fr');
 const ConversationList: React.FC = () => {
   const [selectedId, setSelectedId] = useAtom(selectedConversationIdAtom);
   const { data: userData } = useUserData();
+  if (!userData) {
+    return null;
+  }
 
   const { data: conversations = [], isLoading, error } = useConversations();
 
