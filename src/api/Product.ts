@@ -85,7 +85,6 @@ export function useAddProductMutation() {
   return useMutation({
     mutationFn: (productData: ProductFormData) => addProduct(productData),
     onSuccess: () => {
-      // Invalidate and refetch relevant queries after successful product addition
       queryClient.invalidateQueries({ queryKey: ['nearbyProducts'] });
     },
   });
@@ -134,7 +133,6 @@ export async function getNearbyProducts(
   return response.data;
 }
 
-// Hook for nearby products
 export function useNearbyProducts(
   lat: number,
   lng: number,
@@ -151,5 +149,45 @@ export function useNearbyProducts(
   return useQuery({
     queryKey: ['nearbyProducts', lat, lng, radius, filters],
     queryFn: () => getNearbyProducts(lat, lng, radius, filters),
+  });
+}
+
+export async function donateProduct(productId: number): Promise<any> {
+  const response = await api.patch(`/products/${productId}/donate`);
+  return response.data;
+}
+
+export function useDonateProductMutation() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (productId: number) => donateProduct(productId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['nearbyProducts'] });
+    },
+  });
+}
+
+export async function getAllUserProducts(): Promise<Product[]> {
+  const response = await api.get('/products/my-offers?status=all');
+  return response.data;
+}
+
+export function useAllUserProducts() {
+  return useQuery({
+    queryKey: ['allUserProducts'],
+    queryFn: () => getAllUserProducts(),
+  });
+}
+
+export async function getUserBoughtProducts(): Promise<Product[]> {
+  const response = await api.get('/products/bought-offers');
+  return response.data;
+}
+
+export function useUserBoughtProducts() {
+  return useQuery({
+    queryKey: ['userBoughtProducts'],
+    queryFn: () => getUserBoughtProducts(),
   });
 }

@@ -1,4 +1,5 @@
 import api from './Axios';
+import { useQuery } from '@tanstack/react-query';
 
 export interface User {
   id: number;
@@ -103,4 +104,14 @@ export const getPredefinedMessages = async (): Promise<string[]> => {
 export const getUnreadMessagesCount = async (): Promise<number> => {
   const response = await api.get('/messages/unread-count');
   return response.data.count;
+};
+
+export const useConversations = () => {
+  return useQuery<ConversationPreview[]>({
+    queryKey: ['conversations'],
+    queryFn: getConversations,
+
+    refetchInterval:
+      Number(import.meta.env.VITE_CONVERSATIONS_POLL_INTERVAL) || 60000,
+  });
 };

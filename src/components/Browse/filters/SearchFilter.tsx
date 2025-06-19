@@ -15,6 +15,7 @@ import IconFilterButton from './IconFilterButton';
 import { useSaveSearchMutation } from '@/api/SavedSearch';
 import { useAtomValue } from 'jotai';
 import { locationAtom } from '@/atoms/location';
+import { userLogged } from '@/api/User';
 
 export interface AdvancedFilterState {
   productTypes: string[];
@@ -63,6 +64,7 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
         // minSellerRating: 0,
       }
   );
+  const [isUserLoggedIn, setIsUserLoggedIn] = useState<boolean>(false);
 
   const saveSearchMutation = useSaveSearchMutation();
 
@@ -71,6 +73,19 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
       setFilters(initialFilters);
     }
   }, [initialFilters]);
+
+  useEffect(() => {
+    const checkUserLoggedIn = async () => {
+      try {
+        const logged = await userLogged();
+        setIsUserLoggedIn(logged?.success === true);
+      } catch (error) {
+        setIsUserLoggedIn(false);
+      }
+    };
+    
+    checkUserLoggedIn();
+  }, []);
 
   const updateFilter = (key: keyof AdvancedFilterState, value: any) => {
     setFilters(prev => ({ ...prev, [key]: value }));
@@ -133,13 +148,17 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
   };
 
   const saveSearchFilters = () => {
+    if (!isUserLoggedIn) {
+      return;
+    }
+
     const search: saveSearchType = {
       latitude,
       longitude,
       filters
     };
 
-    saveSearchMutation.mutate(search)
+    saveSearchMutation.mutate(search);
   }
 
   return (

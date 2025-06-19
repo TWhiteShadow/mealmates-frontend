@@ -24,13 +24,11 @@ api.interceptors.response.use(
   async (error: any) => {
     const originalRequest = error.config;
 
-    // Check if the request URL is in the whitelist
     const requestURL = originalRequest.url.replace(originalRequest.baseURL, '');
     const isWhitelisted = whitelistURLs.some((url) =>
       requestURL.startsWith(url)
     );
 
-    // 1) if 401, try refresh & retry once
     if (
       error.response?.status === 401 &&
       !originalRequest._retry &&
@@ -48,6 +46,7 @@ api.interceptors.response.use(
         if (navigationRef.navigate) {
           const redirectURI = locationRef.location;
           navigationRef.navigate(`/app/login?redirectURI=${redirectURI}`);
+          toast.warning('Vous devez être connecté pour accéder à cette page.');
         }
         return Promise.reject(refreshError);
       }
@@ -63,7 +62,6 @@ api.interceptors.response.use(
       }
     }
 
-    // 3) for all other statuses (400, 404, etc), just pass the error along
     if (toastsOnErrors && error.response?.data?.success === false) {
       const errors = error.response?.data?.errors;
       Object.entries(errors).forEach(([value]) => {
