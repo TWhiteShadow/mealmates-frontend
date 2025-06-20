@@ -64,9 +64,9 @@ const ProfilePage = () => {
                     </div>
                     {isLoadingUserBoughtProductsData ? (
                         <div className="space-y-4">
-                            <Skeleton className="h-24 bg-red-200 w-full rounded-lg" />
                             <Skeleton className="h-24 bg-gray-200 w-full rounded-lg" />
-                            <Skeleton className="h-24 bg-green-200 w-full rounded-lg" />
+                            <Skeleton className="h-24 bg-gray-200 w-full rounded-lg" />
+                            <Skeleton className="h-24 bg-gray-200 w-full rounded-lg" />
                         </div>
                     ) : (
                         <div className="space-y-4">
