@@ -104,7 +104,6 @@ export default function SellPage() {
 
             finalFormData.allergens = finalFormData.allergens.map(Number);
             finalFormData.food_preferences = finalFormData.food_preferences.map(Number);
-            finalFormData.expiryDate = finalFormData.expiryDate;
             finalFormData.quantity = parseInt(finalFormData.quantity.toString());
             finalFormData.price = parseFloat(finalFormData.price.toString());
 
@@ -582,6 +581,15 @@ const LocationInfoStep = () => {
     const [formData, setFormData] = useAtom(sellFormDataAtom);
     const { data: userData, isLoading } = useUserData();
     const { setValue } = useFormContext<ProductFormData>();
+
+    // Auto-select the first address if no address is selected and addresses are available
+    useEffect(() => {
+        if (userData && userData.address && userData.address.length > 0 && !formData.address) {
+            const firstAddressId = userData.address[0].id;
+            setFormData({ ...formData, address: firstAddressId });
+            setValue('address', firstAddressId);
+        }
+    }, [userData, formData, setFormData, setValue]);
 
     const handleAddressSelect = (addressId: number) => {
         // Update both the Jotai atom and the React Hook Form state
