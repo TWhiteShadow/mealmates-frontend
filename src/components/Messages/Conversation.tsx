@@ -14,13 +14,17 @@ import {
     hasMoreMessagesAtom,
 } from '@/atoms/messages';
 import { getConversationMessages, useConversations } from '../../api/Message';
+import { reserveOffer } from '@/api/Payment';
 import MessageItem from './MessageItem';
 import MessageInput from './MessageInput';
+import ReservationDialog from './ReservationDialog';
 import { ArrowLeft, ChevronsDownIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useUserData } from '@/api/User';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import { toast } from 'sonner';
+import { useNavigate } from 'react-router';
 
 const Conversation: React.FC = () => {
     const [selectedId, setSelectedId] = useAtom(selectedConversationIdAtom);
@@ -38,6 +42,9 @@ const Conversation: React.FC = () => {
     const isFirstLoadRef = useRef<boolean>(true);
     const currentConversationIdRef = useRef<number | null>(null);
     const { data: userData } = useUserData();
+    const [isPurchasing, setIsPurchasing] = useState<boolean>(false);
+    const [isReservationDialogOpen, setIsReservationDialogOpen] = useState<boolean>(false);
+    const [reservationSuccess, setReservationSuccess] = useState(false);
 
     // Utiliser TanStack Query pour les conversations
     const { data: conversations = [] } = useConversations();
@@ -288,6 +295,39 @@ const Conversation: React.FC = () => {
         previousMessageCountRef.current = currentMessages;
     }, [conversationMessages]);
 
+    const handleReservation = async () => {
+        if (!selectedConversation || !selectedConversation.offer) {
+            toast.error("Information d'offre manquante");
+            return;
+        }
+        
+        setIsReservationDialogOpen(true);
+    };
+    
+    const confirmReservationByBuyer = async () => {
+        setIsPurchasing(true);
+        setIsReservationDialogOpen(false);
+        
+        try {
+            if (!selectedConversation || !selectedConversation.offer) {
+                return;
+            }
+        
+            const response = await reserveOffer(selectedConversation.offer.id);
+            
+            if (response && response.success) {
+                setReservationSuccess(true);
+            }
+            
+            toast.error("Impossible de réserver cette offre");
+        } catch (error) {
+            console.error("Erreur lors de la réservation:", error);
+            toast.error("Une erreur s'est produite lors de la réservation");
+        } finally {
+            setIsPurchasing(false);
+        }
+    };
+    
     if (!selectedId || !selectedConversation) {
         return (
             <div className='flex items-center justify-center h-[calc(100vh-16rem)] bg-white rounded-lg'>
@@ -295,11 +335,13 @@ const Conversation: React.FC = () => {
             </div>
         );
     }
-
+    
     const otherParticipant =
-        selectedConversation.buyer.id != userData?.id
-            ? selectedConversation.buyer
-            : selectedConversation.seller;
+    selectedConversation.buyer.id != userData?.id
+    ? selectedConversation.buyer
+    : selectedConversation.seller;
+    
+    const isCurrentUserSeller = selectedConversation?.seller.id === userData?.id;
 
     return (
         <div className='flex flex-col h-[calc(100vh-16rem)] bg-white rounded-lg'>
@@ -391,8 +433,41 @@ const Conversation: React.FC = () => {
                 )}
             </div>
 
-            <div className='p-4 border-t'>
-                <MessageInput conversationId={selectedId} />
+            <div className='p-4 border-t flex flex-col gap-2 items-center'>
+                {!isCurrentUserSeller && (
+                    <>
+                        {selectedConversation.offer.soldAt === null && selectedConversation.offer.buyer === null ? (
+                            <Button
+                                className='w-fit'
+                                onClick={handleReservation}
+                                disabled={isPurchasing}
+                            >
+                                {isPurchasing ? "Chargement..." : "Réserver"}
+                            </Button>
+                        ) : (
+                            <p className="text-sm text-amber-600 font-medium">
+                                {selectedConversation.offer.soldAt !== null 
+                                    ? "Cette offre est déjà achetée" 
+                                    : "Cette offre est en cours de réservation par un autre utilisateur"}
+                            </p>
+                        )}
+                    </>
+                )}
+                <MessageInput
+                    conversationId={selectedId}
+                    className='w-full'
+                />
+
+                <ReservationDialog 
+                    isOpen={isReservationDialogOpen}
+                    isSuccess={reservationSuccess}
+                    isPurchasing={isPurchasing}
+                    offerName={selectedConversation?.offer?.name}
+                    offerPrice={selectedConversation?.offer?.price}
+                    onOpenChange={setIsReservationDialogOpen}
+                    onConfirm={confirmReservationByBuyer}
+                    onCloseSuccess={() => setReservationSuccess(false)}
+                />
             </div>
         </div>
     );

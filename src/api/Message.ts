@@ -13,6 +13,8 @@ export interface Offer {
   name: string;
   price: number;
   description: string;
+  soldAt: Date|null;
+  buyer: User|null;
 }
 
 export interface Message {

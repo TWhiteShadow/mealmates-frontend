@@ -12,12 +12,14 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import PredefinedMessageSelector from './PredefinedMessageSelector';
 import { ImagePreview } from './ImagePreview';
+import { cn } from '@/lib/utils';
 
 interface MessageInputProps {
     conversationId: number;
+    className?: string;
 }
 
-const MessageInput: React.FC<MessageInputProps> = ({ conversationId }) => {
+const MessageInput: React.FC<MessageInputProps> = ({ conversationId, className }) => {
     const [content, setContent] = useState('');
     const [images, setImages] = useState<File[]>([]);
     const setMessages = useSetAtom(messagesAtom);
@@ -125,7 +127,7 @@ const MessageInput: React.FC<MessageInputProps> = ({ conversationId }) => {
     };
 
     return (
-        <form onSubmit={handleSubmit} className="relative">
+        <form onSubmit={handleSubmit} className={cn("relative", className)}>
             {images.length > 0 && (
                 <ImagePreview
                     images={images}

@@ -85,12 +85,88 @@ const notificationHandlers: Record<string, {
     ),
     getActions: () => []
   },
-  'new_message': {
-    getTitle: () => 'Nouveau message',
-    getContent: (params) => params.preview || 'Vous avez reçu un nouveau message.',
+  'reservation_request': {
+    getTitle: () => 'Nouvelle demande de réservation',
+    getContent: (params) => `${params.buyer_fullname} souhaite réserver votre offre "${params.offer_name}".`,
     getIcon: () => (
-      <div className="h-10 w-10 rounded-full bg-purple-100 flex items-center justify-center">
-        <MessageSquare className="text-purple-500" />
+      <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
+        <ShoppingCart className="text-blue-500" />
+      </div>
+    ),
+    getActions: () => [
+      {
+        title: 'Confirmer la réservation',
+        onClick: (e, params) => {
+          e.stopPropagation();
+          return { type: 'navigate', path: `/messages?transaction=${params.transaction_id}` };
+        },
+        className: "bg-purple-dark text-white hover:bg-purple-dark/80 hover:text-white"
+      },
+      {
+        title: 'Voir les détails',
+        onClick: (e, params) => {
+          e.stopPropagation();
+          return { type: 'navigate', path: `/messages` };
+        },
+        variant: 'outline',
+      }
+    ]
+  },
+  'reservation_confirmed': {
+    getTitle: () => 'Réservation confirmée',
+    getContent: (params) => `${params.seller_fullname} a confirmé votre réservation de "${params.offer_name}".${params.is_free_offer ? ' Offre gratuite acquise!' : ' Vous pouvez maintenant procéder au paiement.'}`,
+    getIcon: () => (
+      <div className="h-10 w-10 rounded-full bg-green-100 flex items-center justify-center">
+        <Check className="text-green-500" />
+      </div>
+    ),
+    getActions: (params) => [
+      {
+        title: params.is_free_offer ? 'Voir les détails' : 'Procéder au paiement',
+        onClick: (e, params) => {
+          e.stopPropagation();
+          return { type: 'navigate', path: `/messages?transaction=${params.transaction_id}` };
+        },
+        className: "bg-purple-dark text-white hover:bg-purple-dark/80 hover:text-white"
+      }
+    ]
+  },
+  'reservation_cancelled': {
+    getTitle: () => 'Réservation annulée',
+    getContent: (params) => `La réservation de "${params.offer_name}" par ${params.buyer_fullname} a été annulée.`,
+    getIcon: () => (
+      <div className="h-10 w-10 rounded-full bg-red-100 flex items-center justify-center">
+        <CircleAlert className="text-red-500" />
+      </div>
+    ),
+    getActions: () => []
+  },
+  'reservation_expired': {
+    getTitle: () => 'Réservation expirée',
+    getContent: (params) => `Votre réservation pour "${params.offer_name}" a expiré car le vendeur n'a pas confirmé à temps.`,
+    getIcon: () => (
+      <div className="h-10 w-10 rounded-full bg-orange-100 flex items-center justify-center">
+        <CircleAlert className="text-orange-500" />
+      </div>
+    ),
+    getActions: () => []
+  },
+  'transaction_completed': {
+    getTitle: () => 'Transaction terminée',
+    getContent: (params) => `La transaction pour "${params.offer_name}" a été complétée avec succès.`,
+    getIcon: () => (
+      <div className="h-10 w-10 rounded-full bg-green-100 flex items-center justify-center">
+        <Check className="text-green-500" />
+      </div>
+    ),
+    getActions: () => []
+  },
+  'transaction_qr_validated': {
+    getTitle: () => 'QR code validé',
+    getContent: (params) => `Le QR code pour la transaction "${params.offer_name}" a été validé par ${params.buyer_fullname}.`,
+    getIcon: () => (
+      <div className="h-10 w-10 rounded-full bg-green-100 flex items-center justify-center">
+        <Check className="text-green-500" />
       </div>
     ),
     getActions: () => []
