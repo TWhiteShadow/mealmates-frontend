@@ -405,7 +405,6 @@ const DetailsInfoStep = () => {
                                 setFormData(prev => ({ ...prev, expiryDate: formattedDate }));
                                 setValue('expiryDate', formattedDate);
                             }}
-                            disabled={(date) => date < new Date()}
                             initialFocus
                         />
                     </PopoverContent>

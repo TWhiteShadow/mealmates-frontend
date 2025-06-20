@@ -64,6 +64,7 @@ api.interceptors.response.use(
 
     if (toastsOnErrors && error.response?.data?.success === false) {
       const errors = error.response?.data?.errors;
+      // eslint-disable-next-line
       Object.entries(errors).forEach(([_, value]) => {
         if (typeof value === 'string') {
           toast.error(value);
