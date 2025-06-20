@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useForm, FormProvider, useFormContext } from 'react-hook-form';
 import { useAtom } from 'jotai';
 import { atom } from 'jotai';
+import { NavigateFunction, useNavigate } from 'react-router';
 import ProfileAppBar from '@/components/ProfileAppBar';
 import { ArrowBackIosOutlined } from '@mui/icons-material';
 import { Button } from '@/components/ui/button';
@@ -55,6 +56,7 @@ export default function SellPage() {
     const [formData, setFormData] = useAtom(sellFormDataAtom);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [confirmedProduct, setConfirmedProduct] = useState<any>(null);
+    const navigate = useNavigate();
 
     // Initialize form with atom data
     const methods = useForm<ProductFormData>({
@@ -217,10 +219,10 @@ export default function SellPage() {
                         {formStep === 'imageUpload' && <ImageUploadStep />}
 
                         {/* Step 4: Location Info */}
-                        {formStep === 'locationInfo' && <LocationInfoStep />}
+                        {formStep === 'locationInfo' && <LocationInfoStep navigate={navigate} />}
 
                         {/* Step 5: Confirmation */}
-                        {formStep === 'confirmation' && <ConfirmationStep product={confirmedProduct} />}
+                        {formStep === 'confirmation' && <ConfirmationStep navigate={navigate} product={confirmedProduct} />}
 
                         {/* Navigation buttons */}
                         {formStep !== 'confirmation' && (
@@ -405,7 +407,11 @@ const DetailsInfoStep = () => {
                                 setFormData(prev => ({ ...prev, expiryDate: formattedDate }));
                                 setValue('expiryDate', formattedDate);
                             }}
-                            initialFocus
+                            disabled={(date) => {
+                                const today = new Date();
+                                today.setHours(0, 0, 0, 0);
+                                return date < today;
+                            }}
                         />
                     </PopoverContent>
                 </Popover>
@@ -576,7 +582,7 @@ const ImageUploadStep = () => {
 };
 
 // Step 4: Location Information
-const LocationInfoStep = () => {
+const LocationInfoStep = ({navigate}: {navigate: NavigateFunction}) => {
     const [formData, setFormData] = useAtom(sellFormDataAtom);
     const { data: userData, isLoading } = useUserData();
     const { setValue } = useFormContext<ProductFormData>();
@@ -623,7 +629,7 @@ const LocationInfoStep = () => {
                     <p className="text-gray-500 mb-4">Vous n'avez pas encore d'adresse. Veuillez en ajouter une dans les paramètres de votre compte.</p>
                     <Button
                         type="button"
-                        onClick={() => window.location.href = '/app/profile/settings'}
+                        onClick={() => navigate(`/app/profile/settings?redirectURI=/app/sell`)}
                         className="mt-2 bg-purple-dark hover:bg-purple-dark/90"
                     >
                         Ajouter une adresse
@@ -635,7 +641,7 @@ const LocationInfoStep = () => {
 };
 
 // Step 5: Confirmation
-const ConfirmationStep = ({ product }: { product: any }) => {
+const ConfirmationStep = ({ navigate, product }: { product: any, navigate: NavigateFunction }) => {
     // Get allergens and food preferences from API to show proper names
     const { data: allergens } = useAllergens();
     const { data: foodPreferences } = useFoodPreferences();
@@ -651,13 +657,12 @@ const ConfirmationStep = ({ product }: { product: any }) => {
 
     // Reset form and redirect to sell another product
     const handleSellAnother = () => {
-        // We'll reload the page to reset all form state
-        window.location.href = '/app/sell';
+        navigate(0);
     };
 
     // Go to profile page
     const handleViewProfile = () => {
-        window.location.href = '/app/profile';
+        navigate('/app/profile');
     };
 
     return (

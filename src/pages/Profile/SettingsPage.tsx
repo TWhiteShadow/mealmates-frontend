@@ -30,6 +30,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { useNavigate, useSearchParams } from 'react-router';
 
 interface AddressWithEditing extends Address {
   isEditing?: boolean;
@@ -58,10 +59,14 @@ const SettingsPage = () => {
   const [newAddress, setNewAddress] = useState<AddressWithEditing | null>(null);
   const [firstName, setFirstName] = useState<string>('');
   const [lastName, setLastName] = useState<string>('');
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
 
   const { isLoading, data: userData } = useUserData();
   const updateUserMutation = useUpdateUserDataMutation();
   const deleteAddressMutation = useDeleteAddressMutation();
+
+  const [redirectURI, setRedirectURI] = useState<string | null>(null);
 
   // Initialize form data from userData when it loads
   useEffect(() => {
@@ -76,6 +81,13 @@ const SettingsPage = () => {
       }
     }
   }, [userData]);
+
+  useEffect(() => {
+    const redirectURI = searchParams.get('redirectURI');
+    if (redirectURI) {
+      setRedirectURI(redirectURI);
+    }
+  }, [searchParams]);
 
   const addNewAddress = () => {
     const emptyAddress: AddressWithEditing = {
@@ -204,6 +216,9 @@ const SettingsPage = () => {
     updateUserMutation.mutate(updatedUserData as any, {
       onSuccess: () => {
         setFieldErrors({});
+        if (redirectURI) {
+          navigate(redirectURI, { replace: true });
+        }
       },
       onError: (error: unknown) => {
         handleApiError(error, 'informations');
