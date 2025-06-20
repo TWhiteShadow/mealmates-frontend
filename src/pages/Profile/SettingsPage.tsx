@@ -1,5 +1,21 @@
 import { useState, useEffect } from 'react';
 import { AxiosError } from 'axios';
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import ProfileAppBar from '@/components/ProfileAppBar';
+import {
+  useUpdateUserDataMutation,
+  useUserData,
+  ApiErrorResponse,
+  useDeleteAddressMutation,
+  Address
+} from "@/api/User";
+import { Skeleton } from '@/components/ui/skeleton';
+import { toast } from "sonner";
+import AddressInput from '@/components/AddressInput';
+import { LogOut } from 'lucide-react';
+import { useAuth } from '@/utils/auth';
 import {
   AddCircleOutline,
   ArrowBackIosOutlined,
@@ -14,23 +30,6 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-
-import ProfileAppBar from '@/components/ProfileAppBar';
-import {
-  useUpdateUserDataMutation,
-  useUserData,
-  ApiErrorResponse,
-  useDeleteAddressMutation,
-  Address
-} from "@/api/User";
-import { Skeleton } from '@/components/ui/skeleton';
-import { toast } from "sonner";
-import AddressInput from '@/components/AddressInput';
-import { LogOut } from 'lucide-react';
-import { useNavigate } from 'react-router';
 
 interface AddressWithEditing extends Address {
   isEditing?: boolean;
@@ -63,7 +62,6 @@ const SettingsPage = () => {
   const { isLoading, data: userData } = useUserData();
   const updateUserMutation = useUpdateUserDataMutation();
   const deleteAddressMutation = useDeleteAddressMutation();
-  const navigate = useNavigate();
 
   // Initialize form data from userData when it loads
   useEffect(() => {
@@ -172,6 +170,15 @@ const SettingsPage = () => {
     }
   };
 
+  const { logout } = useAuth();
+
+  const handleLogout = async () => {
+    if (window.confirm('Are you sure you want to logout?')) {
+      await logout();
+    }
+  }
+
+
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setFieldErrors({});
@@ -225,7 +232,7 @@ const SettingsPage = () => {
             type="button"
             variant="ghost"
             className='absolute right-3 p-1'
-            onClick={() => navigate('/app/login')}
+            onClick={handleLogout}
           >
             <LogOut
               className='!text-purple-dark !h-7 !w-7'
