@@ -7,7 +7,7 @@ import {
     generateImageBlobKey,
 } from '@/atoms/messages';
 import { sendMessage, getPredefinedMessages } from '../../api/Message';
-import { Send, Image as ImageIcon, SmilePlus } from 'lucide-react';
+import { Send, Image as ImageIcon, MessageSquareText } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import PredefinedMessageSelector from './PredefinedMessageSelector';
@@ -150,7 +150,7 @@ const MessageInput: React.FC<MessageInputProps> = ({ conversationId }) => {
                         onClick={() => setShowPredefined(!showPredefined)}
                         className="text-gray-500 hover:text-purple-dark"
                     >
-                        <SmilePlus className="h-5 w-5" />
+                        <MessageSquareText className="h-5 w-5" />
                     </Button>
 
                     <Button

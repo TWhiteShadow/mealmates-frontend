@@ -46,7 +46,7 @@ api.interceptors.response.use(
         if (navigationRef.navigate) {
           const redirectURI = locationRef.location;
           navigationRef.navigate(`/app/login?redirectURI=${redirectURI}`);
-          toast.warning('Vous devez être connecté pour accéder à cette page.');
+          // toast.warning('Vous devez être connecté pour accéder à cette page.');
         }
         return Promise.reject(refreshError);
       }
@@ -64,8 +64,15 @@ api.interceptors.response.use(
 
     if (toastsOnErrors && error.response?.data?.success === false) {
       const errors = error.response?.data?.errors;
-      Object.entries(errors).forEach(([value]) => {
-        toast.error(value as string);
+      // eslint-disable-next-line
+      Object.entries(errors).forEach(([_, value]) => {
+        if (typeof value === 'string') {
+          toast.error(value);
+        } else if (Array.isArray(value)) {
+          value.forEach((errorMessage: string) => {
+            toast.error(errorMessage);
+          });
+        }
       });
     }
     return Promise.reject(error);

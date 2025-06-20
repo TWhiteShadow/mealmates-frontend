@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
-import { MapContainer, TileLayer, Marker, Popup, Circle, ZoomControl, useMapEvents } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Circle, ZoomControl, useMapEvents, Popup } from 'react-leaflet';
 import { LatLngExpression } from 'leaflet';
 import MarkerClusterGroup from 'react-leaflet-markercluster';
 import { Address } from '@/api/User';
@@ -12,6 +12,7 @@ import LocationButton from './map/LocationButton';
 import SetViewOnLocation from './map/SetViewOnLocation';
 import { AdvancedFilterState } from './filters/SearchFilter';
 import { RecenterButton } from './map/RecenterButton';
+import OfferCard from './map/OfferCard';
 
 interface BrowseProps {
   searchValue: Address | null;
@@ -26,7 +27,7 @@ const Browse: React.FC<BrowseProps> = ({
     productTypes: [],
     dietaryPreferences: [],
     expirationDate: '',
-    distance: 1000,
+    distance: 5000,
     price: {
       min: 0,
       max: 50
@@ -41,6 +42,7 @@ const Browse: React.FC<BrowseProps> = ({
   const [products, setProducts] = useState<Product[]>([]);
   const [locationError, setLocationError] = useState<string | null>(null);
   const [zoomLevel, setZoomLevel] = useState(mapViewState.zoom);
+  const [selectedOffer, setSelectedOffer] = useState<Product | null>(null);
 
   const searchRadius = useMemo(() => filters.distance || radius || 1000, [filters.distance, radius]);
 
@@ -75,8 +77,8 @@ const Browse: React.FC<BrowseProps> = ({
       if (searchValue) {
         try {
           setLocation({
-            latitude: searchValue.latitude,
-            longitude: searchValue.longitude,
+            latitude: searchValue.latitude!,
+            longitude: searchValue.longitude!,
             lastUpdated: Date.now()
           });
         } catch (error) {
@@ -217,43 +219,10 @@ const Browse: React.FC<BrowseProps> = ({
                   key={offer.id}
                   position={offer.position as [number, number]}
                   icon={createCustomIcon()}
-                >
-                  <Popup>
-                    <div className="text-center">
-                      <h3 className="font-bold text-purple-dark">{offer.name}</h3>
-                      <p>{offer.description}</p>
-                      <div className="mt-2">
-                        <div className="flex justify-between">
-                          <span>Prix:</span>
-                          <span className="font-bold">{offer.price}€</span>
-                        </div>
-                        {offer.quantity && (
-                          <div className="flex justify-between">
-                            <span>Quantité:</span>
-                            <span>{offer.quantity}</span>
-                          </div>
-                        )}
-                        {offer.seller && (
-                          <div className="flex justify-between">
-                            <span>Vendeur:</span>
-                            <span>{offer.seller.first_name} {offer.seller.last_name}</span>
-                          </div>
-                        )}
-                        {offer.sellerRating && (
-                          <div className="flex justify-between">
-                            <span>Note:</span>
-                            <span>{offer.sellerRating.toFixed(2)}/5 ⭐</span>
-                          </div>
-                        )}
-                        {offer.pickupDetails && (
-                          <div className="mt-1 text-sm text-gray-600">
-                            <p>{offer.pickupDetails}</p>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </Popup>
-                </Marker>
+                  eventHandlers={{
+                    click: () => setSelectedOffer(offer)
+                  }}
+                />
               ))}
             </MarkerClusterGroup>
 
@@ -271,6 +240,13 @@ const Browse: React.FC<BrowseProps> = ({
             {displayedProducts.length} résultat{displayedProducts.length > 1 ? 's' : ''} trouvé{displayedProducts.length > 1 ? 's' : ''}
           </div>
         </div>
+      )}
+
+      {selectedOffer && (
+        <OfferCard
+          offer={selectedOffer}
+          onClose={() => setSelectedOffer(null)}
+        />
       )}
     </div>
   );

@@ -39,8 +39,8 @@ const DiscoverSearchBar: React.FC<DiscoverSearchBarProps> = ({
 
     const handleLocationSelection = (address: Address) => {
         setLocation({
-            latitude: address.latitude,
-            longitude: address.longitude,
+            latitude: address.latitude!,
+            longitude: address.longitude!,
             lastUpdated: Date.now(),
         });
         if (onLocationChange) {

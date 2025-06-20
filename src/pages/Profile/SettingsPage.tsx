@@ -1,5 +1,21 @@
 import { useState, useEffect } from 'react';
 import { AxiosError } from 'axios';
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import ProfileAppBar from '@/components/ProfileAppBar';
+import {
+  useUpdateUserDataMutation,
+  useUserData,
+  ApiErrorResponse,
+  useDeleteAddressMutation,
+  Address
+} from "@/api/User";
+import { Skeleton } from '@/components/ui/skeleton';
+import { toast } from "sonner";
+import AddressInput from '@/components/AddressInput';
+import { LogOut } from 'lucide-react';
+import { useAuth } from '@/utils/auth';
 import {
   AddCircleOutline,
   ArrowBackIosOutlined,
@@ -14,23 +30,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-
-import ProfileAppBar from '@/components/ProfileAppBar';
-import {
-  useUpdateUserDataMutation,
-  useUserData,
-  ApiErrorResponse,
-  useDeleteAddressMutation,
-  Address
-} from "@/api/User";
-import { Skeleton } from '@/components/ui/skeleton';
-import { toast } from "sonner";
-import AddressInput from '@/components/AddressInput';
-import { LogOut } from 'lucide-react';
-import { useNavigate } from 'react-router';
+import { useNavigate, useSearchParams } from 'react-router';
 
 interface AddressWithEditing extends Address {
   isEditing?: boolean;
@@ -46,12 +46,6 @@ const formatAddressTitle = (address: Address | null): string => {
   if (address.address) {
     parts.push(address.address);
   }
-  if (address.city) {
-    parts.push(address.city);
-  }
-  if (address.zipCode) {
-    parts.push(address.zipCode);
-  }
   if (address.region) {
     parts.push(address.region);
   }
@@ -65,11 +59,14 @@ const SettingsPage = () => {
   const [newAddress, setNewAddress] = useState<AddressWithEditing | null>(null);
   const [firstName, setFirstName] = useState<string>('');
   const [lastName, setLastName] = useState<string>('');
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
 
   const { isLoading, data: userData } = useUserData();
   const updateUserMutation = useUpdateUserDataMutation();
   const deleteAddressMutation = useDeleteAddressMutation();
-  const navigate = useNavigate();
+
+  const [redirectURI, setRedirectURI] = useState<string | null>(null);
 
   // Initialize form data from userData when it loads
   useEffect(() => {
@@ -85,15 +82,22 @@ const SettingsPage = () => {
     }
   }, [userData]);
 
+  useEffect(() => {
+    const redirectURI = searchParams.get('redirectURI');
+    if (redirectURI) {
+      setRedirectURI(redirectURI);
+    }
+  }, [searchParams]);
+
   const addNewAddress = () => {
     const emptyAddress: AddressWithEditing = {
-      id: 0,
+      id: null,
       address: '',
       city: '',
       region: '',
       zipCode: '',
-      latitude: 0,
-      longitude: 0,
+      latitude: null,
+      longitude: null,
       isEditing: true,
     };
     setNewAddress(emptyAddress);
@@ -115,16 +119,19 @@ const SettingsPage = () => {
     if (!newAddress) return;
     if (!validateAddress(newAddress)) return;
 
-    // Add new address to local state
-    const addressToAdd = { ...newAddress, isEditing: false };
+    // Add new address to local state without an id
+    const addressToAdd: AddressWithEditing = {
+      ...newAddress,
+      id: null,
+      isEditing: false
+    };
     setAddresses([...addresses, addressToAdd]);
     setNewAddress(null);
   };
 
-  const deleteAddress = (id: number) => {
-    // If it's a new unsaved address with temporary ID
-    if (id === 0) {
-      setAddresses(addresses.filter(addr => addr.id !== id));
+  const deleteAddress = async (id: number | null) => {
+    if (id === null) {
+      setAddresses(addresses.filter(addr => addr.id !== null));
       return;
     }
 
@@ -175,36 +182,48 @@ const SettingsPage = () => {
     }
   };
 
+  const { logout } = useAuth();
+
+  const handleLogout = async () => {
+    if (window.confirm('Are you sure you want to logout?')) {
+      await logout();
+    }
+  }
+
+
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setFieldErrors({});
 
     if (!userData) return;
 
+    const processedAddresses = addresses.map(addr => {
+      const addressData = { ...addr } as Address;
+      delete (addressData as any).isEditing;
+      // For new addresses, make sure id is null not undefined
+      if (addressData.id === undefined) addressData.id = null;
+      return addressData;
+    });
+
     const updatedUserData = {
-      ...userData,
-      last_name: lastName,
       first_name: firstName,
-      address: addresses.map(addr => {
-        const addressData = { ...addr };
-        delete addressData.isEditing;
-        return addressData;
-      }),
-      allergen: userData?.allergen || []
+      last_name: lastName,
+      addresses: processedAddresses,
+      allergenIds: userData?.allergen?.map(a => a.id) || [],
+      foodPreferenceIds: [], // Add this property as required by API
     };
 
-    if (updatedUserData && Object.keys(updatedUserData).length > 0) {
-      updateUserMutation.mutate(updatedUserData, {
-        onSuccess: () => {
-          setFieldErrors({});
-        },
-        onError: (error: unknown) => {
-          handleApiError(error, 'informations');
-        },
-      });
-    } else {
-      toast.info('Aucune modification détectée');
-    }
+    updateUserMutation.mutate(updatedUserData as any, {
+      onSuccess: () => {
+        setFieldErrors({});
+        if (redirectURI) {
+          navigate(redirectURI, { replace: true });
+        }
+      },
+      onError: (error: unknown) => {
+        handleApiError(error, 'informations');
+      },
+    });
   };
 
   return (
@@ -228,7 +247,7 @@ const SettingsPage = () => {
             type="button"
             variant="ghost"
             className='absolute right-3 p-1'
-            onClick={() => navigate('/app/login')}
+            onClick={handleLogout}
           >
             <LogOut
               className='!text-purple-dark !h-7 !w-7'
@@ -236,7 +255,7 @@ const SettingsPage = () => {
           </Button>
         </div>
       </ProfileAppBar>
-      <div className='max-w-md mx-auto px-4 pb-20'>
+      <div className='max-w-md mx-auto px-4'>
         <div className='max-w-xl m-auto'>
           <Avatar className='my-7 mx-auto w-24 h-24 drop-shadow-lg'>
             <AvatarImage
@@ -335,75 +354,74 @@ const SettingsPage = () => {
                     <Skeleton className="h-16 w-full" />
                   </div>
                 ) : (
-                  <Accordion type="multiple" className="w-full">
+                  <div className="space-y-4">
+                    {/* Existing addresses */}
                     {addresses.map((address) => (
-                      <AccordionItem key={address.id} value={address.id.toString()} className="border rounded-lg mb-2 shadow-sm">
-                        <div className="flex items-center justify-between px-4 py-3 hover:bg-purple-50 transition-colors duration-200">
-                          <AccordionTrigger className="flex-1">
-                            <span className="font-medium">{formatAddressTitle(address)}</span>
-                          </AccordionTrigger>
-                          <Button
-                            variant="ghost"
-                            onClick={(e) => {
-                              e.preventDefault(); // Add this to prevent form submission
-                              e.stopPropagation();
-                              deleteAddress(address.id);
-                            }}
-                            data-id={address.id}
-                            className="text-red-500 p-1 hover:bg-red-50 hover:text-red-800"
-                          >
-                            <Delete sx={{ fontSize: 20 }} />
-                          </Button>
-                        </div>
-                        <AccordionContent className="px-4 pb-4 pt-2">
-                          <AddressInput placeholder={""} onSelect={onAddressSelect} />
-                        </AccordionContent>
-                      </AccordionItem>
+                      <div
+                        key={address.id?.toString() || `new-${Math.random()}`}
+                        className="flex items-center justify-between px-4 py-3 border rounded-lg shadow-sm bg-white hover:bg-purple-50 transition-colors duration-200"
+                      >
+                        <span className="font-medium">{formatAddressTitle(address)}</span>
+                        <Button
+                          variant="ghost"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            deleteAddress(address.id || null);
+                          }}
+                          className="text-red-500 p-1 hover:bg-red-50 hover:text-red-800"
+                        >
+                          <Delete sx={{ fontSize: 20 }} />
+                        </Button>
+                      </div>
                     ))}
 
+                    {/* New address accordion */}
                     {newAddress && (
-                      <AccordionItem value="new-address" className="border rounded-lg mb-2 shadow-sm">
-                        <AccordionTrigger className="px-4 py-3 hover:bg-purple-50 transition-colors duration-200">
-                          <span className="font-medium">{formatAddressTitle(newAddress)}</span>
-                        </AccordionTrigger>
-                        <AccordionContent className="px-4 pb-4 pt-2">
-                          <AddressInput placeholder={""} onSelect={onAddressSelect} />
-                        </AccordionContent>
-                      </AccordionItem>
+                      <Accordion type="single" className="w-full">
+                        <AccordionItem value="new-address" className="border rounded-lg shadow-sm">
+                          <AccordionTrigger className="px-4 py-3 hover:bg-purple-50 transition-colors duration-200">
+                            <span className="font-medium">{formatAddressTitle(newAddress)}</span>
+                          </AccordionTrigger>
+                          <AccordionContent className="px-4 pb-4 pt-2">
+                            <AddressInput placeholder={""} onSelect={onAddressSelect} />
+                          </AccordionContent>
+                        </AccordionItem>
+                      </Accordion>
                     )}
-                  </Accordion>
-                )}
 
+                    {!newAddress && (
+                      <Button
+                        onClick={addNewAddress}
+                        disabled={!!newAddress}
+                        className={`w-full bg-purple-dark text-white hover:bg-white hover:text-purple-dark hover:border-2 hover:border-purple-dark group py-2 px-6 ${newAddress ? 'opacity-50 cursor-not-allowed' : ''}`}
+                      >
+                        <AddCircleOutline
+                          sx={{ fontSize: '2rem' }}
+                          className='group-hover:text-purple-dark'
+                        />
+                      </Button>
+                    )}
 
-                {!newAddress && (
-                  <Button
-                    onClick={addNewAddress}
-                    disabled={!!newAddress}
-                    className={`w-full bg-purple-dark text-white hover:bg-white hover:text-purple-dark hover:border-2 hover:border-purple-dark group py-2 px-6 mt-4 ${newAddress ? 'opacity-50 cursor-not-allowed' : ''}`}
-                  >
-                    <AddCircleOutline
-                      sx={{ fontSize: '2rem' }}
-                      className='group-hover:text-purple-dark'
-                    />
-                  </Button>
-                )}
-
-                {newAddress && (
-                  <div className="flex justify-end mt-4">
-                    <Button
-                      onClick={cancelNewAddress}
-                      className="bg-gray-300 hover:bg-gray-400 w-1/2 flex-1/2"
-                    >
-                      Annuler
-                    </Button>
-                    <Button
-                      onClick={saveNewAddress}
-                      className="bg-purple-dark hover:bg-purple-dark/90 flex-1/2 ml-2"
-                    >
-                      Enregistrer
-                    </Button>
+                    {newAddress && (
+                      <div className="flex justify-end">
+                        <Button
+                          onClick={cancelNewAddress}
+                          className="bg-gray-300 hover:bg-gray-400 w-1/2 flex-1/2"
+                        >
+                          Annuler
+                        </Button>
+                        <Button
+                          onClick={saveNewAddress}
+                          className="bg-purple-dark hover:bg-purple-dark/90 flex-1/2 ml-2"
+                        >
+                          Enregistrer
+                        </Button>
+                      </div>
+                    )}
                   </div>
                 )}
+
+
               </AccordionContent>
             </AccordionItem>
           </Accordion>

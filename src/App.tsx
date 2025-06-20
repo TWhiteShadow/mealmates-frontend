@@ -1,9 +1,8 @@
 import { Routes, Route, Outlet, useNavigate, useLocation } from 'react-router';
+import './App.css';
 import MobileApp from './pages/MobileApp';
 import LandingPage from './pages/LandingPage';
 import ProductPage from './pages/ProductPage';
-
-import './App.css';
 import Connection from './pages/Connection/ConnectPage';
 import RegisterPage from './pages/Connection/RegisterPage';
 import LoginPage from './pages/Connection/LoginPage';
@@ -23,8 +22,8 @@ import ProtectedRoute from './components/ProtectedRoute';
 function NavbarLayout() {
   return (
     <>
-      <Navbar />
       <Outlet />
+      <Navbar />
     </>
   );
 }

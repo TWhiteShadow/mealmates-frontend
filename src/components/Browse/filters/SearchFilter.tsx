@@ -56,7 +56,7 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
         productTypes: [],
         dietaryPreferences: [],
         expirationDate: '',
-        distance: 1000, // Par défaut 1km
+        distance: 5000, // Par défaut 5km
         price: {
           min: 0,
           max: 50
@@ -80,10 +80,11 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
         const logged = await userLogged();
         setIsUserLoggedIn(logged?.success === true);
       } catch (error) {
+        console.error('Error checking user logged in status:', error);
         setIsUserLoggedIn(false);
       }
     };
-    
+
     checkUserLoggedIn();
   }, []);
 
@@ -129,7 +130,7 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
       productTypes: [],
       dietaryPreferences: [],
       expirationDate: '',
-      distance: 1000,
+      distance: 5000,
       price: {
         min: 0,
         max: 50
@@ -251,7 +252,7 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
           <input
             type="range"
             min="500"
-            max="10000"
+            max="40000"
             step="500"
             value={filters.distance}
             onChange={(e) => updateFilter('distance', parseInt(e.target.value))}
@@ -259,7 +260,7 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
           />
           <div className="flex justify-between text-xs text-gray-500 mt-1">
             <span>500m</span>
-            <span>10km</span>
+            <span>40km</span>
           </div>
         </div>
       </FilterSection>
