@@ -24,13 +24,13 @@ export interface RegisterResponse {
 }
 
 export type Address = {
-  id: number;
+  id?: number | null;
   city: string;
   zipCode: string;
   address: string;
   region: string;
-  longitude: number;
-  latitude: number;
+  longitude: number | null;
+  latitude: number | null;
 };
 
 export type Allergen = {

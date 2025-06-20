@@ -87,13 +87,13 @@ const SettingsPage = () => {
 
   const addNewAddress = () => {
     const emptyAddress: AddressWithEditing = {
-      id: 0,
+      id: null,
       address: '',
       city: '',
       region: '',
       zipCode: '',
-      latitude: 0,
-      longitude: 0,
+      latitude: null,
+      longitude: null,
       isEditing: true,
     };
     setNewAddress(emptyAddress);
@@ -115,16 +115,19 @@ const SettingsPage = () => {
     if (!newAddress) return;
     if (!validateAddress(newAddress)) return;
 
-    // Add new address to local state
-    const addressToAdd = { ...newAddress, isEditing: false };
+    // Add new address to local state without an id
+    const addressToAdd: AddressWithEditing = {
+      ...newAddress,
+      id: null,
+      isEditing: false
+    };
     setAddresses([...addresses, addressToAdd]);
     setNewAddress(null);
   };
 
-  const deleteAddress = (id: number) => {
-    // If it's a new unsaved address with temporary ID
-    if (id === 0) {
-      setAddresses(addresses.filter(addr => addr.id !== id));
+  const deleteAddress = async (id: number | null) => {
+    if (id === null) {
+      setAddresses(addresses.filter(addr => addr.id !== null));
       return;
     }
 
@@ -181,30 +184,31 @@ const SettingsPage = () => {
 
     if (!userData) return;
 
+    const processedAddresses = addresses.map(addr => {
+      const addressData = { ...addr } as Address;
+      delete (addressData as any).isEditing;
+      // For new addresses, make sure id is null not undefined
+      if (addressData.id === undefined) addressData.id = null;
+      return addressData;
+    });
+
     const updatedUserData = {
-      ...userData,
-      last_name: lastName,
       first_name: firstName,
-      address: addresses.map(addr => {
-        const addressData = { ...addr };
-        delete addressData.isEditing;
-        return addressData;
-      }),
-      allergen: userData?.allergen || []
+      last_name: lastName,
+      addresses: processedAddresses,
+      allergenIds: userData?.allergen?.map(a => a.id) || [],
+      foodPreferenceIds: [], // Add this property as required by API
     };
 
-    if (updatedUserData && Object.keys(updatedUserData).length > 0) {
-      updateUserMutation.mutate(updatedUserData, {
-        onSuccess: () => {
-          setFieldErrors({});
-        },
-        onError: (error: unknown) => {
-          handleApiError(error, 'informations');
-        },
-      });
-    } else {
-      toast.info('Aucune modification détectée');
-    }
+    updateUserMutation.mutate(updatedUserData as any, {
+      onSuccess: () => {
+        setFieldErrors({});
+        toast.success('Vos informations ont été mises à jour');
+      },
+      onError: (error: unknown) => {
+        handleApiError(error, 'informations');
+      },
+    });
   };
 
   return (
@@ -337,7 +341,11 @@ const SettingsPage = () => {
                 ) : (
                   <Accordion type="multiple" className="w-full">
                     {addresses.map((address) => (
-                      <AccordionItem key={address.id} value={address.id.toString()} className="border rounded-lg mb-2 shadow-sm">
+                      <AccordionItem
+                        key={address.id?.toString() || `new-${Math.random()}`}
+                        value={address.id?.toString() || `new-${Math.random()}`}
+                        className="border rounded-lg mb-2 shadow-sm"
+                      >
                         <div className="flex items-center justify-between px-4 py-3 hover:bg-purple-50 transition-colors duration-200">
                           <AccordionTrigger className="flex-1">
                             <span className="font-medium">{formatAddressTitle(address)}</span>
@@ -345,11 +353,10 @@ const SettingsPage = () => {
                           <Button
                             variant="ghost"
                             onClick={(e) => {
-                              e.preventDefault(); // Add this to prevent form submission
+                              e.preventDefault();
                               e.stopPropagation();
-                              deleteAddress(address.id);
+                              deleteAddress(address.id || null);
                             }}
-                            data-id={address.id}
                             className="text-red-500 p-1 hover:bg-red-50 hover:text-red-800"
                           >
                             <Delete sx={{ fontSize: 20 }} />
