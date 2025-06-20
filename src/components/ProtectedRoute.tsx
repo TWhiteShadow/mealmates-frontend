@@ -1,6 +1,7 @@
 import { FC, ReactNode, useEffect, useState } from 'react';
 import { Navigate, useLocation } from 'react-router';
 import { userLogged } from '@/api/User';
+import { toast } from 'sonner';
 
 interface ProtectedRouteProps {
   children: ReactNode;
@@ -17,9 +18,10 @@ const ProtectedRoute: FC<ProtectedRouteProps> = ({ children }) => {
         setIsAuthenticated(response?.success === true);
       } catch (error) {
         setIsAuthenticated(false);
+        console.error('Error checking authentication:', error);
       }
     };
-    
+
     checkAuth();
   }, []);
 
@@ -30,13 +32,14 @@ const ProtectedRoute: FC<ProtectedRouteProps> = ({ children }) => {
   }
 
   if (!isAuthenticated) {
+    toast.info('Vous devez être connecté pour accéder à cette page.');
     return <Navigate to={`/app/login?redirectURI=${location.pathname}`} replace />;
   }
 
   return (
-  <>
-    {children}
-  </>
+    <>
+      {children}
+    </>
   );
 };
 

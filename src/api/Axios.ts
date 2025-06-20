@@ -46,7 +46,7 @@ api.interceptors.response.use(
         if (navigationRef.navigate) {
           const redirectURI = locationRef.location;
           navigationRef.navigate(`/app/login?redirectURI=${redirectURI}`);
-          toast.warning('Vous devez être connecté pour accéder à cette page.');
+          // toast.warning('Vous devez être connecté pour accéder à cette page.');
         }
         return Promise.reject(refreshError);
       }
