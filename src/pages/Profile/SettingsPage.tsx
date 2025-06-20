@@ -236,7 +236,7 @@ const SettingsPage = () => {
           </Button>
         </div>
       </ProfileAppBar>
-      <div className='max-w-md mx-auto px-4 pb-20'>
+      <div className='max-w-md mx-auto px-4'>
         <div className='max-w-xl m-auto'>
           <Avatar className='my-7 mx-auto w-24 h-24 drop-shadow-lg'>
             <AvatarImage
