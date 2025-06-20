@@ -218,7 +218,7 @@ const AddressInput: React.FC<AddressInputProps> = ({
                   >
                     <div className='flex items-center'>
                       <Search className='w-4 h-4 text-purple-dark mr-2 mt-1 flex-shrink-0' />
-                      
+
                       <div>
                         <span>Préférences: {search.filters?.productTypes?.join(', ')}, {search.filters?.dietaryPreferences?.join(', ')}</span>
                         <br />

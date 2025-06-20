@@ -46,12 +46,6 @@ const formatAddressTitle = (address: Address | null): string => {
   if (address.address) {
     parts.push(address.address);
   }
-  if (address.city) {
-    parts.push(address.city);
-  }
-  if (address.zipCode) {
-    parts.push(address.zipCode);
-  }
   if (address.region) {
     parts.push(address.region);
   }
@@ -203,7 +197,6 @@ const SettingsPage = () => {
     updateUserMutation.mutate(updatedUserData as any, {
       onSuccess: () => {
         setFieldErrors({});
-        toast.success('Vos informations ont été mises à jour');
       },
       onError: (error: unknown) => {
         handleApiError(error, 'informations');
@@ -339,78 +332,74 @@ const SettingsPage = () => {
                     <Skeleton className="h-16 w-full" />
                   </div>
                 ) : (
-                  <Accordion type="multiple" className="w-full">
+                  <div className="space-y-4">
+                    {/* Existing addresses */}
                     {addresses.map((address) => (
-                      <AccordionItem
+                      <div
                         key={address.id?.toString() || `new-${Math.random()}`}
-                        value={address.id?.toString() || `new-${Math.random()}`}
-                        className="border rounded-lg mb-2 shadow-sm"
+                        className="flex items-center justify-between px-4 py-3 border rounded-lg shadow-sm bg-white hover:bg-purple-50 transition-colors duration-200"
                       >
-                        <div className="flex items-center justify-between px-4 py-3 hover:bg-purple-50 transition-colors duration-200">
-                          <AccordionTrigger className="flex-1">
-                            <span className="font-medium">{formatAddressTitle(address)}</span>
-                          </AccordionTrigger>
-                          <Button
-                            variant="ghost"
-                            onClick={(e) => {
-                              e.preventDefault();
-                              e.stopPropagation();
-                              deleteAddress(address.id || null);
-                            }}
-                            className="text-red-500 p-1 hover:bg-red-50 hover:text-red-800"
-                          >
-                            <Delete sx={{ fontSize: 20 }} />
-                          </Button>
-                        </div>
-                        <AccordionContent className="px-4 pb-4 pt-2">
-                          <AddressInput placeholder={""} onSelect={onAddressSelect} />
-                        </AccordionContent>
-                      </AccordionItem>
+                        <span className="font-medium">{formatAddressTitle(address)}</span>
+                        <Button
+                          variant="ghost"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            deleteAddress(address.id || null);
+                          }}
+                          className="text-red-500 p-1 hover:bg-red-50 hover:text-red-800"
+                        >
+                          <Delete sx={{ fontSize: 20 }} />
+                        </Button>
+                      </div>
                     ))}
 
+                    {/* New address accordion */}
                     {newAddress && (
-                      <AccordionItem value="new-address" className="border rounded-lg mb-2 shadow-sm">
-                        <AccordionTrigger className="px-4 py-3 hover:bg-purple-50 transition-colors duration-200">
-                          <span className="font-medium">{formatAddressTitle(newAddress)}</span>
-                        </AccordionTrigger>
-                        <AccordionContent className="px-4 pb-4 pt-2">
-                          <AddressInput placeholder={""} onSelect={onAddressSelect} />
-                        </AccordionContent>
-                      </AccordionItem>
+                      <Accordion type="single" className="w-full">
+                        <AccordionItem value="new-address" className="border rounded-lg shadow-sm">
+                          <AccordionTrigger className="px-4 py-3 hover:bg-purple-50 transition-colors duration-200">
+                            <span className="font-medium">{formatAddressTitle(newAddress)}</span>
+                          </AccordionTrigger>
+                          <AccordionContent className="px-4 pb-4 pt-2">
+                            <AddressInput placeholder={""} onSelect={onAddressSelect} />
+                          </AccordionContent>
+                        </AccordionItem>
+                      </Accordion>
                     )}
-                  </Accordion>
-                )}
 
+                    {!newAddress && (
+                      <Button
+                        onClick={addNewAddress}
+                        disabled={!!newAddress}
+                        className={`w-full bg-purple-dark text-white hover:bg-white hover:text-purple-dark hover:border-2 hover:border-purple-dark group py-2 px-6 ${newAddress ? 'opacity-50 cursor-not-allowed' : ''}`}
+                      >
+                        <AddCircleOutline
+                          sx={{ fontSize: '2rem' }}
+                          className='group-hover:text-purple-dark'
+                        />
+                      </Button>
+                    )}
 
-                {!newAddress && (
-                  <Button
-                    onClick={addNewAddress}
-                    disabled={!!newAddress}
-                    className={`w-full bg-purple-dark text-white hover:bg-white hover:text-purple-dark hover:border-2 hover:border-purple-dark group py-2 px-6 mt-4 ${newAddress ? 'opacity-50 cursor-not-allowed' : ''}`}
-                  >
-                    <AddCircleOutline
-                      sx={{ fontSize: '2rem' }}
-                      className='group-hover:text-purple-dark'
-                    />
-                  </Button>
-                )}
-
-                {newAddress && (
-                  <div className="flex justify-end mt-4">
-                    <Button
-                      onClick={cancelNewAddress}
-                      className="bg-gray-300 hover:bg-gray-400 w-1/2 flex-1/2"
-                    >
-                      Annuler
-                    </Button>
-                    <Button
-                      onClick={saveNewAddress}
-                      className="bg-purple-dark hover:bg-purple-dark/90 flex-1/2 ml-2"
-                    >
-                      Enregistrer
-                    </Button>
+                    {newAddress && (
+                      <div className="flex justify-end">
+                        <Button
+                          onClick={cancelNewAddress}
+                          className="bg-gray-300 hover:bg-gray-400 w-1/2 flex-1/2"
+                        >
+                          Annuler
+                        </Button>
+                        <Button
+                          onClick={saveNewAddress}
+                          className="bg-purple-dark hover:bg-purple-dark/90 flex-1/2 ml-2"
+                        >
+                          Enregistrer
+                        </Button>
+                      </div>
+                    )}
                   </div>
                 )}
+
+
               </AccordionContent>
             </AccordionItem>
           </Accordion>

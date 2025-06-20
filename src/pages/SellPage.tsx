@@ -586,8 +586,8 @@ const LocationInfoStep = () => {
     useEffect(() => {
         if (userData && userData.address && userData.address.length > 0 && !formData.address) {
             const firstAddressId = userData.address[0].id;
-            setFormData({ ...formData, address: firstAddressId });
-            setValue('address', firstAddressId);
+            setFormData({ ...formData, address: firstAddressId! });
+            setValue('address', firstAddressId!);
         }
     }, [userData, formData, setFormData, setValue]);
 
@@ -612,7 +612,7 @@ const LocationInfoStep = () => {
                             key={address.id}
                             className={`p-4 border rounded-lg cursor-pointer ${formData.address === address.id ? 'border-purple-dark bg-purple-50' : 'border-gray-300'
                                 }`}
-                            onClick={() => handleAddressSelect(address.id)}
+                            onClick={() => handleAddressSelect(address.id!)}
                         >
                             <p className="font-medium">{address.address}</p>
                             <p className="text-sm text-gray-600">{address.zipCode} {address.city}, {address.region}</p>
