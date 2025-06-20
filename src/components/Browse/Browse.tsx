@@ -75,8 +75,8 @@ const Browse: React.FC<BrowseProps> = ({
       if (searchValue) {
         try {
           setLocation({
-            latitude: searchValue.latitude,
-            longitude: searchValue.longitude,
+            latitude: searchValue.latitude!,
+            longitude: searchValue.longitude!,
             lastUpdated: Date.now()
           });
         } catch (error) {
