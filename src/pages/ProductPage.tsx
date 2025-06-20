@@ -8,12 +8,14 @@ import ProfileAppBar from '@/components/ProfileAppBar';
 import { ArrowBackIosOutlined } from '@mui/icons-material';
 import { cn } from "@/lib/utils";
 import ContactSellerButton from '@/components/ProductPage/ContactSellerButton';
+import { useUserData } from '@/api/User';
 
 dayjs.locale('fr');
 
 export default function ProductPage() {
     const { id } = useParams();
     const { data: product, isLoading, error } = useProduct(Number(id));
+    const { data: user } = useUserData();
     if (isLoading) {
         return (
             <div className="flex items-center justify-center min-h-screen">
@@ -189,13 +191,15 @@ export default function ProductPage() {
                         </div> */}
 
 
-                        <div className="mt-8">
-                            <ContactSellerButton
-                                offerId={product.id}
-                                sellerId={product.seller.id}
-                                className="w-full bg-purple-600 hover:bg-purple-700 text-white py-3 rounded-lg font-medium"
-                            />
-                        </div>
+                        {product.seller && product.seller.id != user?.id && (
+                            <div className="mt-8">
+                                <ContactSellerButton
+                                    offerId={product.id}
+                                    sellerId={product.seller.id}
+                                    className="w-full text-white py-3 rounded-lg font-medium"
+                                />
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>

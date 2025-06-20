@@ -19,7 +19,7 @@ function BrowsePage() {
     productTypes: [],
     dietaryPreferences: [],
     expirationDate: '',
-    distance: 1000,
+    distance: 5000,
     price: {
       min: 0,
       max: 50
@@ -100,7 +100,7 @@ function BrowsePage() {
   return (
     <div className="h-screen relative bg-gray-100 overflow-hidden">
       <div className='fixed top-0 left-0 w-full z-10'>
-        <div className='max-w-md mx-auto pt-12 pb-6 px-4 xs:px-9 rounded-b-[20px] bg-purple-dark/10 backdrop-blur-lg'>
+        <div className={`max-w-md mx-auto pt-6 pb-6 px-4 xs:px-9 ${!showRadiusFilter ? 'rounded-b-[20px]' : ''} bg-purple-dark/10 backdrop-blur-lg`}>
           <SearchBar
             onSearch={handleSearch}
             onFilterClick={handleFilterClick}
