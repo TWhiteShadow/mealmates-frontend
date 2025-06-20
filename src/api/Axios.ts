@@ -64,8 +64,14 @@ api.interceptors.response.use(
 
     if (toastsOnErrors && error.response?.data?.success === false) {
       const errors = error.response?.data?.errors;
-      Object.entries(errors).forEach(([value]) => {
-        toast.error(value as string);
+      Object.entries(errors).forEach(([_, value]) => {
+        if (typeof value === 'string') {
+          toast.error(value);
+        } else if (Array.isArray(value)) {
+          value.forEach((errorMessage: string) => {
+            toast.error(errorMessage);
+          });
+        }
       });
     }
     return Promise.reject(error);
