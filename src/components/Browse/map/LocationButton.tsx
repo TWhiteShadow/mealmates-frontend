@@ -8,11 +8,11 @@ interface LocationButtonProps {
 const LocationButton: React.FC<LocationButtonProps> = ({ onLocationRequest }) => {
   return (
     <div className='location-btn--container w-full'>
-      <button 
+      <button
         onClick={onLocationRequest}
-        className="fixed z-10 bottom-20 inset-x-0 max-w-md sm:m-auto mx-4 bg-purple-dark text-white py-4 px-6 rounded-lg shadow-lg flex items-center justify-center"
+        className="fixed z-10 bottom-20 inset-x-0 sm:max-w-md w-[90vw] m-auto bg-purple-dark text-white py-4 px-6 rounded-lg shadow-lg flex items-center justify-center"
       >
-        <SendOutlinedIcon sx={{ fontSize: '1.5rem' }} className='mr-4'/>
+        <SendOutlinedIcon sx={{ fontSize: '1.5rem' }} className='mr-4' />
         <span className="text-lg font-medium">Où te trouves-tu ?</span>
       </button>
     </div>
