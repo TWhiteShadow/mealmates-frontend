@@ -24,7 +24,7 @@ const ProfilePage = () => {
 
 
     return (
-        <div className="h-[calc(100vh+56px)] relative bg-gray-100">
+        <div className="min-h-screen pb-20 relative bg-gray-100">
             <ProfileAppBar>
                 <div className="flex items-center gap-3">
                     {!isLoadingUserData ? (
@@ -49,7 +49,7 @@ const ProfilePage = () => {
                     <Settings sx={{ fontSize: 28 }} className='!text-purple-dark' />
                 </button>
             </ProfileAppBar>
-            <div className="max-w-md mx-auto px-4 pb-20">
+            <div className="max-w-md mx-auto px-4">
                 <div className="max-w-xl m-auto">
                     <img
                         src={MealMatesLogo}
