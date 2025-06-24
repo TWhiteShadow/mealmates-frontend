@@ -11,8 +11,8 @@ import {
 import { activeTabAtom, unreadNotificationsCountAtom } from '@/atoms/notifications';
 import ProfileAppBar from '@/components/ProfileAppBar';
 import {
-    ArrowLeft,
     Bell,
+    ChevronLeft,
     MessageSquare
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -61,7 +61,7 @@ const MessagesPage: React.FC = () => {
                         className='absolute left-3 p-1'
                         onClick={() => window.history.back()}
                     >
-                        <ArrowLeft />
+                        <ChevronLeft className='size-8 text-purple-dark' />
                     </Button>
                     <h1 className='font-bold text-xl'>
                         {activeTab === 'messages' ? 'Messages' : 'Notifications'}

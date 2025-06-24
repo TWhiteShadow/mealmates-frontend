@@ -1,6 +1,6 @@
 import ProfileAppBar from '@/components/ProfileAppBar';
 import { Button } from '@/components/ui/button';
-import { ArrowBackIosOutlined } from '@mui/icons-material';
+import { ChevronLeft } from 'lucide-react';
 
 const SellPageHeader = () => {
     return (
@@ -12,7 +12,7 @@ const SellPageHeader = () => {
                     className='absolute left-3 p-1'
                     onClick={() => window.history.back()}
                 >
-                    <ArrowBackIosOutlined fontSize="small" />
+                    <ChevronLeft className='size-8 text-purple-dark' />
                 </Button>
                 <h1 className='font-bold text-xl'>Vendre un produit</h1>
             </div>
