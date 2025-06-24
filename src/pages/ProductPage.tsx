@@ -9,6 +9,7 @@ import { ArrowBackIosOutlined } from '@mui/icons-material';
 import { cn } from "@/lib/utils";
 import ContactSellerButton from '@/components/ProductPage/ContactSellerButton';
 import { useUserData } from '@/api/User';
+import logo from '@/assets/MealMatesLogo.webp';
 
 dayjs.locale('fr');
 
@@ -38,7 +39,7 @@ export default function ProductPage() {
     return (
         <div className="min-h-screen bg-gray-50 pb-20">
             <ProfileAppBar>
-                <div className='relative flex items-center w-full h-full justify-center'>
+                <div className='relative flex items-center size-full justify-center'>
                     <Button
                         variant="ghost"
                         className='absolute left-3 p-1'
@@ -53,7 +54,7 @@ export default function ProductPage() {
             <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:max-w-7xl lg:px-8 py-8">
                 <div className="lg:grid lg:grid-cols-2 lg:gap-x-8 lg:items-start">
                     {/* Images */}
-                    <div className="w-full">
+                    <div className="size-full">
                         {product.images && product.images.length > 0 ? (
                             <div className="relative">
                                 {isExpiringSoon && (
@@ -76,7 +77,7 @@ export default function ProductPage() {
                                                     <img
                                                         src={`${import.meta.env.VITE_BACKEND_URL}/images/files/${image.name}`}
                                                         alt={`${product.name} - Image ${index + 1}`}
-                                                        className="w-full h-full object-cover"
+                                                        className="size-full object-cover"
                                                     />
                                                 </div>
                                             </CarouselItem>
@@ -87,8 +88,8 @@ export default function ProductPage() {
                                 </Carousel>
                             </div>
                         ) : (
-                            <div className="aspect-square bg-gray-200 rounded-xl flex items-center justify-center">
-                                <span className="text-gray-400">No image available</span>
+                            <div className='size-full aspect-square bg-purple-100 rounded-lg flex items-center justify-center'>
+                                <img src={logo} alt="" className='w-1/3' />
                             </div>
                         )}
                     </div>
@@ -203,6 +204,6 @@ export default function ProductPage() {
                     </div>
                 </div>
             </div>
-        </div>
+        </div >
     );
 }
