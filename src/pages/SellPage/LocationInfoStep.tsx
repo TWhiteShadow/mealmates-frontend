@@ -47,7 +47,7 @@ const LocationInfoStep = ({ navigate }: LocationInfoStepProps) => {
                             onClick={() => handleAddressSelect(address.id!)}
                         >
                             <p className="font-medium">{address.address}</p>
-                            <p className="text-sm text-gray-600">{address.zipCode} {address.city}, {address.region}</p>
+                            <p className="text-sm text-gray-600">{address.region}</p>
                         </div>
                     ))}
                 </div>

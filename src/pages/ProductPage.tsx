@@ -5,11 +5,11 @@ import 'dayjs/locale/fr';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import { Button } from "@/components/ui/button";
 import ProfileAppBar from '@/components/ProfileAppBar';
-import { ArrowBackIosOutlined } from '@mui/icons-material';
 import { cn } from "@/lib/utils";
 import ContactSellerButton from '@/components/ProductPage/ContactSellerButton';
 import { useUserData } from '@/api/User';
 import logo from '@/assets/MealMatesLogo.webp';
+import { ChevronLeft } from 'lucide-react';
 
 dayjs.locale('fr');
 
@@ -45,7 +45,7 @@ export default function ProductPage() {
                         className='absolute left-3 p-1'
                         onClick={() => window.history.back()}
                     >
-                        <ArrowBackIosOutlined fontSize="small" />
+                        <ChevronLeft className='size-8 text-purple-dark' />
                     </Button>
                     <h1 className='font-bold text-xl'>{product.name}</h1>
                 </div>

@@ -14,11 +14,10 @@ import {
 import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from "sonner";
 import AddressInput from '@/components/AddressInput';
-import { LogOut } from 'lucide-react';
+import { ChevronLeft, LogOut } from 'lucide-react';
 import { useAuth } from '@/utils/auth';
 import {
   AddCircleOutline,
-  ArrowBackIosOutlined,
   Home,
   Person,
   Delete,
@@ -236,9 +235,7 @@ const SettingsPage = () => {
             className='absolute left-3 p-1'
             onClick={() => window.history.back()}
           >
-            <ArrowBackIosOutlined
-              className='!text-purple-dark'
-            />
+            <ChevronLeft className='size-8 text-purple-dark' />
           </Button>
           <span className='text-lg font-Lilita font-bold text-purple-dark'>
             Votre compte
