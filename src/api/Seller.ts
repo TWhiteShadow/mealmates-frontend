@@ -1,6 +1,13 @@
 import { useQuery } from '@tanstack/react-query';
 import api from './Axios';
 
+export type SellerEarningsType = {
+  totalEarnings: number;
+  pendingAmount: number;
+  completedTransactions: number;
+  pendingTransactions: number;
+};
+
 export const getSellerStatus = async (): Promise<boolean> => {
   const response = await api.get('/seller/banking/status');
   return (
@@ -26,5 +33,17 @@ export const useSellerSetup = () => {
   return useQuery({
     queryKey: ['sellerSetup'],
     queryFn: getSellerSetup,
+  });
+};
+
+export const getSellerEarnings = async (): Promise<SellerEarningsType> => {
+  const response = await api.get('/seller/earnings');
+  return response.data;
+};
+
+export const useSellerEarnings = () => {
+  return useQuery({
+    queryKey: ['sellerEarnings'],
+    queryFn: getSellerEarnings,
   });
 };

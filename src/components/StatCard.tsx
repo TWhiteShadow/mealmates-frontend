@@ -11,19 +11,28 @@ interface StatCardProps {
   unit: string;
   icon: ReactNode;
   className?: string;
+  isLoading?: boolean;
 }
 
-const StatCard = ({ title, value, unit, icon, children, className }: StatCardProps & { children?: ReactNode }) => {
+const StatCard = ({ title, value, unit, icon, children, className, isLoading }: StatCardProps & { children?: ReactNode }) => {
   return (
-    <div className="bg-white p-4 rounded-lg drop-shadow-lg text-center">
+    <div className="bg-white p-4 rounded-lg drop-shadow-lg text-center h-42">
       <div className="text-sm text-gray-600 font-bold">{title}</div>
-      <div className={cn("flex justify-center mb-2", className)}>
-        {icon}
-      </div>
-      <div className="font-semibold mt-1">
-        {value} {unit}
-      </div>
-      {children}
+      {isLoading ? (
+        <div className="flex justify-center items-center h-[90%]">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-dark"></div>
+        </div>
+      ) : (
+        <>
+          <div className={cn("flex justify-center mb-2", className)}>
+            {icon}
+          </div>
+          <div className="font-semibold mt-1">
+            {value} {unit}
+          </div>
+          {children}
+        </>
+      )}
     </div>
   );
 };

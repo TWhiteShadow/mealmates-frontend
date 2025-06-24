@@ -1,13 +1,14 @@
 import ProfileAppBar from "@/components/ProfileAppBar";
 import MealMatesLogo from '../../assets/MealMatesLogo.webp';
 import OrderCard from "@/components/OrderCard";
-import { BoltRounded, Euro, Settings } from "@mui/icons-material";
 import StatCard from "@/components/StatCard";
 import { useNavigate } from "react-router";
 import { useUserData } from "@/api/User";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { useAllUserProducts, useUserBoughtProducts } from "@/api/Product";
+import { EuroIcon, PiggyBank, SettingsIcon, Zap } from "lucide-react";
+import { useSellerEarnings } from "@/api/Seller";
 
 const ProfilePage = () => {
     const { isLoading: isLoadingUserData, data: userData } = useUserData();
@@ -15,6 +16,8 @@ const ProfilePage = () => {
     const { isLoading: isLoadingUserProductsData, data: userProductsData } = useAllUserProducts();
 
     const { isLoading: isLoadingUserBoughtProductsData, data: userBoughtProductsData } = useUserBoughtProducts();
+
+    const { isLoading: isLoadingSellerEarnings, data: sellerEarnings } = useSellerEarnings();
 
     const navigate = useNavigate();
 
@@ -46,7 +49,7 @@ const ProfilePage = () => {
 
                 </div>
                 <button onClick={handleSettings}>
-                    <Settings sx={{ fontSize: 28 }} className='!text-purple-dark' />
+                    <SettingsIcon className='text-purple-dark size-7' />
                 </button>
             </ProfileAppBar>
             <div className="max-w-md mx-auto px-4">
@@ -119,14 +122,22 @@ const ProfilePage = () => {
                         value="51"
                         unit="KW/h"
                         className="text-purple-dark"
-                        icon={<BoltRounded sx={{ fontSize: 80 }} />}
+                        icon={<Zap className="size-[80px]" />}
                     />
                     <StatCard
                         title="Argent économisé"
                         value="32"
                         unit="EUR"
                         className="text-purple-dark"
-                        icon={<Euro sx={{ fontSize: 80 }} />}
+                        icon={<EuroIcon className="size-[80px]" />}
+                    />
+                    <StatCard
+                        title="Porte-monnaie"
+                        value={!isLoadingSellerEarnings && sellerEarnings?.totalEarnings !== undefined ? sellerEarnings?.totalEarnings.toFixed(2) : "0.00"}
+                        unit="EUR"
+                        isLoading={isLoadingSellerEarnings}
+                        className="text-purple-dark "
+                        icon={<PiggyBank className="size-[80px]" />}
                     />
                 </div>
             </div>
