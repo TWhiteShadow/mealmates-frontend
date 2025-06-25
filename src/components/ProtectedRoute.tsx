@@ -32,6 +32,7 @@ const ProtectedRoute: FC<ProtectedRouteProps> = ({ children }) => {
   }
 
   if (!isAuthenticated) {
+    // triggers twice but only in dev mode
     toast.info('Vous devez être connecté pour accéder à cette page.');
     return <Navigate to={`/app/login?redirectURI=${location.pathname}`} replace />;
   }
