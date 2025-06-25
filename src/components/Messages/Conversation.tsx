@@ -21,6 +21,7 @@ import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useUserData } from '@/api/User';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import OfferActions from './OfferActions';
 
 const Conversation: React.FC = () => {
     const [selectedId, setSelectedId] = useAtom(selectedConversationIdAtom);
@@ -290,7 +291,7 @@ const Conversation: React.FC = () => {
 
     if (!selectedId || !selectedConversation) {
         return (
-            <div className='flex items-center justify-center h-[calc(100vh-16rem)] bg-white rounded-lg'>
+            <div className='flex items-center justify-center h-[calc(100vh-14rem)] bg-white rounded-lg'>
                 <p className='text-gray-400'>Sélectionnez une conversation</p>
             </div>
         );
@@ -302,7 +303,7 @@ const Conversation: React.FC = () => {
             : selectedConversation.seller;
 
     return (
-        <div className='flex flex-col h-[calc(100vh-16rem)] bg-white rounded-lg'>
+        <div className='flex flex-col h-[calc(100vh-14rem)] bg-white rounded-lg'>
             <div className='p-4 border-b flex items-center justify-between'>
                 <div className='flex items-center'>
                     <Button
@@ -390,7 +391,12 @@ const Conversation: React.FC = () => {
                     </div>
                 )}
             </div>
-
+            <OfferActions
+                offer={selectedConversation.offer}
+                transactions={selectedConversation.offer.transactions || []}
+                otherParticipant={otherParticipant}
+                selectedId={selectedId}
+            />
             <div className='p-4 border-t'>
                 <MessageInput conversationId={selectedId} />
             </div>

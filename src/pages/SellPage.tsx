@@ -1,5 +1,5 @@
-import SellPageHeader from './SellPage/SellPageHeader';
-import SellPageForm from './SellPage/SellPageForm';
+import SellPageHeader from '../components/SellPage/SellPageHeader';
+import SellPageForm from '../components/SellPage/SellPageForm';
 import { useSellerStatus } from '@/api/Seller';
 import SellerStatusPage from './SellerStatusPage';
 

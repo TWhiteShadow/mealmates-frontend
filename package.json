@@ -50,6 +50,8 @@
     "react-leaflet": "^5.0.0",
     "react-leaflet-markercluster": "^5.0.0-rc.0",
     "react-medium-image-zoom": "^5.2.14",
+    "react-qr-barcode-scanner": "^2.1.7",
+    "react-qrcode-logo": "^3.0.0",
     "react-router": "^7.2.0",
     "sonner": "^2.0.3",
     "styled-components": "^6.1.15",
@@ -83,5 +85,10 @@
     "typescript-eslint": "^8.26.1",
     "vite": "^6.2.0",
     "vite-plugin-compression2": "^1.3.3"
+  },
+  "overrides": {
+    "react-qrcode-logo": {
+      "qrcode-generator": "1.4.4"
+    }
   }
 }

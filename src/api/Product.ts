@@ -33,11 +33,24 @@ export interface Product {
     id: number;
     name: string;
   }>;
+  transactions?: Transaction[];
   distance?: number;
   createdAt?: string;
   updatedAt?: string;
 }
 
+export interface Transaction {
+  id: number;
+  status:
+    | 'pending'
+    | 'reserved'
+    | 'confirmed'
+    | 'completed'
+    | 'failed'
+    | 'refunded';
+  createdAt: string;
+  amount: number;
+}
 export interface ProductFormData {
   name: string;
   description: string;
