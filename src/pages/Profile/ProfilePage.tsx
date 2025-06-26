@@ -1,14 +1,12 @@
 import ProfileAppBar from "@/components/ProfileAppBar";
-import MealMatesLogo from '../../assets/MealMatesLogo.webp';
 import OrderCard from "@/components/OrderCard";
 import StatCard from "@/components/StatCard";
 import { useNavigate } from "react-router";
-import { useUserData } from "@/api/User";
+import { useUserData, useUserStats } from "@/api/User";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { useAllUserProducts, useUserBoughtProducts } from "@/api/Product";
-import { EuroIcon, PiggyBank, SettingsIcon, Zap } from "lucide-react";
-import { useSellerEarnings } from "@/api/Seller";
+import { PackageOpen, PiggyBank, SettingsIcon, ShoppingCart, Zap } from "lucide-react";
 
 const ProfilePage = () => {
     const { isLoading: isLoadingUserData, data: userData } = useUserData();
@@ -17,14 +15,13 @@ const ProfilePage = () => {
 
     const { isLoading: isLoadingUserBoughtProductsData, data: userBoughtProductsData } = useUserBoughtProducts();
 
-    const { isLoading: isLoadingSellerEarnings, data: sellerEarnings } = useSellerEarnings();
+    const { isLoading: isLoadingUserStats, data: userStats } = useUserStats();
 
     const navigate = useNavigate();
 
     const handleSettings = () => {
         navigate('/app/profile/settings');
     };
-
 
     return (
         <div className="min-h-screen pb-20 relative bg-gray-100">
@@ -53,13 +50,41 @@ const ProfilePage = () => {
                 </button>
             </ProfileAppBar>
             <div className="max-w-md mx-auto px-4">
-                <div className="max-w-xl m-auto">
-                    <img
-                        src={MealMatesLogo}
-                        alt="logo"
-                        className="my-7 w-16 ml-auto mr-auto"
-                    />
-                </div>
+                <section className="my-8">
+                    <div className="grid grid-cols-2 gap-4">
+                        <StatCard
+                            title="CO2 évité"
+                            value="51"
+                            unit="KW/h"
+                            className="text-purple-dark"
+                            icon={<Zap className="size-[80px]" />}
+                        />
+                        <StatCard
+                            title="Porte-monnaie"
+                            value={!isLoadingUserStats && userStats?.totalEarnings !== undefined ? userStats?.totalEarnings.toFixed(2) : "0.00"}
+                            unit="EUR"
+                            isLoading={isLoadingUserStats}
+                            className="text-purple-dark "
+                            icon={<PiggyBank className="size-[80px]" />}
+                        />
+                        <StatCard
+                            title="Offres vendues"
+                            value={!isLoadingUserStats && userStats?.completedTransactions !== undefined ? userStats?.completedTransactions.toString() : "0"}
+                            unit=""
+                            isLoading={isLoadingUserStats}
+                            className="text-purple-dark "
+                            icon={<PackageOpen className="size-[80px]" />}
+                        />
+                        <StatCard
+                            title="Offres achetées"
+                            value={!isLoadingUserStats && userStats?.boughtTransactions !== undefined ? userStats?.boughtTransactions.toString() : "0"}
+                            unit=""
+                            isLoading={isLoadingUserStats}
+                            className="text-purple-dark "
+                            icon={<ShoppingCart className="size-[80px]" />}
+                        />
+                    </div>
+                </section>
                 <section className="mb-8">
                     <div className="flex items-center justify-between mb-4">
                         <h2 className="text-lg font-semibold">Vos dernières commandes</h2>
@@ -114,32 +139,6 @@ const ProfilePage = () => {
                         </div>
                     )}
                 </section>
-
-
-                <div className="grid grid-cols-2 gap-4 mt-8">
-                    <StatCard
-                        title="CO2 évité"
-                        value="51"
-                        unit="KW/h"
-                        className="text-purple-dark"
-                        icon={<Zap className="size-[80px]" />}
-                    />
-                    <StatCard
-                        title="Argent économisé"
-                        value="32"
-                        unit="EUR"
-                        className="text-purple-dark"
-                        icon={<EuroIcon className="size-[80px]" />}
-                    />
-                    <StatCard
-                        title="Porte-monnaie"
-                        value={!isLoadingSellerEarnings && sellerEarnings?.totalEarnings !== undefined ? sellerEarnings?.totalEarnings.toFixed(2) : "0.00"}
-                        unit="EUR"
-                        isLoading={isLoadingSellerEarnings}
-                        className="text-purple-dark "
-                        icon={<PiggyBank className="size-[80px]" />}
-                    />
-                </div>
             </div>
         </div>
     );
