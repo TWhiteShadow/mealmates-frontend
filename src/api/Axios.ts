@@ -12,7 +12,7 @@ const api = axios.create({
   withCredentials: true,
 });
 
-const whitelistURLs = ['/user/logged'];
+const whitelistURLs = ['/user/logged', '/login_check'];
 
 api.interceptors.response.use(
   (response) => {
@@ -30,36 +30,15 @@ api.interceptors.response.use(
     );
 
     if (
+      toastsOnErrors &&
       error.response?.status === 401 &&
-      !originalRequest._retry &&
-      !originalRequest.url.includes('/token/refresh')
+      error.response?.data?.message
     ) {
-      originalRequest._retry = true;
-      try {
-        await refreshToken();
-        return api(originalRequest);
-      } catch (refreshError) {
-        if (isWhitelisted) {
-          return Promise.resolve(error.response);
-        }
-
-        if (navigationRef.navigate) {
-          const redirectURI = locationRef.location;
-          navigationRef.navigate(`/app/login?redirectURI=${redirectURI}`);
-          // toast.warning('Vous devez être connecté pour accéder à cette page.');
-        }
-        return Promise.reject(refreshError);
-      }
-    }
-
-    // 2) only redirect for final auth failures
-    if (error.response?.status === 401 || error.response?.status === 403) {
-      if (isWhitelisted) {
-        return Promise.resolve(error.response);
-      }
-      if (navigationRef.navigate) {
-        navigationRef.navigate('/app/login');
-      }
+      const message =
+        error.response.data.message === 'Bad credentials.'
+          ? 'Identifiants incorrects.'
+          : error.response.data.message;
+      toast.error(message);
     }
 
     if (toastsOnErrors && error.response?.data?.success === false) {
@@ -75,6 +54,43 @@ api.interceptors.response.use(
         }
       });
     }
+
+    // For whitelisted URLs, immediately reject without any redirects
+    if (
+      isWhitelisted &&
+      (error.response?.status === 401 || error.response?.status === 403)
+    ) {
+      return;
+    }
+
+    if (
+      error.response?.status === 401 &&
+      !originalRequest._retry &&
+      !originalRequest.url.includes('/token/refresh')
+    ) {
+      originalRequest._retry = true;
+      try {
+        await refreshToken();
+        return api(originalRequest);
+      } catch (refreshError) {
+        if (!isWhitelisted && navigationRef.navigate) {
+          const redirectURI = locationRef.location;
+          navigationRef.navigate(`/app/login?redirectURI=${redirectURI}`);
+        }
+        return Promise.reject(refreshError);
+      }
+    }
+
+    // Only redirect for final auth failures on non-whitelisted URLs
+    if (
+      !isWhitelisted &&
+      (error.response?.status === 401 || error.response?.status === 403)
+    ) {
+      if (navigationRef.navigate) {
+        navigationRef.navigate('/app/login');
+      }
+    }
+
     return Promise.reject(error);
   }
 );

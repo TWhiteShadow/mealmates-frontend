@@ -3,7 +3,7 @@ import { cn } from '../../lib/utils';
 import logo from '../../assets/mealmates-icon.png';
 import googleLogo from '../../assets/google_logo.svg';
 import githubLogo from '../../assets/github_logo.svg';
-import { useSearchParams } from 'react-router';
+import { Link, useSearchParams } from 'react-router';
 
 const HomePage = () => {
   const [searchParams] = useSearchParams();
@@ -33,12 +33,12 @@ const HomePage = () => {
             <img src={googleLogo} className='h-full' alt='Google Logo' />
             <span>Connexion avec Google</span>
           </a>
-          <a
-            href={`login/login${redirectParam}`}
+          <Link
+            to={`/app/login/login${redirectParam}`}
             className={cn(buttonVariants({ variant: 'default' }), 'w-full')}
           >
             Connexion par mail
-          </a>
+          </Link>
           <a href='discover' className='text-purple-semi-dark'>
             Ignorer pour le moment
           </a>

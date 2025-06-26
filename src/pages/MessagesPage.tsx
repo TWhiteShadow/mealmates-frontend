@@ -51,7 +51,7 @@ const MessagesPage: React.FC = () => {
 
 
     return (
-        <div className="h-screen relative bg-gray-100 overflow-hidden">
+        <div className="h-screen relative bg-gray-100 overflow-hidden z-20">
             <ProfileAppBar>
                 <div className='relative flex items-center size-full justify-center'>
 
