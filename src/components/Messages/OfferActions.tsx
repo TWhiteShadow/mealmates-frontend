@@ -6,6 +6,8 @@ import { User } from "@/api/Message";
 import { useLocation } from "react-router";
 import CustomQRCode from "@/components/CustomQRCode";
 import QRCodeScanner from "@/components/QRCodeScanner";
+import ReviewDialog from "@/components/ReviewDialog";
+import { useState } from "react";
 
 interface OfferActionsProps {
     offer: Product;
@@ -18,6 +20,7 @@ const OfferActions = ({ offer, transactions, otherParticipant, selectedId }: Off
     const userData = useUserData();
     const isSeller = userData?.data?.id === offer.seller.id;
     const hasBuyer = offer.buyer !== null;
+    const [showReviewDialog, setShowReviewDialog] = useState(false);
 
     const location = useLocation();
     const redirectURI = location.pathname + (selectedId ? `?conversation=${selectedId}` : '');
@@ -141,6 +144,7 @@ const OfferActions = ({ offer, transactions, otherParticipant, selectedId }: Off
     }
     if (!isSeller && hasBuyer && isCompleted && otherParticipant && otherParticipant.id === offer.seller?.id) {
         return (
+            <>
             <div className="flex gap-5 flex-wrap min-h-16 p-4 items-center justify-center bg-white border-t border-gray-200">
                 <div className="textBox text-center">
                     <p className="text-gray-600">Bravo ! Vous avez acheté "{offer.name}" pour {lastTransaction.amount}€</p>
@@ -149,9 +153,20 @@ const OfferActions = ({ offer, transactions, otherParticipant, selectedId }: Off
                 <Button
                     size={"lg"}
                     className="bg-purple-dark hover:bg-purple-dark/90 text-white"
-                    onClick={() => { }}
+                    onClick={() => setShowReviewDialog(true)}
                 >Laisser un avis</Button>
             </div>
+            {showReviewDialog && otherParticipant && (
+                <ReviewDialog
+                    isOpen={showReviewDialog}
+                    onClose={() => setShowReviewDialog(false)}
+                    transaction={lastTransaction}
+                    offer={offer}
+                    otherParticipant={otherParticipant}
+                    isBuyer={!isSeller}
+                />
+            )}
+            </>
         );
     }
 
@@ -165,13 +180,13 @@ const OfferActions = ({ offer, transactions, otherParticipant, selectedId }: Off
                 <Button
                     size={"lg"}
                     className="bg-purple-dark hover:bg-purple-dark/90 text-white"
-                    onClick={() => { }}
+                    onClick={() => setShowReviewDialog(true)}
                 >Laisser un avis</Button>
             </div>
         );
     }
 
-    return null;
+    return (<></>);
 }
 
 
