@@ -94,7 +94,7 @@ const SimpleBottomNavigation = () => {
           color: 'var(--color-purple-dark)',
         },
       }}
-      className='z-10'
+      className='z-50 h-14'
     >
       <BottomNavigation
         showLabels

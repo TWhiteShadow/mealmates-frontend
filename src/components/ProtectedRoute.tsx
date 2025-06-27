@@ -16,9 +16,20 @@ const ProtectedRoute: FC<ProtectedRouteProps> = ({ children }) => {
       try {
         const response = await userLogged();
         setIsAuthenticated(response?.success === true);
-      } catch (error) {
-        setIsAuthenticated(false);
-        console.error('Error checking authentication:', error);
+      } catch (error: any) {
+        if (error?.response?.status === 401 || error?.response?.status === 403) {
+          // Let Axios handle the refresh token logic
+          await new Promise(resolve => setTimeout(resolve, 500));
+          
+          try {
+            const retryResponse = await userLogged();
+            setIsAuthenticated(retryResponse?.success === true);
+          } catch (retryError: any) {
+            setIsAuthenticated(false);
+          }
+        } else {
+          setIsAuthenticated(false);
+        }
       }
     };
 
@@ -32,6 +43,7 @@ const ProtectedRoute: FC<ProtectedRouteProps> = ({ children }) => {
   }
 
   if (!isAuthenticated) {
+    // triggers twice but only in dev mode
     toast.info('Vous devez être connecté pour accéder à cette page.');
     return <Navigate to={`/app/login?redirectURI=${location.pathname}`} replace />;
   }

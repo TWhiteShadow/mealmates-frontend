@@ -1,4 +1,5 @@
 import { Product } from "@/api/Product";
+import logo from '@/assets/MealMatesLogo.webp';
 
 interface OrderCardProps {
   product: Product;
@@ -12,11 +13,17 @@ const OrderCard = ({ product }: OrderCardProps) => {
 
   return (
     <div className="flex items-center gap-4 bg-white p-4 rounded-lg drop-shadow-lg max-w-full cursor-pointer hover:bg-purple-50 transition-all">
-      <img
-        src={imageUrl}
-        alt={product.name}
-        className="w-16 h-16 rounded-lg object-cover"
-      />
+      {product.images?.[0] ? (
+        <img
+          src={imageUrl}
+          alt={product.name}
+          className="size-16 object-cover rounded-lg pointer-events-none"
+        />
+      ) : (
+        <div className="size-16 bg-purple-100 rounded-lg flex items-center justify-center">
+          <img src={logo} alt="" className='w-1/3' />
+        </div>
+      )}
       <div className="flex-1 max-w-[calc(100%-5rem)]">
         <h3 className="font-semibold">{product.name}</h3>
         {product.description && (

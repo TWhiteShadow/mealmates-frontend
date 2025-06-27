@@ -7,6 +7,7 @@ import { calculateDistanceInKm } from '@/utils/geoUtils';
 import dayjs from 'dayjs';
 import 'dayjs/locale/fr';
 import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
+import logo from '@/assets/MealMatesLogo.webp';
 
 dayjs.extend(isSameOrBefore);
 dayjs.locale('fr');
@@ -31,24 +32,30 @@ const DiscoverCard = ({ product, onClick }: DiscoverCardProps) => {
 
     return (
         <div
-            className="bg-white w-full h-full rounded-lg shadow-md overflow-hidden cursor-pointer transform hover:bg-purple-50 transition-all "
+            className="bg-white size-full rounded-lg shadow-md overflow-hidden cursor-pointer transform hover:bg-purple-50 transition-all "
             onClick={() => onClick(product.id)}
         >
-            {product.images && product.images.length > 0 && (
-                <div className="relative h-48">
+            <div className="relative h-48">
+                {product.images?.[0] ? (
                     <img
-                        src={backEndUrl + '/images/files/' + product.images[0].name}
+                        src={`${backEndUrl}/images/files/${product.images?.[0]?.name}`}
                         alt={product.name}
-                        className="w-full h-full object-cover p-1 rounded-lg"
+                        className="size-full p-1 object-cover rounded-lg pointer-events-none"
                     />
-                    {distance && (
-                        <div className="absolute top-2 right-2 bg-white/90 backdrop-blur-sm px-2 py-1 rounded-full text-xs text-gray-700 font-medium flex items-center gap-1">
-                            <MapPin size={12} />
-                            {distance} km
+                ) : (
+                    <div className="p-1 h-full">
+                        <div className='size-full bg-purple-100 rounded-lg flex items-center justify-center'>
+                            <img src={logo} alt="" className='w-1/3' />
                         </div>
-                    )}
-                </div>
-            )}
+                    </div>
+                )}
+                {distance && (
+                    <div className="absolute top-2 right-2 bg-white/90 backdrop-blur-sm px-2 py-1 rounded-full text-xs text-gray-700 font-medium flex items-center gap-1">
+                        <MapPin size={12} />
+                        {distance} km
+                    </div>
+                )}
+            </div>
 
             <div className='flex flex-col h-[calc(100%-12rem)]'>
                 <div className="p-2 flex-1">

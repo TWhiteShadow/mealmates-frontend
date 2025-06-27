@@ -11,12 +11,10 @@ import {
 import { activeTabAtom, unreadNotificationsCountAtom } from '@/atoms/notifications';
 import ProfileAppBar from '@/components/ProfileAppBar';
 import {
-    ArrowLeft,
     Bell,
     MessageSquare
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { Button } from '@/components/ui/button';
 import { useSearchParams } from 'react-router';
 
 const MessagesPage: React.FC = () => {
@@ -53,16 +51,10 @@ const MessagesPage: React.FC = () => {
 
 
     return (
-        <div className="h-screen relative bg-gray-100 overflow-hidden">
+        <div className="h-screen relative bg-gray-100 overflow-hidden z-20">
             <ProfileAppBar>
-                <div className='relative flex items-center w-full h-full justify-center'>
-                    <Button
-                        variant="ghost"
-                        className='absolute left-3 p-1'
-                        onClick={() => window.history.back()}
-                    >
-                        <ArrowLeft />
-                    </Button>
+                <div className='relative flex items-center size-full justify-center'>
+
                     <h1 className='font-bold text-xl'>
                         {activeTab === 'messages' ? 'Messages' : 'Notifications'}
                     </h1>

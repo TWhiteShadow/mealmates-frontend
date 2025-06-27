@@ -61,6 +61,12 @@ export type UserDataResponse = {
   user: UserData;
 };
 
+export type UserStatsResponse = {
+  totalEarnings: number;
+  completedTransactions: number;
+  boughtTransactions: number;
+};
+
 export interface ApiErrorResponse {
   errors?: Record<string, string>;
 }
@@ -199,3 +205,15 @@ export async function userLogged(): Promise<any> {
   const response = await api.get(`/user/logged`);
   return response.data;
 }
+
+export const getUserStats = async (): Promise<UserStatsResponse> => {
+  const response = await api.get('/user/stats');
+  return response.data;
+};
+
+export const useUserStats = () => {
+  return useQuery({
+    queryKey: ['userStats'],
+    queryFn: getUserStats,
+  });
+};

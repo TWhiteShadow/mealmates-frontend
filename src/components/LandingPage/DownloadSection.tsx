@@ -1,5 +1,6 @@
 import { Download } from 'lucide-react';
 import PhoneMockup from '../../assets/phone-mockup.png';
+import { Link } from 'react-router';
 
 function DownloadSection() {
   return (
@@ -19,8 +20,8 @@ function DownloadSection() {
               MealMates.
             </p>
             <div className='flex flex-col sm:flex-row gap-4'>
-              <a
-                href='/app'
+              <Link
+                to='/app'
                 className='inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-primary bg-white hover:bg-gray-100 transition-colors'
               >
                 <svg
@@ -47,9 +48,9 @@ function DownloadSection() {
                   />
                 </svg>
                 App Store
-              </a>
-              <a
-                href='/app'
+              </Link>
+              <Link
+                to='/app'
                 className='inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-primary bg-white hover:bg-gray-100 transition-colors'
               >
                 <svg
@@ -74,7 +75,7 @@ function DownloadSection() {
                   />
                 </svg>
                 Google Play
-              </a>
+              </Link>
             </div>
           </div>
           <div className='relative'>

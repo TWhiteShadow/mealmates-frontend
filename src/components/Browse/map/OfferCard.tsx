@@ -2,6 +2,7 @@ import { Product } from '@/api/Product';
 import { Button } from '@/components/ui/button';
 import { XCircle } from 'lucide-react';
 import { useNavigate } from 'react-router';
+import logo from '@/assets/MealMatesLogo.webp';
 
 interface OfferCardProps {
     offer: Product | null;
@@ -30,13 +31,18 @@ const OfferCard: React.FC<OfferCardProps> = ({ offer, onClose }) => {
                 </button>
 
                 <div className="flex gap-6">
-                    {offer.images?.[0] && (
+                    {offer.images?.[0] ? (
                         <img
                             src={`${import.meta.env.VITE_BACKEND_URL}/images/files/${offer.images?.[0]?.name}`}
                             alt={offer.name}
                             className="size-48 object-cover rounded-lg pointer-events-none"
                         />
+                    ) : (
+                        <div className="size-48 bg-purple-100 rounded-lg flex items-center justify-center">
+                            <img src={logo} alt="" className='w-1/3' />
+                        </div>
                     )}
+
                     <div className="flex-1 space-y-2">
                         <h2 className="text-xl font-bold text-purple-dark">{offer.name}</h2>
                         <p className="text-gray-600">{offer.description}</p>

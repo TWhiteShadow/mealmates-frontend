@@ -167,8 +167,8 @@ const Browse: React.FC<BrowseProps> = ({
   }
 
   return (
-    <div className="m-auto w-full h-full relative margin-auto z-0">
-      <div className="w-full h-full relative">
+    <div className="m-auto size-full relative margin-auto z-0">
+      <div className="size-full relative">
         {isLoadingLocation || queryLoading ? (
           <div className="absolute inset-0 flex items-center justify-center bg-gray-100">
             <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-dark"></div>

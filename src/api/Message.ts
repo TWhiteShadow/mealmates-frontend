@@ -1,18 +1,12 @@
 import api from './Axios';
 import { useQuery } from '@tanstack/react-query';
+import { Product } from './Product';
 
 export interface User {
   id: number;
   email: string;
   first_name: string;
   last_name: string;
-}
-
-export interface Offer {
-  id: number;
-  name: string;
-  price: number;
-  description: string;
 }
 
 export interface Message {
@@ -26,7 +20,7 @@ export interface Message {
 
 export interface Conversation {
   id: number;
-  offer: Offer;
+  offer: Product;
   buyer: User;
   seller: User;
   messages: Message[];
@@ -36,7 +30,7 @@ export interface Conversation {
 
 export interface ConversationPreview {
   id: number;
-  offer: Offer;
+  offer: Product;
   buyer: User;
   seller: User;
   messages: Message[];

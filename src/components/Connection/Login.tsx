@@ -3,7 +3,7 @@ import { loginUser } from '@/api/User';
 import { cn } from '@/lib/utils';
 import { buttonVariants } from '../ui/button';
 import logo from '@/assets/MealMatesLogo.webp';
-import { useNavigate, useSearchParams } from 'react-router';
+import { Link, useNavigate, useSearchParams } from 'react-router';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -26,14 +26,13 @@ const Login = () => {
       navigate(redirectURI || '/app/discover', { replace: true });
     } catch (err) {
       console.error(err);
-      setError('Email ou mot de passe incorrect.');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className='flex flex-col items-center justify-center h-screen bg-gray-100'>
+    <div className='flex flex-col items-center justify-center h-screen z-20 relative'>
       <div className='relative flex flex-col items-center space-y-4'>
         <img src={logo} alt='logo' className='w-[90vw] max-w-30' />
       </div>
@@ -71,11 +70,8 @@ const Login = () => {
           {loading ? 'Connexion...' : 'Valider'}
         </button>
       </form>
-      <div className='text-center mt-4 text-sm font-bold flex space-x-4'>
-        <a href='../login/register' className='text-purple-400'>
-          Créez un compte.
-        </a>
-        <a href='../login/register'>Mot de passe oublié</a>
+      <div className='text-center mt-4 text-sm font-bold flex space-x-4 rounded-lg bg-gray-100 p-2'>
+        <span>Vous n'avez pas de compte ?</span><Link to="/app/login/register" className='text-purple-400 hover:text-purple-600 '>Créez un compte !</Link>
       </div>
     </div>
   );

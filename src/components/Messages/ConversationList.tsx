@@ -24,7 +24,7 @@ const ConversationList: React.FC = () => {
 
   if (isLoading && conversations.length === 0) {
     return (
-      <div className='overflow-y-auto h-[calc(100vh-16rem)] bg-white rounded-lg p-4 space-y-3'>
+      <div className='overflow-y-auto h-[calc(100vh-14rem)] bg-white rounded-lg p-4 space-y-3'>
         {Array.from({ length: 5 }).map((_, index) => (
           <div
             key={index}
@@ -43,7 +43,7 @@ const ConversationList: React.FC = () => {
 
   if (error) {
     return (
-      <div className='overflow-y-auto h-[calc(100vh-16rem)] bg-white rounded-lg p-4'>
+      <div className='overflow-y-auto h-[calc(100vh-14rem)] bg-white rounded-lg p-4'>
         <div className='text-center py-10'>
           <p className='text-red-500 mb-4'>
             Erreur lors du chargement des conversations
@@ -56,7 +56,7 @@ const ConversationList: React.FC = () => {
 
   if (!isLoading && conversations.length === 0) {
     return (
-      <div className='overflow-y-auto h-[calc(100vh-16rem)] bg-white rounded-lg p-4'>
+      <div className='overflow-y-auto h-[calc(100vh-14rem)] bg-white rounded-lg p-4'>
         <div className='text-center py-10'>
           <p className='text-gray-500 mb-4'>
             Vous n'avez pas encore de conversations
@@ -70,7 +70,7 @@ const ConversationList: React.FC = () => {
     );
   }
   return (
-    <div className='overflow-y-auto h-[calc(100vh-16rem)] bg-white rounded-lg'>
+    <div className='overflow-y-auto h-[calc(100vh-14rem)] bg-white rounded-lg'>
       <div className='p-4 border-b border-gray-200'>
         <h2 className='text-lg font-semibold text-gray-800'>Messages</h2>
       </div>
@@ -84,9 +84,8 @@ const ConversationList: React.FC = () => {
           return (
             <div
               key={conversation.id}
-              className={`p-4 flex items-center hover:bg-gray-50 cursor-pointer border-b border-gray-100 ${
-                selectedId === conversation.id ? 'bg-purple-50' : ''
-              }`}
+              className={`p-4 flex items-center hover:bg-gray-50 cursor-pointer border-b border-gray-100 ${selectedId === conversation.id ? 'bg-purple-50' : ''
+                }`}
               onClick={() => handleSelectConversation(conversation)}
             >
               <div className='flex-shrink-0'>
@@ -124,9 +123,9 @@ const ConversationList: React.FC = () => {
                 </div>
 
                 {conversation.lastMessage && (
-                  <p className='text-xs text-gray-500 mt-1 line-clamp-3'>
+                  <p className='text-xs text-gray-500 mt-1 line-clamp-3 break-all'>
                     {conversation.lastMessage.images &&
-                    conversation.lastMessage.images.length > 0
+                      conversation.lastMessage.images.length > 0
                       ? '📷 Image'
                       : conversation.lastMessage.content}
                   </p>

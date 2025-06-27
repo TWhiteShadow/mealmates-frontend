@@ -98,7 +98,7 @@ function BrowsePage() {
   const activeFiltersCount = getActiveFiltersCount();
 
   return (
-    <div className="h-screen relative bg-gray-100 overflow-hidden">
+    <div className="h-screen relative bg-gray-100 overflow-hidden z-20">
       <div className='fixed top-0 left-0 w-full z-10'>
         <div className={`max-w-md mx-auto pt-6 pb-6 px-4 xs:px-9 ${!showRadiusFilter ? 'rounded-b-[20px]' : ''} bg-purple-dark/10 backdrop-blur-lg`}>
           <SearchBar
