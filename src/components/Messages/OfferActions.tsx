@@ -31,7 +31,14 @@ const OfferActions = ({ offer, transactions, otherParticipant, selectedId }: Off
     const reserveProductMutation = useReserveProductMutation();
     const confirmReservationMutation = useConfirmReservationMutation();
     const cancelReservationMutation = useCancelReservationMutation();
+    const { data: paymentLink, isLoading } = useTransactionPaymentLink(lastTransaction?.id || 0, redirectURI);
+    const { data: qrCodeUrl } = useGeneratedQRCodeToken(lastTransaction?.id || 0);
 
+    const handleScan = (value: string) => {
+        if (value.startsWith(import.meta.env.VITE_BACKEND_URL)) {
+            validateQRCode(value);
+        }
+    }
 
     if (!isSeller && !hasBuyer) {
 
@@ -92,7 +99,6 @@ const OfferActions = ({ offer, transactions, otherParticipant, selectedId }: Off
     }
 
     if (!isSeller && hasBuyer && isConfirmed && otherParticipant && otherParticipant.id === offer.seller.id) {
-        const { data: paymentLink, isLoading } = useTransactionPaymentLink(lastTransaction.id, redirectURI);
         return (
             <div className="flex gap-5 flex-wrap min-h-16 p-4 items-center justify-center bg-white border-t border-gray-200">
                 <div className="textBox text-center">
@@ -109,7 +115,6 @@ const OfferActions = ({ offer, transactions, otherParticipant, selectedId }: Off
     }
 
     if (!isSeller && hasBuyer && isPending && otherParticipant && otherParticipant.id === offer.seller.id) {
-        const { data: qrCodeUrl } = useGeneratedQRCodeToken(lastTransaction?.id || 0);
         return (
             <div className="flex gap-5 flex-wrap min-h-16 p-4 items-center justify-center bg-white border-t border-gray-200">
                 <div className="textBox text-center">
@@ -122,11 +127,6 @@ const OfferActions = ({ offer, transactions, otherParticipant, selectedId }: Off
     }
 
     if (isSeller && hasBuyer && isPending && otherParticipant && otherParticipant.id === offer.buyer?.id) {
-        const handleScan = (value: string) => {
-            if (value.startsWith(import.meta.env.VITE_BACKEND_URL)) {
-                validateQRCode(value);
-            }
-        }
         return (
             <div className="flex gap-5 flex-wrap min-h-16 p-4 items-center justify-center bg-white border-t border-gray-200">
                 <div className="textBox text-center">
