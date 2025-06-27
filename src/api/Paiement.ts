@@ -1,6 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import api from './Axios';
-import { url } from 'inspector';
 
 export async function reserveProduct(id: number) {
   const response = await api.post(`/payments/reserve/${id}`);
