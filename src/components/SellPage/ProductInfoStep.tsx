@@ -49,7 +49,7 @@ const ProductInfoStep = () => {
                 <input
                     {...register('price', { valueAsNumber: true })}
                     type="number"
-                    step="0.01"
+                    step="0.10"
                     min="0"
                     className="w-full p-3 bg-white border border-gray-300 rounded-lg"
                     placeholder="Ex: 1.99"
@@ -59,9 +59,9 @@ const ProductInfoStep = () => {
                         <p className="text-xs text-gray-500">
                             Vous serez payé {(price * (1 - Number(import.meta.env.VITE_SERVICE_FEES))).toFixed(2)}€ de ce montant après la commission.
                         </p>
-                        <CustomTooltip 
-                        trigger={<Info className="inline-block ml-1 w-4 h-4 text-purple-dark cursor-pointer" />}
-                        content="Le montant final que vous recevrez après déduction des frais de service de MealMates."
+                        <CustomTooltip
+                            trigger={<Info className="inline-block ml-1 w-4 h-4 text-purple-dark cursor-pointer" />}
+                            content="Le montant final que vous recevrez après déduction des frais de service de MealMates."
                         />
                     </div>
                 )}
