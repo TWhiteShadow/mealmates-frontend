@@ -4,7 +4,6 @@ import { useAtom } from 'jotai';
 import { useNavigate } from 'react-router';
 import { sellFormDataAtom } from './atoms';
 import { ProductFormData, useAddProductMutation } from '@/api/Product';
-import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 
 import ProductInfoStep from './ProductInfoStep';

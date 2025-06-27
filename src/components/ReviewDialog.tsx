@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Star, ArrowLeft, ArrowRight, X } from 'lucide-react';
+import { Star, ArrowLeft, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogTitle, DialogContent } from '@/components/ui/dialog';
 import { cn } from '@/lib/utils';
