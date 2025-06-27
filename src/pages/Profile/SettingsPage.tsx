@@ -254,7 +254,7 @@ const SettingsPage = () => {
       </ProfileAppBar>
       <div className='max-w-md mx-auto px-4'>
         <div className='max-w-xl m-auto'>
-          <UserAvatar user={userData} size="xl" showInitials={false} className="my-7 mx-auto drop-shadow-lg" />
+          <UserAvatar user={userData} size="xl" className="my-7 mx-auto drop-shadow-lg" />
           <span className='font-semibold text-lg text-purple-dark mx-auto block text-center'>
             {isLoading ? (
               <Skeleton className="h-6 w-32 mx-auto" />

@@ -29,7 +29,7 @@ const ProfilePage = () => {
                 <div className="flex items-center gap-3">
                     {!isLoadingUserData ? (
                         <>
-                            <UserAvatar user={userData} size="md" showInitials={false} />
+                            <UserAvatar user={userData} size="md" />
                             <span className="font-semibold text-lg">{userData?.first_name + " " + userData?.last_name}</span>
                         </>
                     ) : (
