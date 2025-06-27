@@ -68,8 +68,6 @@ const SellPageForm = () => {
 
             const response = await addProductMutation.mutateAsync(finalFormData);
 
-            toast.success('Votre produit a été mis en vente avec succès!');
-
             const confirmedProduct = {
                 ...finalFormData,
                 id: response?.id || Date.now()
