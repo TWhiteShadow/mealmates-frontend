@@ -43,7 +43,7 @@ const OfferActions = ({ offer, transactions, otherParticipant, selectedId }: Off
     if (!isSeller && !hasBuyer) {
 
         return (
-            <div className="flex gap-2 h-16 items-center justify-center bg-white border-t border-gray-200">
+            <div className="flex gap-2 min-h-16 p-4 items-center justify-center bg-white border-t border-gray-200">
                 <Button
                     size={"lg"}
                     className="bg-purple-dark hover:bg-purple-dark/90 text-white"
@@ -52,9 +52,10 @@ const OfferActions = ({ offer, transactions, otherParticipant, selectedId }: Off
             </div>
         );
     }
+
     if (!isSeller && hasBuyer && isReserved && otherParticipant && otherParticipant.id === offer.seller?.id) {
         return (
-            <div className="flex gap-2 h-16 items-center justify-center bg-white border-t border-gray-200">
+            <div className="flex gap-2 min-h-16 p-4 items-center justify-center bg-white border-t border-gray-200">
                 <div className="textBox text-center">
                     <p className="text-gray-600">Vous avez réservé ce produit ! </p>
                     <p className="text-gray-600">{otherParticipant.first_name} {otherParticipant.last_name} à maintenant 72 heures pour accepter. </p>
@@ -70,7 +71,7 @@ const OfferActions = ({ offer, transactions, otherParticipant, selectedId }: Off
 
     if (isSeller && hasBuyer && isReserved && otherParticipant && otherParticipant.id === offer.buyer?.id) {
         return (
-            <div className="flex gap-2 h-16 items-center justify-center bg-white border-t border-gray-200">
+            <div className="flex gap-2 min-h-16 p-4 items-center justify-center bg-white border-t border-gray-200">
                 <div className="textBox text-center">
                     <p className="text-gray-600">{otherParticipant.first_name} {otherParticipant.last_name} souhaite réserver ce produit.</p>
                 </div>
@@ -82,6 +83,7 @@ const OfferActions = ({ offer, transactions, otherParticipant, selectedId }: Off
             </div>
         );
     }
+
     if (isSeller && hasBuyer && isConfirmed && otherParticipant && otherParticipant.id === offer.buyer?.id) {
         return (
             <div className="flex gap-5 flex-wrap min-h-16 p-4 items-center justify-center bg-white border-t border-gray-200">
@@ -152,6 +154,7 @@ const OfferActions = ({ offer, transactions, otherParticipant, selectedId }: Off
             </div>
         );
     }
+
     if (isSeller && hasBuyer && isCompleted && otherParticipant && otherParticipant.id === offer.buyer?.id) {
         return (
             <div className="flex gap-5 flex-wrap min-h-16 p-4 items-center justify-center bg-white border-t border-gray-200">
@@ -168,6 +171,7 @@ const OfferActions = ({ offer, transactions, otherParticipant, selectedId }: Off
         );
     }
 
+    return null;
 }
 
 
