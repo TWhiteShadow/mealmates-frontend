@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { Star, X, ArrowLeft, ArrowRight } from 'lucide-react';
+import { Star, ArrowLeft, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Dialog, DialogTitle, DialogContent } from '@/components/ui/dialog';
 import { cn } from '@/lib/utils';
-import { toast } from 'sonner';
 import { useSubmitTransactionReviewMutation, ReviewData } from '@/api/Paiement';
 import { Product, Transaction } from '@/api/Product';
 import { User } from '@/api/Message';
@@ -25,58 +25,55 @@ const ReviewDialog: React.FC<ReviewDialogProps> = ({
   otherParticipant,
   isBuyer
 }) => {
-  const [currentStep, setCurrentStep] = useState(0);
+  const [currentStep, setCurrentStep] = useState<number>(0);
   const [productQualityRating, setProductQualityRating] = useState<number>(0);
   const [appointmentRespectRating, setAppointmentRespectRating] = useState<number>(0);
   const [friendlinessRating, setFriendlinessRating] = useState<number>(0);
   const [hoveredRating, setHoveredRating] = useState<number>(0);
 
-  const submitReviewMutation = useSubmitTransactionReviewMutation();
+  const submitReviewMutation = useSubmitTransactionReviewMutation();;
 
-  // Define steps based on user type
-  const steps = isBuyer
-    ? [
-      {
-        key: 'productQuality',
-        title: 'Comment était la qualité du produit ?',
-        subtitle: 'Votre avis nous aide à améliorer la qualité des offres',
-        rating: productQualityRating,
-        setRating: setProductQualityRating
-      },
-      {
-        key: 'appointmentRespect',
-        title: 'Le vendeur a-t-il respecté le rendez-vous ?',
-        subtitle: 'Ponctualité et respect des horaires convenus',
-        rating: appointmentRespectRating,
-        setRating: setAppointmentRespectRating
-      },
-      {
-        key: 'friendliness',
-        title: 'Comment s\'est passé l\'échange ?',
-        subtitle: 'Amabilité et courtoisie du vendeur',
-        rating: friendlinessRating,
-        setRating: setFriendlinessRating
-      }
-    ]
-    : [
-      {
-        key: 'appointmentRespect',
-        title: 'L\'acheteur a-t-il respecté le rendez-vous ?',
-        subtitle: 'Ponctualité et respect des horaires convenus',
-        rating: appointmentRespectRating,
-        setRating: setAppointmentRespectRating
-      },
-      {
-        key: 'friendliness',
-        title: 'Comment s\'est passé l\'échange ?',
-        subtitle: 'Amabilité et courtoisie de l\'acheteur',
-        rating: friendlinessRating,
-        setRating: setFriendlinessRating
-      }
-    ];
+  const steps = isBuyer ? [
+    {
+      key: 'productQuality',
+      title: 'Comment était la qualité du produit ?',
+      subtitle: 'Votre avis nous aide à améliorer la qualité des offres',
+      rating: productQualityRating,
+      setRating: setProductQualityRating
+    },
+    {
+      key: 'appointmentRespect',
+      title: 'Le vendeur a-t-il respecté le rendez-vous ?',
+      subtitle: 'Ponctualité et respect des horaires convenus',
+      rating: appointmentRespectRating,
+      setRating: setAppointmentRespectRating
+    },
+    {
+      key: 'friendliness',
+      title: 'Comment s\'est passé l\'échange ?',
+      subtitle: 'Amabilité et courtoisie du vendeur',
+      rating: friendlinessRating,
+      setRating: setFriendlinessRating
+    }
+  ] : [
+    {
+      key: 'appointmentRespect',
+      title: 'L\'acheteur a-t-il respecté le rendez-vous ?',
+      subtitle: 'Ponctualité et respect des horaires convenus',
+      rating: appointmentRespectRating,
+      setRating: setAppointmentRespectRating
+    },
+    {
+      key: 'friendliness',
+      title: 'Comment s\'est passé l\'échange ?',
+      subtitle: 'Amabilité et courtoisie de l\'acheteur',
+      rating: friendlinessRating,
+      setRating: setFriendlinessRating
+    }
+  ];
 
   const currentStepData = steps[currentStep];
-  const isLastStep = currentStep === steps.length - 1;
+  const isLastStep = currentStep === (steps.length - 1);
   const canGoNext = currentStepData.rating > 0;
 
   const handleStarClick = (rating: number) => {
@@ -87,13 +84,13 @@ const ReviewDialog: React.FC<ReviewDialogProps> = ({
     if (isLastStep) {
       handleSubmit();
     } else {
-      setCurrentStep(prev => prev + 1);
+      setCurrentStep(step => step + 1);
     }
   };
 
   const handleBack = () => {
     if (currentStep > 0) {
-      setCurrentStep(prev => prev - 1);
+      setCurrentStep(step => step - 1);
     }
   };
 
@@ -106,10 +103,8 @@ const ReviewDialog: React.FC<ReviewDialogProps> = ({
 
     try {
       await submitReviewMutation.mutateAsync({ transactionId: transaction.id, reviewData });
-      toast.success('Avis soumis avec succès !');
       onClose();
     } catch (error) {
-      toast.error('Erreur lors de la soumission de l\'avis');
       console.error('Error submitting review:', error);
     }
   };
@@ -125,106 +120,100 @@ const ReviewDialog: React.FC<ReviewDialogProps> = ({
     }
   };
 
-  if (!isOpen) return null;
+  const currentRating = hoveredRating || currentStepData.rating;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-xl shadow-xl max-w-lg w-full max-h-[90vh] overflow-hidden">
-        {/* Header */}
-        <div className="bg-purple-dark text-white p-6 relative">
-          <button
-            onClick={onClose}
-            className="absolute top-4 right-4 p-2 hover:bg-white/20 rounded-full transition-colors"
-          >
-            <X className="w-5 h-5" />
-          </button>
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="max-w-md w-full p-0 overflow-hidden bg-white rounded-2xl shadow-2xl border-0">
+        <DialogTitle className="sr-only">
+          Donnez votre avis sur cette transaction
+        </DialogTitle>
 
-          {/* Progress Bar */}
-          <div className="mb-4">
-            <div className="flex justify-between text-sm mb-2">
-              <span>Étape {currentStep + 1} sur {steps.length}</span>
-              <span>{Math.round(((currentStep + 1) / steps.length) * 100)}%</span>
+        <div className="bg-purple-dark text-white p-8 relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-16 translate-x-16"></div>
+          <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/5 rounded-full translate-y-12 -translate-x-12"></div>
+          
+          <div className="mb-6 relative z-10">
+            <div className="flex justify-between text-sm mb-3 text-purple-100">
+              <span className="font-medium">Étape {currentStep + 1} sur {steps.length}</span>
+              <span className="font-medium">{Math.round(((currentStep + 1) / steps.length) * 100)}%</span>
             </div>
-            <div className="w-full bg-white/20 rounded-full h-2">
+            <div className="w-full bg-white/20 rounded-full h-3 overflow-hidden backdrop-blur-sm">
               <div
-                className="bg-white rounded-full h-2 transition-all duration-300"
+                className="bg-gradient-to-r from-white to-purple-100 rounded-full h-3 transition-all duration-500 ease-out shadow-sm"
                 style={{ width: `${((currentStep + 1) / steps.length) * 100}%` }}
               />
             </div>
           </div>
 
-          {/* User Info */}
-          <div className="flex items-center gap-3">
-            <UserAvatar user={otherParticipant} size="sm" />
+          <div className="flex items-center gap-4 relative z-10">
+            <div className="relative">
+              <UserAvatar user={otherParticipant} size="sm" />
+            </div>
             <div>
-              <h3 className="font-medium text-white">
+              <h3 className="font-semibold text-white text-lg">
                 {otherParticipant.first_name} {otherParticipant.last_name}
               </h3>
-              <p className="text-purple-100 text-sm">
+              <p className="text-purple-100 text-sm font-medium">
                 {isBuyer ? 'Vendeur' : 'Acheteur'} • {product.name}
               </p>
             </div>
           </div>
         </div>
 
-        {/* Content */}
-        <div className="p-6">
-          <div className="text-center space-y-6">
-            {/* Question */}
-            <div className="space-y-2">
-              <h2 className="text-xl font-semibold text-gray-900">
+        <div className="p-8">
+          <div className="text-center space-y-8">
+            <div className="space-y-3">
+              <h2 className="text-2xl font-bold text-gray-900 leading-tight">
                 {currentStepData.title}
               </h2>
-              <p className="text-gray-600 text-sm">
+              <p className="text-gray-600 text-base leading-relaxed">
                 {currentStepData.subtitle}
               </p>
             </div>
 
-            {/* Star Rating */}
-            <div className="space-y-4">
-              <div className="flex justify-center gap-2">
+            <div className="space-y-6">
+              <div className="flex justify-center gap-3">
                 {[1, 2, 3, 4, 5].map((star) => (
                   <button
                     key={star}
                     onClick={() => handleStarClick(star)}
                     onMouseEnter={() => setHoveredRating(star)}
                     onMouseLeave={() => setHoveredRating(0)}
-                    className="p-2 transition-transform hover:scale-110"
+                    className="p-3 transition-all duration-200 hover:scale-110 active:scale-95 rounded-full hover:bg-purple-50"
                   >
                     <Star
                       className={cn(
-                        "w-10 h-10 transition-colors",
-                        (hoveredRating || currentStepData.rating) >= star
-                          ? "fill-purple-dark stroke-purple-dark"
-                          : "stroke-gray-300"
+                        "w-12 h-12 transition-all duration-200",
+                        currentRating >= star
+                          ? "fill-purple-semi-dark stroke-purple-dark drop-shadow-sm"
+                          : "stroke-gray-300 hover:stroke-gray-400"
                       )}
                     />
                   </button>
                 ))}
               </div>
 
-              {/* Rating Text */}
-              {(hoveredRating || currentStepData.rating) > 0 && (
-                <p className="text-purple-dark font-medium">
-                  {getRatingText(hoveredRating || currentStepData.rating)}
+              <div className="h-8 flex items-center justify-center">
+                <p className={cn(
+                  "text-lg font-semibold transition-all duration-200",
+                  currentRating > 0 ? "text-purple-dark opacity-100" : "opacity-0"
+                )}>
+                  {getRatingText(currentRating)}
                 </p>
-              )}
+              </div>
             </div>
           </div>
         </div>
 
-        {/* Footer */}
-        <div className="bg-gray-50 px-6 py-4 flex justify-between items-center">
+        <div className="bg-gradient-to-r from-gray-50 to-gray-100 px-8 py-6 flex justify-between items-center border-t">
           <Button
             onClick={currentStep === 0 ? onClose : handleBack}
             variant="ghost"
-            className="text-gray-600 hover:text-gray-800"
+            className="text-gray-600 hover:text-gray-800 hover:bg-white/80 font-medium px-6 py-3 rounded-xl transition-all duration-200"
           >
             {currentStep === 0 ? (
-              <>
-                <X className="w-4 h-4 mr-2" />
-                Annuler
-              </>
+              'Annuler'
             ) : (
               <>
                 <ArrowLeft className="w-4 h-4 mr-2" />
@@ -236,10 +225,18 @@ const ReviewDialog: React.FC<ReviewDialogProps> = ({
           <Button
             onClick={handleNext}
             disabled={!canGoNext || submitReviewMutation.isPending}
-            className="bg-purple-dark hover:bg-purple-dark/90 text-white"
+            className={cn(
+              "font-medium px-8 py-3 rounded-xl transition-all duration-200 shadow-lg",
+              canGoNext && !submitReviewMutation.isPending
+                ? "bg-gradient-to-r from-purple-600 to-purple-dark hover:from-purple-700 hover:to-purple-800 text-white shadow-purple-500/25 hover:shadow-purple-500/40 hover:scale-105"
+                : "bg-gray-300 text-gray-500 cursor-not-allowed"
+            )}
           >
             {submitReviewMutation.isPending ? (
-              'Envoi...'
+              <div className="flex items-center gap-2">
+                <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                Envoi...
+              </div>
             ) : isLastStep ? (
               'Terminer'
             ) : (
@@ -250,8 +247,8 @@ const ReviewDialog: React.FC<ReviewDialogProps> = ({
             )}
           </Button>
         </div>
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 };
 

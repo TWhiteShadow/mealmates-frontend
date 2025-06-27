@@ -4,7 +4,6 @@ import { useAtom } from 'jotai';
 import { useNavigate } from 'react-router';
 import { sellFormDataAtom } from './atoms';
 import { ProductFormData, useAddProductMutation } from '@/api/Product';
-import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 
 import ProductInfoStep from './ProductInfoStep';
@@ -75,9 +74,6 @@ const SellPageForm = () => {
 
             setConfirmedProduct(confirmedProduct);
             setFormStep('confirmation');
-        } catch (error: any) {
-            console.error('Error submitting product:', error);
-            toast.error('Une erreur est survenue lors de la mise en vente de votre produit.');
         } finally {
             setIsSubmitting(false);
         }
