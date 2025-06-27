@@ -98,7 +98,7 @@ const NotificationList: React.FC = () => {
           </Button>
         )}
       </div>
-      <div className="max-h-[70vh] overflow-y-auto">
+      <div className="max-h-[calc(70vh-64px)] overflow-y-auto">
         {notifications.map(notification => (
           <NotificationItem
             key={notification.id}
