@@ -1,6 +1,7 @@
 import { buttonVariants } from '@/components/ui/button';
 import { cn } from '../../lib/utils';
 import logo from '../../assets/mealmates-icon.png';
+import { Link } from 'react-router';
 
 const HomePage = () => {
   return (
@@ -12,12 +13,12 @@ const HomePage = () => {
         </div>
 
         {/* Button */}
-        <a
-          href='/app/login'
+        <Link
+          to='/app/login'
           className={cn(buttonVariants({ variant: 'default' })) + ' mt-32 w-50'}
         >
           GO !
-        </a>
+        </Link>
       </div>
     </div>
   );

@@ -3,11 +3,25 @@ import { cn } from '../../lib/utils';
 import logo from '../../assets/mealmates-icon.png';
 import googleLogo from '../../assets/google_logo.svg';
 import githubLogo from '../../assets/github_logo.svg';
-import { Link, useSearchParams } from 'react-router';
+import { Link, useNavigate, useSearchParams } from 'react-router';
+import { userLogged } from '@/api/User';
+import { useEffect } from 'react';
 
 const HomePage = () => {
   const [searchParams] = useSearchParams();
   const redirectURI = searchParams.get('redirectURI');
+
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const checkLogin = async () => {
+      const logged = await userLogged();
+      if (logged && logged.success) {
+        navigate('/app/discover');
+      }
+    };
+    checkLogin();
+  }, [navigate]);
 
   const redirectParam = redirectURI ? `?redirectURI=${redirectURI}` : '';
 
@@ -39,9 +53,9 @@ const HomePage = () => {
           >
             Connexion par mail
           </Link>
-          <a href='discover' className='text-purple-semi-dark'>
+          <Link to='/app/discover' className='text-purple-semi-dark'>
             Ignorer pour le moment
-          </a>
+          </Link>
         </div>
       </div>
     </div>

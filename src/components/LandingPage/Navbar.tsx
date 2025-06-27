@@ -1,6 +1,7 @@
 import { buttonVariants } from '@/components/ui/button';
 import { cn } from '../../lib/utils';
 import MealMatesLogo from '@/assets/MealMatesLogo.webp';
+import { Link } from 'react-router';
 
 function Navbar() {
   return (
@@ -33,12 +34,12 @@ function Navbar() {
             >
               Télécharger l'app
             </a>
-            <a
-              href='/app/login'
+            <Link
+              to='/app/login'
               className={cn(buttonVariants({ variant: 'outline' }))}
             >
               Se Connecter
-            </a>
+            </Link>
           </div>
         </div>
       </div>
