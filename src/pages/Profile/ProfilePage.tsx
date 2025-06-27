@@ -4,7 +4,7 @@ import StatCard from "@/components/StatCard";
 import { useNavigate } from "react-router";
 import { useUserData, useUserStats } from "@/api/User";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import UserAvatar from "@/components/UserAvatar";
 import { useAllUserProducts, useUserBoughtProducts } from "@/api/Product";
 import { PackageOpen, PiggyBank, SettingsIcon, ShoppingCart, Zap } from "lucide-react";
 
@@ -29,13 +29,7 @@ const ProfilePage = () => {
                 <div className="flex items-center gap-3">
                     {!isLoadingUserData ? (
                         <>
-                            <Avatar className="h-12 w-12">
-                                <AvatarImage
-                                    src={`https://api.dicebear.com/9.x/thumbs/svg?seed=${userData?.first_name || 'default'}&backgroundColor=5e1969&shapeColor=c19ee0`}
-                                    alt="Profile"
-                                />
-                                <AvatarFallback>User</AvatarFallback>
-                            </Avatar>
+                            <UserAvatar user={userData} size="md" />
                             <span className="font-semibold text-lg">{userData?.first_name + " " + userData?.last_name}</span>
                         </>
                     ) : (

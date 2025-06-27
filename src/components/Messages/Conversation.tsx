@@ -20,7 +20,7 @@ import { ArrowLeft, ChevronsDownIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useUserData } from '@/api/User';
-import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import UserAvatar from '@/components/UserAvatar';
 import OfferActions from './OfferActions';
 
 const Conversation: React.FC = () => {
@@ -316,15 +316,7 @@ const Conversation: React.FC = () => {
                     </Button>
 
                     <div className='flex items-center'>
-                        <Avatar className='h-10 w-10'>
-                            <AvatarImage
-                                src={`https://api.dicebear.com/9.x/thumbs/svg?seed=${otherParticipant?.first_name || 'default'}&backgroundColor=5e1969&shapeColor=c19ee0`}
-                                alt={otherParticipant?.first_name || 'Profile'}
-                            />
-                            <AvatarFallback>
-                                {otherParticipant?.first_name?.charAt(0) || '?'}
-                            </AvatarFallback>
-                        </Avatar>
+                        <UserAvatar user={otherParticipant} size="sm" />
                         <div className='ml-3'>
                             <h3 className='text-sm font-medium text-gray-900'>
                                 {otherParticipant
@@ -392,7 +384,7 @@ const Conversation: React.FC = () => {
                 )}
             </div>
             <OfferActions
-                offer={selectedConversation.offer}
+                product={selectedConversation.offer}
                 transactions={selectedConversation.offer.transactions || []}
                 otherParticipant={otherParticipant}
                 selectedId={selectedId}

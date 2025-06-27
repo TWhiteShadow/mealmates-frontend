@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { AxiosError } from 'axios';
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import UserAvatar from "@/components/UserAvatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import ProfileAppBar from '@/components/ProfileAppBar';
@@ -254,13 +254,7 @@ const SettingsPage = () => {
       </ProfileAppBar>
       <div className='max-w-md mx-auto px-4'>
         <div className='max-w-xl m-auto'>
-          <Avatar className='my-7 mx-auto w-24 h-24 drop-shadow-lg'>
-            <AvatarImage
-              src={`https://api.dicebear.com/9.x/thumbs/svg?seed=${userData?.first_name || 'default'}&backgroundColor=5e1969&shapeColor=c19ee0`}
-              alt="Profile"
-            />
-            <AvatarFallback>User</AvatarFallback>
-          </Avatar>
+          <UserAvatar user={userData} size="xl" className="my-7 mx-auto drop-shadow-lg" />
           <span className='font-semibold text-lg text-purple-dark mx-auto block text-center'>
             {isLoading ? (
               <Skeleton className="h-6 w-32 mx-auto" />

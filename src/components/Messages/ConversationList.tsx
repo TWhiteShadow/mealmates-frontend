@@ -7,7 +7,7 @@ import relativeTime from 'dayjs/plugin/relativeTime';
 import 'dayjs/locale/fr';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useUserData } from '@/api/User';
-import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import UserAvatar from '@/components/UserAvatar';
 
 dayjs.extend(relativeTime);
 dayjs.locale('fr');
@@ -92,15 +92,7 @@ const ConversationList: React.FC = () => {
                 {isLoading ? (
                   <Skeleton className='h-12 w-12 rounded-full' />
                 ) : (
-                  <Avatar className='w-12 h-12'>
-                    <AvatarImage
-                      src={`https://api.dicebear.com/9.x/thumbs/svg?seed=${otherParticipant?.first_name || 'default'}&backgroundColor=5e1969&shapeColor=c19ee0`}
-                      alt={otherParticipant?.first_name || 'Profile'}
-                    />
-                    <AvatarFallback>
-                      {otherParticipant?.first_name?.charAt(0) || '?'}
-                    </AvatarFallback>
-                  </Avatar>
+                  <UserAvatar user={otherParticipant} size="md" />
                 )}
               </div>
 
