@@ -1,6 +1,5 @@
 import { Dialog, DialogContent, DialogTrigger, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
-import { se } from "date-fns/locale";
 import { useState } from "react";
 import BarcodeScanner from "react-qr-barcode-scanner";
 
@@ -26,7 +25,7 @@ const QRCodeScanner = ({ onScan }: { onScan: (value: string) => void }) => {
                     <BarcodeScanner
                         width={1000}
                         height={1000}
-                        onUpdate={(err, result) => {
+                        onUpdate={(_, result) => {
                             if (isLoading) setIsLoading(false);
                             if (result) {
                                 onScan(result.getText());
