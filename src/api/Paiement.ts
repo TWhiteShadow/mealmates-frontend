@@ -55,11 +55,13 @@ export async function getTransactionPaymentLink(
 
 export const useTransactionPaymentLink = (
   id: number,
-  redirectURI: string | null
+  redirectURI: string | null,
+  enabled: boolean = true
 ) => {
   return useQuery({
     queryKey: ['transactionPaymentLink', id],
     queryFn: () => getTransactionPaymentLink(id, redirectURI),
+    enabled: enabled && id > 0,
   });
 };
 
@@ -92,10 +94,14 @@ export const getGeneratedQRCodeLink = async (
   return url;
 };
 
-export const useGeneratedQRCodeToken = (transactionId: number) => {
+export const useGeneratedQRCodeToken = (
+  transactionId: number,
+  enabled: boolean = true
+) => {
   return useQuery({
     queryKey: ['generatedQRCodeToken', transactionId],
     queryFn: () => getGeneratedQRCodeLink(transactionId),
+    enabled: enabled && transactionId > 0,
   });
 };
 

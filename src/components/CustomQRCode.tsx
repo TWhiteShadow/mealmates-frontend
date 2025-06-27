@@ -32,7 +32,7 @@ const CustomQRCode = ({ value, size = 200 }: CustomQRCodeProps) => {
                 <QRCode
                     value={value}
                     logoImage={logo}
-                    ecLevel='H'
+                    ecLevel='L'
                     qrStyle='dots'
                     fgColor='#5e1969'
                     logoHeight={50}

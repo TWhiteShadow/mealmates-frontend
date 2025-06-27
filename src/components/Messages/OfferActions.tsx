@@ -1,5 +1,4 @@
 import { Product, Transaction } from "@/api/Product";
-import { Button } from "../ui/button";
 import { useUserData } from "@/api/User";
 import { useCancelReservationMutation, useConfirmReservationMutation, useGeneratedQRCodeToken, useReserveProductMutation, useTransactionPaymentLink, validateQRCode } from "@/api/Paiement";
 import { User } from "@/api/Message";
@@ -8,18 +7,20 @@ import CustomQRCode from "@/components/CustomQRCode";
 import QRCodeScanner from "@/components/QRCodeScanner";
 import ReviewDialog from "@/components/ReviewDialog";
 import { useState } from "react";
+import ActionBanner from "./ActionBanner";
+import { useMemo } from "react";
 
-interface OfferActionsProps {
-    offer: Product;
+interface ProductActionsProps {
+    product: Product;
     transactions: Transaction[];
     otherParticipant?: User;
     selectedId?: number;
 }
 
-const OfferActions = ({ offer, transactions, otherParticipant, selectedId }: OfferActionsProps) => {
+const ProductActions = ({ product, transactions, otherParticipant, selectedId }: ProductActionsProps) => {
     const userData = useUserData();
-    const isSeller = userData?.data?.id === offer.seller.id;
-    const hasBuyer = offer.buyer !== null;
+    const isSeller = userData?.data?.id === product.seller.id;
+    const hasBuyer = product.buyer !== null;
     const [showReviewDialog, setShowReviewDialog] = useState(false);
 
     const location = useLocation();
@@ -31,11 +32,14 @@ const OfferActions = ({ offer, transactions, otherParticipant, selectedId }: Off
     const isPending = lastTransaction?.status === 'pending';
     const isCompleted = lastTransaction?.status === 'completed';
 
+    const hasToPay = useMemo(() => !isSeller && hasBuyer && isConfirmed && otherParticipant && otherParticipant.id === product.seller.id, [isSeller, hasBuyer, isConfirmed, otherParticipant, product.seller.id]);
+    const generateQRCode = useMemo(() => !isSeller && hasBuyer && isPending && otherParticipant && otherParticipant.id === product.seller.id, [isSeller, hasBuyer, isPending, otherParticipant, product.seller.id]);
+
     const reserveProductMutation = useReserveProductMutation();
     const confirmReservationMutation = useConfirmReservationMutation();
     const cancelReservationMutation = useCancelReservationMutation();
-    const { data: paymentLink, isLoading } = useTransactionPaymentLink(lastTransaction?.id || 0, redirectURI);
-    const { data: qrCodeUrl } = useGeneratedQRCodeToken(lastTransaction?.id || 0);
+    const { data: paymentLink, isLoading } = useTransactionPaymentLink(lastTransaction?.id || 0, redirectURI, hasToPay);
+    const { data: qrCodeUrl } = useGeneratedQRCodeToken(lastTransaction?.id || 0, generateQRCode);
 
     const handleScan = (value: string) => {
         if (value.startsWith(import.meta.env.VITE_BACKEND_URL)) {
@@ -44,86 +48,55 @@ const OfferActions = ({ offer, transactions, otherParticipant, selectedId }: Off
     }
 
     if (!isSeller && !hasBuyer) {
-
-        return (
-            <div className="flex gap-2 min-h-16 p-4 items-center justify-center bg-white border-t border-gray-200">
-                <Button
-                    size={"lg"}
-                    className="bg-purple-dark hover:bg-purple-dark/90 text-white"
-                    onClick={() => { reserveProductMutation.mutate(offer.id) }}
-                >Réserver</Button>
-            </div>
-        );
+        return <ActionBanner
+            title="Intéressé par ce produit ?"
+            description="Réservez-le dès maintenant !"
+            buttonAction={() => reserveProductMutation.mutate(product.id)}
+            buttonText="Réserver"
+        />
     }
 
-    if (!isSeller && hasBuyer && isReserved && otherParticipant && otherParticipant.id === offer.seller?.id) {
-        return (
-            <div className="flex gap-2 min-h-16 p-4 items-center justify-center bg-white border-t border-gray-200">
-                <div className="textBox text-center">
-                    <p className="text-gray-600">Vous avez réservé ce produit ! </p>
-                    <p className="text-gray-600">{otherParticipant.first_name} {otherParticipant.last_name} à maintenant 72 heures pour accepter. </p>
-                </div>
-                <Button
-                    size={"lg"}
-                    variant={"outline"}
-                    onClick={() => { cancelReservationMutation.mutate(lastTransaction.id) }}
-                >Annuler</Button>
-            </div>
-        );
+    if (!isSeller && hasBuyer && isReserved && otherParticipant && otherParticipant.id === product.seller?.id) {
+        return <ActionBanner
+            title="Vous avez réservé ce produit !"
+            description={`${otherParticipant.first_name} ${otherParticipant.last_name} a maintenant 72 heures pour accepter.`}
+            buttonAction={() => cancelReservationMutation.mutate(lastTransaction.id)}
+            buttonText="Annuler"
+        />;
     }
 
-    if (isSeller && hasBuyer && isReserved && otherParticipant && otherParticipant.id === offer.buyer?.id) {
-        return (
-            <div className="flex gap-2 min-h-16 p-4 items-center justify-center bg-white border-t border-gray-200">
-                <div className="textBox text-center">
-                    <p className="text-gray-600">{otherParticipant.first_name} {otherParticipant.last_name} souhaite réserver ce produit.</p>
-                </div>
-                <Button
-                    size={"lg"}
-                    className="bg-purple-dark hover:bg-purple-dark/90 text-white"
-                    onClick={() => { confirmReservationMutation.mutate(lastTransaction.id) }}
-                >Confirmer la réservation</Button>
-            </div>
-        );
+    if (isSeller && hasBuyer && isReserved && otherParticipant && otherParticipant.id === product.buyer?.id) {
+        return <ActionBanner
+            title={`${otherParticipant.first_name} ${otherParticipant.last_name} souhaite réserver ce produit.`}
+            buttonAction={() => confirmReservationMutation.mutate(lastTransaction.id)}
+            buttonText="Confirmer la réservation"
+        />
     }
 
-    if (isSeller && hasBuyer && isConfirmed && otherParticipant && otherParticipant.id === offer.buyer?.id) {
+    if (isSeller && hasBuyer && isConfirmed && otherParticipant && otherParticipant.id === product.buyer?.id) {
+        return <ActionBanner
+            title={`Vous avez confirmé la réservation de ${otherParticipant.first_name} ${otherParticipant.last_name}`}
+            description={`${otherParticipant.first_name} ${otherParticipant.last_name} a maintenant 72 heures pour payer.`}
+            buttonAction={() => cancelReservationMutation.mutate(lastTransaction.id)}
+            buttonText="Annuler"
+        />
+    }
+
+    if (hasToPay) {
+        return <ActionBanner
+            title={`${otherParticipant?.first_name} ${otherParticipant?.last_name} à confirmé votre réservation !`}
+            description="Vous pouvez maintenant payer le produit."
+            buttonAction={() => window.location.href = paymentLink || ''}
+            buttonDisabledWhile={isLoading || !paymentLink}
+            buttonText="Acheter"
+        />
+    }
+
+    if (generateQRCode) {
         return (
             <div className="flex gap-5 flex-wrap min-h-16 p-4 items-center justify-center bg-white border-t border-gray-200">
                 <div className="textBox text-center">
-                    <p className="text-gray-600">Vous avez confirmé la réservation de {otherParticipant.first_name} {otherParticipant.last_name}</p>
-                    <p className="text-gray-600">{otherParticipant.first_name} {otherParticipant.last_name} à maintenant 72 heures pour payer. </p>
-                </div>
-                <Button
-                    size={"lg"}
-                    variant={"outline"}
-                    onClick={() => { cancelReservationMutation.mutate(lastTransaction.id) }}
-                >Annuler</Button>
-            </div>
-        );
-    }
-
-    if (!isSeller && hasBuyer && isConfirmed && otherParticipant && otherParticipant.id === offer.seller.id) {
-        return (
-            <div className="flex gap-5 flex-wrap min-h-16 p-4 items-center justify-center bg-white border-t border-gray-200">
-                <div className="textBox text-center">
-                    <p className="text-gray-600"> {offer.seller.first_name} {offer.seller.last_name} à confirmé votre réservation !</p>
-                    <p className="text-gray-600">Vous pouvez maintenant pré-payer le produit.</p>
-                </div>
-                <Button
-                    size={"lg"}
-                    disabled={isLoading || !paymentLink}
-                    onClick={() => window.location.href = paymentLink || ''}
-                >Acheter</Button>
-            </div>
-        );
-    }
-
-    if (!isSeller && hasBuyer && isPending && otherParticipant && otherParticipant.id === offer.seller.id) {
-        return (
-            <div className="flex gap-5 flex-wrap min-h-16 p-4 items-center justify-center bg-white border-t border-gray-200">
-                <div className="textBox text-center">
-                    <p className="text-gray-600">Bravo ! Vous avez réservé ce produit !</p>
+                    <p className="text-gray-600">Merci ! Vous avez payé pour ce produit !</p>
                     <p className="text-gray-600">Au moment de votre rencontre, le vendeur devra scanner le QR code ci-dessous.</p>
                 </div>
                 {qrCodeUrl && <CustomQRCode value={qrCodeUrl} size={150} />}
@@ -131,7 +104,7 @@ const OfferActions = ({ offer, transactions, otherParticipant, selectedId }: Off
         );
     }
 
-    if (isSeller && hasBuyer && isPending && otherParticipant && otherParticipant.id === offer.buyer?.id) {
+    if (isSeller && hasBuyer && isPending && otherParticipant && otherParticipant.id === product.buyer?.id) {
         return (
             <div className="flex gap-5 flex-wrap min-h-16 p-4 items-center justify-center bg-white border-t border-gray-200">
                 <div className="textBox text-center">
@@ -142,52 +115,52 @@ const OfferActions = ({ offer, transactions, otherParticipant, selectedId }: Off
             </div>
         );
     }
-    if (!isSeller && hasBuyer && isCompleted && otherParticipant && otherParticipant.id === offer.seller?.id) {
-        return (
-            <>
-            <div className="flex gap-5 flex-wrap min-h-16 p-4 items-center justify-center bg-white border-t border-gray-200">
-                <div className="textBox text-center">
-                    <p className="text-gray-600">Bravo ! Vous avez acheté "{offer.name}" pour {lastTransaction.amount}€</p>
-                    <p className="text-gray-600">Vous pouvez laisser un avis sur le vendeur !</p>
-                </div>
-                <Button
-                    size={"lg"}
-                    className="bg-purple-dark hover:bg-purple-dark/90 text-white"
-                    onClick={() => setShowReviewDialog(true)}
-                >Laisser un avis</Button>
-            </div>
+
+    if (!isSeller && hasBuyer && isCompleted && otherParticipant && otherParticipant.id === product.seller?.id) {
+        return <>
+            <ActionBanner
+                title={`Bravo ! Vous avez acheté ${product.name} pour ${lastTransaction.amount}€`}
+                description="Vous pouvez laisser un avis sur le vendeur !"
+                buttonAction={() => setShowReviewDialog(true)}
+                buttonText="Laisser un avis"
+            />
+            {
+                showReviewDialog && otherParticipant && (
+                    <ReviewDialog
+                        isOpen={showReviewDialog}
+                        onClose={() => setShowReviewDialog(false)}
+                        transaction={lastTransaction}
+                        product={product}
+                        otherParticipant={otherParticipant}
+                        isBuyer={!isSeller}
+                    />
+                )
+            }
+        </>
+    }
+
+    if (isSeller && hasBuyer && isCompleted && otherParticipant && otherParticipant.id === product.buyer?.id) {
+        return <>
+            <ActionBanner
+                title={`Merci d'avoir vendu votre produit !`}
+                description="Vous pouvez laisser un avis sur l'acheteur !"
+                buttonAction={() => setShowReviewDialog(true)}
+                buttonText="Laisser un avis"
+            />
             {showReviewDialog && otherParticipant && (
                 <ReviewDialog
                     isOpen={showReviewDialog}
                     onClose={() => setShowReviewDialog(false)}
                     transaction={lastTransaction}
-                    offer={offer}
+                    product={product}
                     otherParticipant={otherParticipant}
                     isBuyer={!isSeller}
                 />
             )}
-            </>
-        );
+        </>
     }
 
-    if (isSeller && hasBuyer && isCompleted && otherParticipant && otherParticipant.id === offer.buyer?.id) {
-        return (
-            <div className="flex gap-5 flex-wrap min-h-16 p-4 items-center justify-center bg-white border-t border-gray-200">
-                <div className="textBox text-center">
-                    <p className="text-gray-600">Merci d'avoir vendu votre produit !</p>
-                    <p className="text-gray-600">Vous pouvez laisser un avis sur l'acheteur !</p>
-                </div>
-                <Button
-                    size={"lg"}
-                    className="bg-purple-dark hover:bg-purple-dark/90 text-white"
-                    onClick={() => setShowReviewDialog(true)}
-                >Laisser un avis</Button>
-            </div>
-        );
-    }
-
-    return (<></>);
 }
 
 
-export default OfferActions;
+export default ProductActions;

@@ -12,7 +12,7 @@ interface ReviewDialogProps {
   isOpen: boolean;
   onClose: () => void;
   transaction: Transaction;
-  offer: Product;
+  product: Product;
   otherParticipant: User;
   isBuyer: boolean;
 }
@@ -21,7 +21,7 @@ const ReviewDialog: React.FC<ReviewDialogProps> = ({
   isOpen,
   onClose,
   transaction,
-  offer,
+  product,
   otherParticipant,
   isBuyer
 }) => {
@@ -34,46 +34,46 @@ const ReviewDialog: React.FC<ReviewDialogProps> = ({
   const submitReviewMutation = useSubmitTransactionReviewMutation();
 
   // Define steps based on user type
-  const steps = isBuyer 
+  const steps = isBuyer
     ? [
-        { 
-          key: 'productQuality', 
-          title: 'Comment était la qualité du produit ?',
-          subtitle: 'Votre avis nous aide à améliorer la qualité des offres',
-          rating: productQualityRating,
-          setRating: setProductQualityRating
-        },
-        { 
-          key: 'appointmentRespect', 
-          title: 'Le vendeur a-t-il respecté le rendez-vous ?',
-          subtitle: 'Ponctualité et respect des horaires convenus',
-          rating: appointmentRespectRating,
-          setRating: setAppointmentRespectRating
-        },
-        { 
-          key: 'friendliness', 
-          title: 'Comment s\'est passé l\'échange ?',
-          subtitle: 'Amabilité et courtoisie du vendeur',
-          rating: friendlinessRating,
-          setRating: setFriendlinessRating
-        }
-      ]
+      {
+        key: 'productQuality',
+        title: 'Comment était la qualité du produit ?',
+        subtitle: 'Votre avis nous aide à améliorer la qualité des offres',
+        rating: productQualityRating,
+        setRating: setProductQualityRating
+      },
+      {
+        key: 'appointmentRespect',
+        title: 'Le vendeur a-t-il respecté le rendez-vous ?',
+        subtitle: 'Ponctualité et respect des horaires convenus',
+        rating: appointmentRespectRating,
+        setRating: setAppointmentRespectRating
+      },
+      {
+        key: 'friendliness',
+        title: 'Comment s\'est passé l\'échange ?',
+        subtitle: 'Amabilité et courtoisie du vendeur',
+        rating: friendlinessRating,
+        setRating: setFriendlinessRating
+      }
+    ]
     : [
-        { 
-          key: 'appointmentRespect', 
-          title: 'L\'acheteur a-t-il respecté le rendez-vous ?',
-          subtitle: 'Ponctualité et respect des horaires convenus',
-          rating: appointmentRespectRating,
-          setRating: setAppointmentRespectRating
-        },
-        { 
-          key: 'friendliness', 
-          title: 'Comment s\'est passé l\'échange ?',
-          subtitle: 'Amabilité et courtoisie de l\'acheteur',
-          rating: friendlinessRating,
-          setRating: setFriendlinessRating
-        }
-      ];
+      {
+        key: 'appointmentRespect',
+        title: 'L\'acheteur a-t-il respecté le rendez-vous ?',
+        subtitle: 'Ponctualité et respect des horaires convenus',
+        rating: appointmentRespectRating,
+        setRating: setAppointmentRespectRating
+      },
+      {
+        key: 'friendliness',
+        title: 'Comment s\'est passé l\'échange ?',
+        subtitle: 'Amabilité et courtoisie de l\'acheteur',
+        rating: friendlinessRating,
+        setRating: setFriendlinessRating
+      }
+    ];
 
   const currentStepData = steps[currentStep];
   const isLastStep = currentStep === steps.length - 1;
@@ -110,6 +110,7 @@ const ReviewDialog: React.FC<ReviewDialogProps> = ({
       onClose();
     } catch (error) {
       toast.error('Erreur lors de la soumission de l\'avis');
+      console.error('Error submitting review:', error);
     }
   };
 
@@ -137,7 +138,7 @@ const ReviewDialog: React.FC<ReviewDialogProps> = ({
           >
             <X className="w-5 h-5" />
           </button>
-          
+
           {/* Progress Bar */}
           <div className="mb-4">
             <div className="flex justify-between text-sm mb-2">
@@ -145,7 +146,7 @@ const ReviewDialog: React.FC<ReviewDialogProps> = ({
               <span>{Math.round(((currentStep + 1) / steps.length) * 100)}%</span>
             </div>
             <div className="w-full bg-white/20 rounded-full h-2">
-              <div 
+              <div
                 className="bg-white rounded-full h-2 transition-all duration-300"
                 style={{ width: `${((currentStep + 1) / steps.length) * 100}%` }}
               />
@@ -160,7 +161,7 @@ const ReviewDialog: React.FC<ReviewDialogProps> = ({
                 {otherParticipant.first_name} {otherParticipant.last_name}
               </h3>
               <p className="text-purple-100 text-sm">
-                {isBuyer ? 'Vendeur' : 'Acheteur'} • {offer.name}
+                {isBuyer ? 'Vendeur' : 'Acheteur'} • {product.name}
               </p>
             </div>
           </div>
@@ -201,7 +202,7 @@ const ReviewDialog: React.FC<ReviewDialogProps> = ({
                   </button>
                 ))}
               </div>
-              
+
               {/* Rating Text */}
               {(hoveredRating || currentStepData.rating) > 0 && (
                 <p className="text-purple-dark font-medium">

@@ -384,7 +384,7 @@ const Conversation: React.FC = () => {
                 )}
             </div>
             <OfferActions
-                offer={selectedConversation.offer}
+                product={selectedConversation.offer}
                 transactions={selectedConversation.offer.transactions || []}
                 otherParticipant={otherParticipant}
                 selectedId={selectedId}
