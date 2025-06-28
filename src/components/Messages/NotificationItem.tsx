@@ -14,6 +14,7 @@ import ReservationExpired from '../Notifications/ReservationExpired';
 import TransactionCompleted from '../Notifications/TransactionCompleted';
 import TransactionQrValidated from '../Notifications/TransactionQrValidated';
 import TransactionPaid from '../Notifications/TransactionPaid';
+import ReviewReminder from '../Notifications/ReviewReminder';
 
 interface NotificationItemProps {
   notification: Notification;
@@ -136,6 +137,15 @@ const NotificationItem: React.FC<NotificationItemProps> = ({ notification, onCli
       case 'transaction_qr_validated':
         return (
           <TransactionQrValidated 
+            notification={notification}
+            onClick={onClick}
+            onActionClick={handleActionClick}
+          />
+        );
+
+      case 'review_reminder':
+        return (
+          <ReviewReminder 
             notification={notification}
             onClick={onClick}
             onActionClick={handleActionClick}

@@ -4,14 +4,14 @@ import { Button } from '@/components/ui/button';
 import { Dialog, DialogTitle, DialogContent } from '@/components/ui/dialog';
 import { cn } from '@/lib/utils';
 import { useSubmitTransactionReviewMutation, ReviewData } from '@/api/Paiement';
-import { Product, Transaction } from '@/api/Product';
+import { Product } from '@/api/Product';
 import { User } from '@/api/Message';
 import UserAvatar from '@/components/UserAvatar';
 
 interface ReviewDialogProps {
   isOpen: boolean;
   onClose: () => void;
-  transaction: Transaction;
+  transactionId: number;
   product: Product;
   otherParticipant: User;
   isBuyer: boolean;
@@ -20,7 +20,7 @@ interface ReviewDialogProps {
 const ReviewDialog: React.FC<ReviewDialogProps> = ({
   isOpen,
   onClose,
-  transaction,
+  transactionId,
   product,
   otherParticipant,
   isBuyer
@@ -102,7 +102,7 @@ const ReviewDialog: React.FC<ReviewDialogProps> = ({
     };
 
     try {
-      await submitReviewMutation.mutateAsync({ transactionId: transaction.id, reviewData });
+      await submitReviewMutation.mutateAsync({ transactionId: transactionId, reviewData });
       onClose();
     } catch (error) {
       console.error('Error submitting review:', error);

@@ -129,7 +129,7 @@ const ProductActions = ({ product, transactions, otherParticipant, selectedId }:
                     <ReviewDialog
                         isOpen={showReviewDialog}
                         onClose={() => setShowReviewDialog(false)}
-                        transaction={lastTransaction}
+                        transactionId={lastTransaction.id}
                         product={product}
                         otherParticipant={otherParticipant}
                         isBuyer={!isSeller}
@@ -151,7 +151,7 @@ const ProductActions = ({ product, transactions, otherParticipant, selectedId }:
                 <ReviewDialog
                     isOpen={showReviewDialog}
                     onClose={() => setShowReviewDialog(false)}
-                    transaction={lastTransaction}
+                    transactionId={lastTransaction.id}
                     product={product}
                     otherParticipant={otherParticipant}
                     isBuyer={!isSeller}

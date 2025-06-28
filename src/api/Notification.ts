@@ -24,6 +24,7 @@ export type NotificationType =
   | 'transaction_completed'
   | 'transaction_paid'
   | 'transaction_qr_validated'
+  | 'review_reminder'
   | 'new_message';
 
 export interface NotificationParams {
@@ -115,6 +116,19 @@ export interface TransactionQrValidatedParams extends NotificationParams {
   transaction_id: number;
   offer_name: string;
   buyer_fullname: string;
+}
+
+export interface ReviewReminderParams extends NotificationParams {
+  transaction_id: number;
+  offer_id: number;
+  offer_name: string;
+  seller_id?: number;
+  seller_firstname?: string;
+  seller_lastname?: string;
+  buyer_id?: number;
+  buyer_firstname?: string;
+  buyer_lastname?: string;
+  completed_at: string;
 }
 
 export interface NewMessageParams extends NotificationParams {
