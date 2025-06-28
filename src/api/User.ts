@@ -42,6 +42,7 @@ export interface AddressResponse {
   success: boolean;
   message: string;
   address: Address[];
+  averageRating: number | null;
 }
 
 export type UserData = {
@@ -53,6 +54,7 @@ export type UserData = {
   address: Address[];
   allergen: Allergen[];
   isVerified: boolean;
+  averageRating: number | null;
 };
 
 export type UserDataResponse = {
@@ -65,6 +67,7 @@ export type UserStatsResponse = {
   totalEarnings: number;
   completedTransactions: number;
   boughtTransactions: number;
+  averageRating: number | null;
 };
 
 export interface ApiErrorResponse {

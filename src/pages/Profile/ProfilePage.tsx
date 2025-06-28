@@ -6,7 +6,7 @@ import { useUserData, useUserStats } from "@/api/User";
 import { Skeleton } from "@/components/ui/skeleton";
 import UserAvatar from "@/components/UserAvatar";
 import { useAllUserProducts, useUserBoughtProducts } from "@/api/Product";
-import { PackageOpen, PiggyBank, SettingsIcon, ShoppingCart, Zap } from "lucide-react";
+import { PackageOpen, PiggyBank, SettingsIcon, ShoppingCart, Star } from "lucide-react";
 
 const ProfilePage = () => {
     const { isLoading: isLoadingUserData, data: userData } = useUserData();
@@ -47,11 +47,12 @@ const ProfilePage = () => {
                 <section className="my-8">
                     <div className="grid grid-cols-2 gap-4">
                         <StatCard
-                            title="CO2 évité"
-                            value="51"
-                            unit="KW/h"
+                            title="Note moyenne"
+                            value={!isLoadingUserStats && userData?.averageRating ? userData?.averageRating.toFixed(2) : "0.0"}
+                            unit="/5"
+                            isLoading={isLoadingUserStats}
                             className="text-purple-dark"
-                            icon={<Zap className="size-[80px]" />}
+                            icon={<Star className="size-[80px]" />}
                         />
                         <StatCard
                             title="Porte-monnaie"
