@@ -16,20 +16,8 @@ const ProtectedRoute: FC<ProtectedRouteProps> = ({ children }) => {
       try {
         const response = await userLogged();
         setIsAuthenticated(response?.success === true);
-      } catch (error: any) {
-        if (error?.response?.status === 401 || error?.response?.status === 403) {
-          // Let Axios handle the refresh token logic
-          await new Promise(resolve => setTimeout(resolve, 500));
-          
-          try {
-            const retryResponse = await userLogged();
-            setIsAuthenticated(retryResponse?.success === true);
-          } catch (retryError: any) {
-            setIsAuthenticated(false);
-          }
-        } else {
-          setIsAuthenticated(false);
-        }
+      } catch {
+        setIsAuthenticated(false);
       }
     };
 

@@ -1,8 +1,13 @@
 // api.js
-import axios from 'axios';
+import axios, { AxiosRequestConfig } from 'axios';
 import { locationRef, navigationRef } from '../utils/navigateRef';
 import { refreshToken } from './User';
 import { toast } from 'sonner';
+
+// Extend AxiosRequestConfig to include our custom _retry property
+interface CustomAxiosRequestConfig extends AxiosRequestConfig {
+  _retry?: boolean;
+}
 
 const baseURL = import.meta.env.VITE_BACKEND_URL;
 
@@ -12,22 +17,46 @@ const api = axios.create({
 });
 
 api.interceptors.response.use(
-  (response) => {
+  async (response) => {
     if (response.data?.success === true && response.data?.message) {
       toast.success(response.data.message);
     }
+
+    // Check if this is not a token refresh request
+    if (!response.config.url?.includes('/token/refresh')) {
+      const config = response.config as CustomAxiosRequestConfig;
+      // For all other requests, if success is false, try to refresh the token once
+      if (response.data?.success === false && !config._retry) {
+        config._retry = true;
+        try {
+          await refreshToken();
+          // Retry the original request with the new token
+          return await api(config);
+        } catch (refreshError) {
+          if (navigationRef.navigate) {
+            const redirectURI = locationRef.location;
+            navigationRef.navigate(`/app/login?redirectURI=${redirectURI}`);
+          }
+          return Promise.reject(refreshError);
+        }
+      }
+    }
+
     return response;
   },
   async (error) => {
-    const originalRequest = error.config;
-
     if (error.response?.data) {
       if (error.response.status === 401) {
         const message =
           error.response.data.message === 'Bad credentials.'
             ? 'Identifiants incorrects.'
             : error.response.data.message;
-        toast.error(message);
+        if (
+          message != 'Missing JWT Refresh Token' &&
+          message != 'Missing JWT Access Token'
+        ) {
+          toast.error(message);
+        }
       }
 
       if (error.response.data.success === false) {
@@ -47,24 +76,6 @@ api.interceptors.response.use(
             }
           });
         }
-      }
-    }
-
-    if (
-      error.response?.status === 401 &&
-      !originalRequest._retry &&
-      !originalRequest.url.includes('/token/refresh')
-    ) {
-      originalRequest._retry = true;
-      try {
-        await refreshToken();
-        return api(originalRequest);
-      } catch (refreshError) {
-        if (navigationRef.navigate) {
-          const redirectURI = locationRef.location;
-          navigationRef.navigate(`/app/login?redirectURI=${redirectURI}`);
-        }
-        return Promise.reject(refreshError);
       }
     }
 

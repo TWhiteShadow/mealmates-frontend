@@ -203,8 +203,12 @@ export function useUserData() {
   });
 }
 
+export interface LoggedResponse {
+  success: boolean;
+}
+
 // check if user is logged
-export async function userLogged(): Promise<any> {
+export async function userLogged(): Promise<LoggedResponse> {
   const response = await api.get(`/user/logged`);
   return response.data;
 }
