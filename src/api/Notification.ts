@@ -40,7 +40,7 @@ export interface NotificationAction {
 }
 
 export interface NotificationActionResult {
-  type: 'navigate';
+  type: 'navigate'|'custom';
   path: string;
 }
 
@@ -69,6 +69,7 @@ export interface OfferSoldParams extends NotificationParams {
 
 export interface ReservationRequestParams extends NotificationParams {
   transaction_id: number;
+  conversation_id: number|null;
   offer_id: number;
   offer_name: string;
   buyer_id: number;
@@ -106,6 +107,7 @@ export interface TransactionCompletedParams extends NotificationParams {
 
 export interface TransactionPaidParams extends NotificationParams {
   transaction_id: number;
+  conversation_id: number|null;
   offer_id: number;
   offer_name: string;
   is_seller?: boolean;

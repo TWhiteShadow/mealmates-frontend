@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Clock } from 'lucide-react';
 import { Notification, ReservationRequestParams, NotificationAction } from '@/api/Notification';
 import NotificationBase from './NotificationBase';
+import { useConfirmReservationMutation } from '@/api/Paiement';
 
 interface ReservationRequestProps {
   notification: Notification;
@@ -12,6 +13,8 @@ interface ReservationRequestProps {
 const ReservationRequest: React.FC<ReservationRequestProps> = ({ notification, onClick, onActionClick }) => {
   const params = notification.content as ReservationRequestParams;
   const [timeLeft, setTimeLeft] = useState<number | null>(null);
+
+  const confirmReservationMutation = useConfirmReservationMutation();
 
   // Convertir en UTC+2
   useEffect(() => {
@@ -44,34 +47,34 @@ const ReservationRequest: React.FC<ReservationRequestProps> = ({ notification, o
     ? `${baseMessage} Cette réservation a expiré.` 
     : baseMessage;
 
-  const actions: NotificationAction[] = hasExpired
+
+  const seeDetailsAction: NotificationAction = {
+    title: 'Voir détails',
+    onClick: (_: React.MouseEvent, params: Record<string, any>) => {
+      return { type: "navigate" as const, path: `/app/messages?conversation=${params.conversation_id}` };
+    },
+    variant: 'outline',
+    className: "border-purple-semi-dark text-purple-semi-dark hover:bg-purple-semi-dark hover:text-white"
+  }
+
+
+  let actions: NotificationAction[] = [];
+  actions = hasExpired
     ? [
-        {
-          title: 'Voir détails',
-          onClick: (_, params: Record<string, any>) => {
-            return { type: 'navigate', path: `/transaction/${params.transaction_id}` };
-          },
-          variant: 'outline',
-          className: "border-purple-semi-dark text-purple-semi-dark hover:bg-purple-semi-dark hover:text-white"
-        }
+        seeDetailsAction
       ]
     : [
         {
           title: 'Confirmer',
-          onClick: (_, params: Record<string, any>) => {
-            return { type: 'navigate', path: `/reservations/${params.transaction_id}/confirm` };
+          onClick: (e: React.MouseEvent, params: Record<string, any>) => {
+            e.stopPropagation();
+            confirmReservationMutation.mutate(params.transaction_id);
+            return { type: 'custom' as const, path: '' };
           },
           variant: 'default',
           className: "bg-purple-semi-dark hover:bg-purple-dark text-white border-purple-semi-dark"
         },
-        {
-          title: 'Voir détails',
-          onClick: (_, params: Record<string, any>) => {
-            return { type: 'navigate', path: `/transaction/${params.transaction_id}` };
-          },
-          variant: 'outline',
-          className: "border-purple-semi-dark text-purple-semi-dark hover:bg-purple-semi-dark hover:text-white"
-        }
+        seeDetailsAction
       ];
 
   const icon = (

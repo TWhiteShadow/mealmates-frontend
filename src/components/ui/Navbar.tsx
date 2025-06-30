@@ -34,6 +34,8 @@ const getValueFromPath = (path: string) => {
       return 3;
     case '/app/profile':
       return 4;
+    case '/app/profile/settings':
+      return 4;
     default:
       return 0;
   }

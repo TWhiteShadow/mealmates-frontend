@@ -24,7 +24,8 @@ const MessagesPage: React.FC = () => {
     const [activeTab, setActiveTab] = useAtom(activeTabAtom);
     const [windowWidth, setWindowWidth] = useState(window.innerWidth);
 
-    const [searchParams] = useSearchParams();
+    const [searchParams, setSearchParams] = useSearchParams();
+
     useEffect(() => {
         // Handle window resize
         const handleResize = () => {
@@ -42,6 +43,8 @@ const MessagesPage: React.FC = () => {
         if (searchParams.get('conversation')) {
             setActiveTab("messages")
             setSelectedId(parseInt(searchParams.get('conversation') || '0'));
+            searchParams.delete('conversation');
+            setSearchParams(searchParams);
         }
     }, [searchParams]);
 

@@ -24,8 +24,16 @@ const TransactionPaid: React.FC<TransactionPaidProps> = ({
   
   const actions: NotificationAction[] = [
     {
+      title: 'Voir détails',
+      onClick: (_: React.MouseEvent, params: Record<string, any>) => {
+        return { type: "navigate" as const, path: `/app/messages?conversation=${params.conversation_id}` };
+      },
+      variant: 'default',
+      className: "bg-purple-semi-dark hover:bg-purple-dark text-white border-purple-semi-dark"
+    },
+    {
       title: "Voir l'offre",
-      onClick: (_, params: Record<string, any>) => {
+      onClick: (_: React.MouseEvent, params: Record<string, any>) => {
         return { type: 'navigate', path: `/app/product/${params.offer_id}` };
       },
       variant: 'outline',
