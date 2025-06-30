@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import api from './Axios';
+import { Review } from './Review';
 
 export interface Product {
   id: number;
@@ -50,6 +51,7 @@ export interface Transaction {
     | 'refunded';
   createdAt: string;
   amount: number;
+  reviews?: Review[];
 }
 export interface ProductFormData {
   name: string;

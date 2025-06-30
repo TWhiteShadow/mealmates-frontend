@@ -1,6 +1,7 @@
 import { QRCode } from 'react-qrcode-logo';
 import logo from '@/assets/MealMatesLogo.webp';
 import { Dialog, DialogContent, DialogTrigger, DialogTitle } from "@/components/ui/dialog";
+import { ZoomIn } from 'lucide-react';
 
 interface CustomQRCodeProps {
     value: string;
@@ -10,7 +11,8 @@ interface CustomQRCodeProps {
 const CustomQRCode = ({ value, size = 200 }: CustomQRCodeProps) => {
     return (
         <Dialog>
-            <DialogTrigger>
+            <DialogTrigger className='relative'>
+                <ZoomIn className='absolute z-10 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 size-15 p-2 bg-white/90 rounded-full  text-purple-dark hover:text-purple-dark/90 transition-colors duration-200' />
                 <QRCode
                     value={value}
                     logoImage={logo}

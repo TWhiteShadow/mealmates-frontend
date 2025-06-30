@@ -1,14 +1,7 @@
 import api from './Axios';
 import { useQuery } from '@tanstack/react-query';
 import { Product } from './Product';
-
-export interface User {
-  id: number;
-  email: string;
-  first_name: string;
-  last_name: string;
-  fullname?: string;
-}
+import { User } from './User';
 
 export interface Message {
   id: number;

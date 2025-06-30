@@ -3,9 +3,9 @@ import { Star, ArrowLeft, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogTitle, DialogContent } from '@/components/ui/dialog';
 import { cn } from '@/lib/utils';
-import { useSubmitTransactionReviewMutation, ReviewData } from '@/api/Paiement';
+import { useSubmitTransactionReviewMutation, ReviewData } from '@/api/Review';
 import { Product } from '@/api/Product';
-import { User } from '@/api/Message';
+import { User } from '@/api/User';
 import UserAvatar from '@/components/UserAvatar';
 
 interface ReviewDialogProps {
@@ -132,7 +132,7 @@ const ReviewDialog: React.FC<ReviewDialogProps> = ({
         <div className="bg-purple-dark text-white p-6 sm:p-8 relative overflow-hidden">
           <div className="absolute top-0 right-0 w-20 sm:w-32 h-20 sm:h-32 bg-white/10 rounded-full -translate-y-10 sm:-translate-y-16 translate-x-10 sm:translate-x-16"></div>
           <div className="absolute bottom-0 left-0 w-14 sm:w-24 h-14 sm:h-24 bg-white/5 rounded-full translate-y-7 sm:translate-y-12 -translate-x-7 sm:-translate-x-12"></div>
-          
+
           <div className="mb-6 relative z-10">
             <div className="flex justify-between text-sm mb-3 text-purple-100">
               <span className="font-medium">Étape {currentStep + 1} sur {steps.length}</span>
