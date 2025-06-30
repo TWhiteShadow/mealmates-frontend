@@ -22,7 +22,7 @@ const OfferSold: React.FC<OfferSoldProps> = ({
     {
       title: 'Voir les détails',
       onClick: (_, params: Record<string, any>) => {
-        return { type: 'navigate', path: `/app/messages/${params.transaction_id || 'sold'}` };
+        return { type: 'navigate', path: `/app/messages?conversation=${params.conversation_id}` };
       },
       variant: 'outline',
       className: "border-purple-semi-dark text-purple-semi-dark hover:bg-purple-semi-dark hover:text-white"

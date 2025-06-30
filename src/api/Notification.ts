@@ -59,6 +59,7 @@ export interface OfferPurchaseRequestParams extends NotificationParams {
 }
 
 export interface OfferSoldParams extends NotificationParams {
+  conversation_id: number|null;
   offer_id: number;
   offer_name: string;
   buyer_id: number;
