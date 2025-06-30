@@ -1,5 +1,5 @@
-import { useParams } from 'react-router';
-import { useProduct } from '@/api/Product';
+import { useParams, useNavigate } from 'react-router';
+import { useProduct, useDeleteProductMutation } from '@/api/Product';
 import dayjs from 'dayjs';
 import 'dayjs/locale/fr';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
@@ -9,14 +9,33 @@ import { cn } from "@/lib/utils";
 import ContactSellerButton from '@/components/ProductPage/ContactSellerButton';
 import { useUserData } from '@/api/User';
 import logo from '@/assets/MealMatesLogo.webp';
-import { ChevronLeft } from 'lucide-react';
+import { ChevronLeft, Pencil, Trash2 } from 'lucide-react';
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 dayjs.locale('fr');
 
 export default function ProductPage() {
     const { id } = useParams();
+    const navigate = useNavigate();
     const { data: product, isLoading, error } = useProduct(Number(id));
     const { data: user } = useUserData();
+    const deleteProduct = useDeleteProductMutation();
+
+    const handleDelete = async () => {
+        await deleteProduct.mutateAsync(Number(id));
+        navigate('/app/profile');
+    };
+
     if (isLoading) {
         return (
             <div className="flex items-center justify-center min-h-screen">
@@ -191,16 +210,54 @@ export default function ProductPage() {
                             </StatCard>
                         </div> */}
 
-
-                        {product.seller && product.seller.id != user?.id && (
-                            <div className="mt-8">
+                        <div className="mt-8">
+                            {product.seller?.id === user?.id ? (
+                                <div className="flex gap-4">
+                                    <Button
+                                        variant="outline"
+                                        className="flex-1 gap-2"
+                                        onClick={() => navigate(`/app/product/${id}/edit`)}
+                                    >
+                                        <Pencil className="w-4 h-4" />
+                                        Modifier
+                                    </Button>
+                                    <AlertDialog>
+                                        <AlertDialogTrigger asChild>
+                                            <Button
+                                                variant="destructive"
+                                                className="flex-1 gap-2"
+                                            >
+                                                <Trash2 className="w-4 h-4" />
+                                                Supprimer
+                                            </Button>
+                                        </AlertDialogTrigger>
+                                        <AlertDialogContent>
+                                            <AlertDialogHeader>
+                                                <AlertDialogTitle>Êtes-vous sûr ?</AlertDialogTitle>
+                                                <AlertDialogDescription>
+                                                    Cette action est irréversible. L'offre sera définitivement supprimée.
+                                                </AlertDialogDescription>
+                                            </AlertDialogHeader>
+                                            <AlertDialogFooter>
+                                                <AlertDialogCancel>Annuler</AlertDialogCancel>
+                                                <AlertDialogAction
+                                                    onClick={handleDelete}
+                                                    className="bg-destructive hover:bg-destructive/90"
+                                                >
+                                                    Supprimer
+                                                </AlertDialogAction>
+                                            </AlertDialogFooter>
+                                        </AlertDialogContent>
+                                    </AlertDialog>
+                                </div>
+                            ) : (
                                 <ContactSellerButton
                                     offerId={product.id}
                                     sellerId={product.seller.id}
                                     className="w-full text-white py-3 rounded-lg font-medium"
                                 />
-                            </div>
-                        )}
+                            )}
+                        </div>
                     </div>
                 </div>
             </div>

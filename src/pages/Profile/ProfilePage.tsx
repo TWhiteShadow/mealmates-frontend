@@ -83,7 +83,12 @@ const ProfilePage = () => {
                 <section className="mb-8">
                     <div className="flex items-center justify-between mb-4">
                         <h2 className="text-lg font-semibold">Vos dernières commandes</h2>
-                        <a href="#" className="text-purple-dark underline-offset-2 underline text-sm">Voir plus</a>
+                        <button
+                            onClick={() => navigate('/app/profile/orders')}
+                            className="text-purple-dark underline-offset-2 underline text-sm"
+                        >
+                            Voir plus
+                        </button>
                     </div>
                     {isLoadingUserBoughtProductsData ? (
                         <div className="space-y-4">
@@ -98,6 +103,7 @@ const ProfilePage = () => {
                                     <OrderCard
                                         key={product.id}
                                         product={product}
+                                        onClick={() => navigate(`/app/product/${product.id}`)}
                                     />
                                 ))
                             ) : (
@@ -110,7 +116,12 @@ const ProfilePage = () => {
                 <section className="mt-8">
                     <div className="flex items-center justify-between mb-4">
                         <h2 className="text-lg font-semibold">Vos offres</h2>
-                        <a href="#" className="text-purple-dark underline-offset-2 underline text-sm">Voir plus</a>
+                        <button
+                            onClick={() => navigate('/app/profile/offers')}
+                            className="text-purple-dark underline-offset-2 underline text-sm"
+                        >
+                            Voir plus
+                        </button>
                     </div>
 
                     {isLoadingUserProductsData ? (
@@ -126,6 +137,7 @@ const ProfilePage = () => {
                                     <OrderCard
                                         key={product.id}
                                         product={product}
+                                        onClick={() => navigate(`/app/product/${product.id}`)}
                                     />
                                 ))
                             ) : (

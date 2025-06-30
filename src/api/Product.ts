@@ -206,3 +206,42 @@ export function useUserBoughtProducts() {
     queryFn: () => getUserBoughtProducts(),
   });
 }
+
+export async function editProduct(
+  id: number,
+  productData: ProductFormData
+): Promise<any> {
+  const response = await api.put(`/products/${id}/edit`, productData);
+  return response.data;
+}
+
+export function useEditProductMutation() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ id, data }: { id: number; data: ProductFormData }) =>
+      editProduct(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['product'] });
+      queryClient.invalidateQueries({ queryKey: ['allUserProducts'] });
+      queryClient.invalidateQueries({ queryKey: ['nearbyProducts'] });
+    },
+  });
+}
+
+export async function deleteProduct(id: number): Promise<any> {
+  const response = await api.delete(`/products/${id}/delete`);
+  return response.data;
+}
+
+export function useDeleteProductMutation() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: deleteProduct,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['allUserProducts'] });
+      queryClient.invalidateQueries({ queryKey: ['nearbyProducts'] });
+    },
+  });
+}
