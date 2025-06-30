@@ -80,6 +80,7 @@ export interface ReservationRequestParams extends NotificationParams {
 
 export interface ReservationConfirmedParams extends NotificationParams {
   transaction_id: number;
+  conversation_id: number|null;
   offer_id: number;
   offer_name: string;
   seller_id: number;

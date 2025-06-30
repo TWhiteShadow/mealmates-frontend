@@ -27,7 +27,7 @@ const ReservationConfirmed: React.FC<ReservationConfirmedProps> = ({
     actions.push({
       title: 'Payer maintenant',
       onClick: (_, params: Record<string, any>) => {
-        return { type: 'navigate', path: `/transaction/${params.transaction_id}/payment` };
+        return { type: 'navigate', path: `/app/messages?conversation=${params.conversation_id}` };
       },
       variant: 'default',
       className: "bg-purple-semi-dark hover:bg-purple-dark text-white border-purple-semi-dark"
@@ -35,12 +35,14 @@ const ReservationConfirmed: React.FC<ReservationConfirmedProps> = ({
   }
 
   actions.push({
-    title: 'Voir transaction',
+    title: 'Voir la conversation',
     onClick: (_, params: Record<string, any>) => {
-      return { type: 'navigate', path: `/transaction/${params.transaction_id}` };
+      return { type: 'navigate', path: `/app/messages?conversation=${params.conversation_id}` };
     },
-    variant: 'outline',
-    className: "border-purple-semi-dark text-purple-semi-dark hover:bg-purple-semi-dark hover:text-white"
+    variant: !params.is_free_offer ? 'outline' : 'default',
+    className: !params.is_free_offer
+      ? "border-purple-semi-dark text-purple-semi-dark hover:bg-purple-semi-dark hover:text-white"
+      : "bg-purple-semi-dark hover:bg-purple-dark text-white border-purple-semi-dark"
   });
 
   const icon = (
