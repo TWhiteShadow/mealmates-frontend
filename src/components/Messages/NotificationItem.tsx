@@ -5,8 +5,6 @@ import { useNavigate } from 'react-router';
 import { useDonateProductMutation } from '@/api/Product';
 
 import OfferExpiryWarning from '../Notifications/OfferExpiryWarning';
-import OfferPurchaseRequest from '../Notifications/OfferPurchaseRequest';
-import OfferSold from '../Notifications/OfferSold';
 import ReservationRequest from '../Notifications/ReservationRequest';
 import ReservationConfirmed from '../Notifications/ReservationConfirmed';
 import ReservationCancelled from '../Notifications/ReservationCancelled';
@@ -59,24 +57,6 @@ const NotificationItem: React.FC<NotificationItemProps> = ({ notification, onCli
             onClick={onClick}
             onActionClick={handleActionClick}
             donateProduct={(productId: number) => donateProductMutation.mutate(productId)}
-          />
-        );
-      
-      case 'offer_purchase_request':
-        return (
-          <OfferPurchaseRequest 
-            notification={notification}
-            onClick={onClick}
-            onActionClick={handleActionClick}
-          />
-        );
-      
-      case 'offer_sold':
-        return (
-          <OfferSold 
-            notification={notification}
-            onClick={onClick}
-            onActionClick={handleActionClick}
           />
         );
       
