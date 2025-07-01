@@ -21,12 +21,17 @@ api.interceptors.response.use(
     if (response.data?.success === true && response.data?.message) {
       toast.success(response.data.message);
     }
-
-    // Check if this is not a token refresh request
-    if (!response.config.url?.includes('/token/refresh')) {
-      const config = response.config as CustomAxiosRequestConfig;
-      // For all other requests, if success is false, try to refresh the token once
-      if (response.data?.success === false && !config._retry) {
+    return response;
+  },
+  async (error) => {
+    const status = error.response?.status;
+    // Check if this is not a token refresh request and if we got a 401 or 403
+    if (
+      !error.config.url?.includes('/token/refresh') &&
+      (status === 401 || status === 403)
+    ) {
+      const config = error.config as CustomAxiosRequestConfig;
+      if (!config._retry) {
         config._retry = true;
         try {
           await refreshToken();
@@ -42,9 +47,6 @@ api.interceptors.response.use(
       }
     }
 
-    return response;
-  },
-  async (error) => {
     if (error.response?.data) {
       if (error.response.status === 401) {
         const message =
@@ -53,7 +55,8 @@ api.interceptors.response.use(
             : error.response.data.message;
         if (
           message != 'Missing JWT Refresh Token' &&
-          message != 'Missing JWT Access Token'
+          message != 'Missing JWT Access Token' &&
+          message != 'JWT Token not found'
         ) {
           toast.error(message);
         }
