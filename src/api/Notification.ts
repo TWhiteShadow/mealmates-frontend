@@ -23,7 +23,6 @@ export type NotificationType =
   | 'reservation_expired'
   | 'transaction_completed'
   | 'transaction_paid'
-  | 'transaction_qr_validated'
   | 'review_reminder'
   | 'new_message';
 
@@ -114,12 +113,6 @@ export interface TransactionPaidParams extends NotificationParams {
   offer_name: string;
   is_seller?: boolean;
   buyer_fullname?: string;
-}
-
-export interface TransactionQrValidatedParams extends NotificationParams {
-  transaction_id: number;
-  offer_name: string;
-  buyer_fullname: string;
 }
 
 export interface ReviewReminderParams extends NotificationParams {

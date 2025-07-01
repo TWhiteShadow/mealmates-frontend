@@ -110,7 +110,7 @@ const ConversationList: React.FC = () => {
 
                 <div className='flex items-center'>
                   <p className='text-sm text-gray-500 truncate max-w-xs'>
-                    {conversation.offer.name} - {conversation.offer.price}€
+                    {conversation.offer.name} - {conversation.offer.dynamicPrice || conversation.offer.price}€
                   </p>
                 </div>
 

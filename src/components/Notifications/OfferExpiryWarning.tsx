@@ -24,7 +24,7 @@ const OfferExpiryWarning: React.FC<OfferExpiryWarningProps> = ({
     {
       title: "Modifier l'offre",
       onClick: (_, params: Record<string, any>) => {
-        return { type: 'navigate', path: `/app/sell/edit/${params.offer_id}` };
+        return { type: 'navigate', path: `/app/product/${params.offer_id}/edit` };
       },
       variant: 'outline',
       className: "border-purple-semi-dark text-purple-semi-dark hover:bg-purple-semi-dark hover:text-white"

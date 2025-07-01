@@ -320,7 +320,7 @@ const Conversation: React.FC = () => {
                 </h3>
                 <p className='text-xs text-gray-500'>
                   {selectedConversation.offer.name} -{' '}
-                  {selectedConversation.offer.price}€
+                  {selectedConversation.offer.dynamicPrice || selectedConversation.offer.price}€
                 </p>
               </div>
             </UserCardLink>
