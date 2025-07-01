@@ -29,7 +29,8 @@ api.interceptors.response.use(
     if (error.response?.data) {
       if (error.response.status === 401) {
         const message =
-          error.response.data.message === 'Bad credentials.'
+          error.response.data.message === 'Bad credentials.' ||
+          error.response.data.message === 'The presented password is invalid.'
             ? 'Identifiants incorrects.'
             : error.response.data.message;
         console.error('Unauthorized:', message);

@@ -16,10 +16,10 @@ interface FilterModalProps {
   applyLabel?: string;
 }
 
-const FilterModal: React.FC<FilterModalProps> = ({ 
-  title, 
-  isOpen, 
-  onClose, 
+const FilterModal: React.FC<FilterModalProps> = ({
+  title,
+  isOpen,
+  onClose,
   children,
   onApply,
   onReset,
@@ -28,13 +28,13 @@ const FilterModal: React.FC<FilterModalProps> = ({
   applyLabel = "Appliquer"
 }) => {
   const [canSaveSearch, setCanSaveSearch] = useState<boolean>(false);
-  
+
   useEffect(() => {
     const fetchUserData = async () => {
-        const logged = await userLogged();
-        setCanSaveSearch(logged?.success && logged?.success === true);
+      const logged = await userLogged();
+      setCanSaveSearch(logged?.success && logged?.success === true);
     };
-    
+
     if (isOpen) {
       fetchUserData();
     }
@@ -44,7 +44,7 @@ const FilterModal: React.FC<FilterModalProps> = ({
 
   return (
     <div className="fixed inset-0 bg-white z-50 overflow-auto">
-      <div className="max-w-md mx-auto px-4 py-4">
+      <div className="max-w-md mx-auto px-4 py-4 pb-20">
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-2xl font-bold text-gray-800">{title}</h2>
           <button onClick={onClose} className="text-gray-500">
