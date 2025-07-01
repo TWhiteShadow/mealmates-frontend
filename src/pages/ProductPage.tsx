@@ -9,7 +9,7 @@ import { cn } from "@/lib/utils";
 import ContactSellerButton from '@/components/ProductPage/ContactSellerButton';
 import { useUserData } from '@/api/User';
 import logo from '@/assets/MealMatesLogo.webp';
-import { ChevronLeft, Pencil, Star, Trash2 } from 'lucide-react';
+import { ChevronLeft, CircleCheckBig, Clock, Pencil, Star, Trash2 } from 'lucide-react';
 import {
     AlertDialog,
     AlertDialogAction,
@@ -53,7 +53,7 @@ export default function ProductPage() {
         );
     }
 
-    const isExpiringSoon = dayjs(product.expiryDate).diff(dayjs(), 'day') <= 3;
+    const isExpiringSoon = !product.soldAt && dayjs(product.expiryDate).diff(dayjs(), 'day') <= 1;
     const formattedPrice = new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' }).format(product.price);
 
     return (
@@ -77,10 +77,17 @@ export default function ProductPage() {
                     <div className="size-full">
                         {product.images && product.images.length > 0 ? (
                             <div className="relative">
-                                {isExpiringSoon && (
+                                {!product.soldAt && isExpiringSoon && (
                                     <div className="absolute top-4 left-4 z-10">
                                         <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-red-100 text-red-800">
-                                            Ending soon
+                                            <Clock className='mr-1' size={16} /> Bientôt fini
+                                        </span>
+                                    </div>
+                                )}
+                                {product.soldAt && (
+                                    <div className="absolute top-4 left-4 z-10">
+                                        <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
+                                            <CircleCheckBig className='mr-1' size={16} /> Vendu
                                         </span>
                                     </div>
                                 )}
@@ -116,26 +123,32 @@ export default function ProductPage() {
 
                     {/* Product Info */}
                     <div className="mt-10 px-4 sm:px-0 sm:mt-16 lg:mt-0">
-                        <div className="flex justify-between items-start">
-                            <div>
-                                <h1 className="text-3xl font-bold tracking-tight text-gray-900">{product.name}</h1>
-                                <UserProfileLink
-                                    user={product.seller}
-                                >
-                                    <div className='flex items-center flex-nowrap'>
-                                        <span className='text-gray-600'>{product.seller.first_name || ''} {product.seller.last_name || ''}</span>
-                                        {product.seller.averageRating && (
-                                            <span className="ml-2 text-gray-500 text-sm flex items-center flex-nowrap">
-                                                {product.seller.averageRating.toFixed(2)}
-                                                <Star className='fill-purple-semi-dark stroke-purple-dark w-3 ml-0.5' />
-                                            </span>
-                                        )}
-                                    </div>
-                                </UserProfileLink>
+                        <div className='flex flex-col-reverse gap-4 lg:flex-col'>
+                            <div className="flex justify-between items-start">
+                                <div>
+                                    <h1 className="text-3xl font-bold tracking-tight text-gray-900">{product.name}</h1>
+                                    <UserProfileLink
+                                        user={product.seller}
+                                    >
+                                        <div className='flex items-center flex-nowrap'>
+                                            <span className='text-gray-600'>{product.seller.first_name || ''} {product.seller.last_name || ''}</span>
+                                            {product.seller.averageRating && (
+                                                <span className="ml-2 text-gray-500 text-sm flex items-center flex-nowrap">
+                                                    {product.seller.averageRating.toFixed(2)}
+                                                    <Star className='fill-purple-semi-dark stroke-purple-dark w-3 ml-0.5' />
+                                                </span>
+                                            )}
+                                        </div>
+                                    </UserProfileLink>
+                                </div>
+                                <p className="text-3xl font-bold text-purple-semi-dark">{formattedPrice == "0,00 €" ? "Don" : formattedPrice}</p>
                             </div>
-                            <p className="text-3xl font-bold text-purple-semi-dark">{formattedPrice == "0,00 €" ? "Don" : formattedPrice}</p>
+                            {product.soldAt && (
+                                <div className="text-sm text-gray-500">
+                                    <span className="font-semibold text-green-600 text-xl">Ce produit à été vendu le {dayjs(product.soldAt).format('DD MMMM YYYY')} à {product.buyer?.first_name + " " + product.buyer?.last_name}</span>
+                                </div>
+                            )}
                         </div>
-
                         <div className="mt-6">
                             <div className="text-sm font-medium text-gray-900">Description</div>
                             <p className="mt-2 text-base text-gray-700">{product.description}</p>
@@ -192,51 +205,53 @@ export default function ProductPage() {
                         </div>
 
                         <div className="mt-8">
-                            {product.seller?.id === user?.id ? (
-                                <div className="flex gap-4">
-                                    <Button
-                                        variant="outline"
-                                        className="flex-1 gap-2"
-                                        onClick={() => navigate(`/app/product/${id}/edit`)}
-                                    >
-                                        <Pencil className="w-4 h-4" />
-                                        Modifier
-                                    </Button>
-                                    <AlertDialog>
-                                        <AlertDialogTrigger asChild>
-                                            <Button
-                                                variant="destructive"
-                                                className="flex-1 gap-2"
-                                            >
-                                                <Trash2 className="w-4 h-4" />
-                                                Supprimer
-                                            </Button>
-                                        </AlertDialogTrigger>
-                                        <AlertDialogContent>
-                                            <AlertDialogHeader>
-                                                <AlertDialogTitle>Êtes-vous sûr ?</AlertDialogTitle>
-                                                <AlertDialogDescription>
-                                                    Cette action est irréversible. L'offre sera définitivement supprimée.
-                                                </AlertDialogDescription>
-                                            </AlertDialogHeader>
-                                            <AlertDialogFooter>
-                                                <AlertDialogCancel>Annuler</AlertDialogCancel>
-                                                <AlertDialogAction
-                                                    onClick={handleDelete}
-                                                    className="bg-destructive hover:bg-destructive/90"
+                            {!product.soldAt && (
+                                product.seller?.id === user?.id ? (
+                                    <div className="flex gap-4">
+                                        <Button
+                                            variant="outline"
+                                            className="flex-1 gap-2"
+                                            onClick={() => navigate(`/app/product/${id}/edit`)}
+                                        >
+                                            <Pencil className="w-4 h-4" />
+                                            Modifier
+                                        </Button>
+                                        <AlertDialog>
+                                            <AlertDialogTrigger asChild>
+                                                <Button
+                                                    variant="destructive"
+                                                    className="flex-1 gap-2"
                                                 >
+                                                    <Trash2 className="w-4 h-4" />
                                                     Supprimer
-                                                </AlertDialogAction>
-                                            </AlertDialogFooter>
-                                        </AlertDialogContent>
-                                    </AlertDialog>
-                                </div>
-                            ) : (
-                                <ContactSellerButton
-                                    offerId={product.id}
-                                    sellerId={product.seller.id}
-                                    className="w-full text-white py-3 rounded-lg font-medium"
-                                />
+                                                </Button>
+                                            </AlertDialogTrigger>
+                                            <AlertDialogContent>
+                                                <AlertDialogHeader>
+                                                    <AlertDialogTitle>Êtes-vous sûr ?</AlertDialogTitle>
+                                                    <AlertDialogDescription>
+                                                        Cette action est irréversible. L'offre sera définitivement supprimée.
+                                                    </AlertDialogDescription>
+                                                </AlertDialogHeader>
+                                                <AlertDialogFooter>
+                                                    <AlertDialogCancel>Annuler</AlertDialogCancel>
+                                                    <AlertDialogAction
+                                                        onClick={handleDelete}
+                                                        className="bg-destructive hover:bg-destructive/90"
+                                                    >
+                                                        Supprimer
+                                                    </AlertDialogAction>
+                                                </AlertDialogFooter>
+                                            </AlertDialogContent>
+                                        </AlertDialog>
+                                    </div>
+                                ) : (
+                                    <ContactSellerButton
+                                        offerId={product.id}
+                                        sellerId={product.seller.id}
+                                        className="w-full text-white py-3 rounded-lg font-medium"
+                                    />
+                                )
                             )}
                         </div>
                     </div>

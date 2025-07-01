@@ -1,5 +1,6 @@
 import { Product } from "@/api/Product";
 import logo from '@/assets/MealMatesLogo.webp';
+import { cn } from "@/lib/utils";
 
 interface OrderCardProps {
   product: Product;
@@ -15,7 +16,7 @@ const OrderCard = ({ product, onClick }: OrderCardProps) => {
   return (
     <div
       onClick={onClick}
-      className="flex items-center gap-4 bg-white p-4 rounded-lg drop-shadow-lg max-w-full cursor-pointer hover:bg-purple-50 transition-all"
+      className={cn("flex items-center gap-4 bg-white p-4 rounded-lg drop-shadow-lg max-w-full cursor-pointer hover:bg-purple-50 transition-all", product.soldAt && "opacity-50 grayscale")}
     >
       {product.images?.[0] ? (
         <img
@@ -39,9 +40,16 @@ const OrderCard = ({ product, onClick }: OrderCardProps) => {
         )}
         <div className="text-sm text-purple-dark mt-1">
           {product.price}€ ·{" "}
-          {new Date(product.expiryDate).toLocaleDateString()}
+          {new Date(product.expiryDate).toLocaleDateString("fr-FR")}
         </div>
       </div>
+      {product.soldAt && (
+        <div className="absolute top-2 right-4 z-10">
+          <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-purple-100 text-grey-800">
+            Vendu
+          </span>
+        </div>
+      )}
     </div>
   );
 };

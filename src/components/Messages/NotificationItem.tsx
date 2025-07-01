@@ -33,9 +33,6 @@ const NotificationItem: React.FC<NotificationItemProps> = ({ notification, onCli
       ...notification.content,
       donateProduct: (productId: number) => {
         donateProductMutation.mutate(productId, {
-          onSuccess: () => {
-            console.log('Produit transformé en don avec succès');
-          },
           onError: (error) => {
             console.error('Erreur lors de la transformation en don:', error);
           }
@@ -52,53 +49,53 @@ const NotificationItem: React.FC<NotificationItemProps> = ({ notification, onCli
     switch (notification.type) {
       case 'offer_expiry_warning':
         return (
-          <OfferExpiryWarning 
+          <OfferExpiryWarning
             notification={notification}
             onClick={onClick}
             onActionClick={handleActionClick}
             donateProduct={(productId: number) => donateProductMutation.mutate(productId)}
           />
         );
-      
+
       case 'reservation_request':
         return (
-          <ReservationRequest 
+          <ReservationRequest
             notification={notification}
             onClick={onClick}
             onActionClick={handleActionClick}
           />
         );
-      
+
       case 'reservation_confirmed':
         return (
-          <ReservationConfirmed 
+          <ReservationConfirmed
             notification={notification}
             onClick={onClick}
             onActionClick={handleActionClick}
           />
         );
-      
+
       case 'reservation_cancelled':
         return (
-          <ReservationCancelled 
+          <ReservationCancelled
             notification={notification}
             onClick={onClick}
             onActionClick={handleActionClick}
           />
         );
-      
+
       case 'reservation_expired':
         return (
-          <ReservationExpired 
+          <ReservationExpired
             notification={notification}
             onClick={onClick}
             onActionClick={handleActionClick}
           />
         );
-      
+
       case 'transaction_completed':
         return (
-          <TransactionCompleted 
+          <TransactionCompleted
             notification={notification}
             onClick={onClick}
             onActionClick={handleActionClick}
@@ -107,7 +104,7 @@ const NotificationItem: React.FC<NotificationItemProps> = ({ notification, onCli
 
       case 'transaction_paid':
         return (
-          <TransactionPaid 
+          <TransactionPaid
             notification={notification}
             onClick={onClick}
             onActionClick={handleActionClick}
@@ -116,7 +113,7 @@ const NotificationItem: React.FC<NotificationItemProps> = ({ notification, onCli
 
       case 'transaction_qr_validated':
         return (
-          <TransactionQrValidated 
+          <TransactionQrValidated
             notification={notification}
             onClick={onClick}
             onActionClick={handleActionClick}
@@ -125,7 +122,7 @@ const NotificationItem: React.FC<NotificationItemProps> = ({ notification, onCli
 
       case 'review_reminder':
         return (
-          <ReviewReminder 
+          <ReviewReminder
             notification={notification}
             onClick={onClick}
             onActionClick={handleActionClick}

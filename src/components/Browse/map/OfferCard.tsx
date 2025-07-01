@@ -1,9 +1,10 @@
 import { Product } from '@/api/Product';
 import { Button } from '@/components/ui/button';
-import { Star, XCircle } from 'lucide-react';
+import { Clock, Star, XCircle } from 'lucide-react';
 import { useNavigate } from 'react-router';
 import logo from '@/assets/MealMatesLogo.webp';
 import UserProfileLink from '@/components/UserProfileLink';
+import dayjs from 'dayjs';
 
 interface OfferCardProps {
     offer: Product | null;
@@ -21,6 +22,8 @@ const OfferCard: React.FC<OfferCardProps> = ({ offer, onClose }) => {
         }
     };
 
+
+    const isExpiringSoon = dayjs(offer.expiryDate).diff(dayjs(), 'day') <= 1;
     return (
         <div className="fixed max-w-[800px] w-full mx-auto bottom-[56px] left-0 right-0 bg-white rounded-t-2xl shadow-lg z-50 transition-transform duration-300 ease-in-out transform translate-y-0">
             <div className="p-4">
@@ -32,17 +35,27 @@ const OfferCard: React.FC<OfferCardProps> = ({ offer, onClose }) => {
                 </button>
 
                 <div className="flex gap-6">
-                    {offer.images?.[0] ? (
-                        <img
-                            src={`${import.meta.env.VITE_BACKEND_URL}/images/files/${offer.images?.[0]?.name}`}
-                            alt={offer.name}
-                            className="size-48 object-cover rounded-lg pointer-events-none"
-                        />
-                    ) : (
-                        <div className="size-48 bg-purple-100 rounded-lg flex items-center justify-center">
-                            <img src={logo} alt="" className='w-1/3' />
-                        </div>
-                    )}
+                    <div className='relative'>
+                        {isExpiringSoon && (
+                            <div className="absolute top-2 left-2 z-10">
+                                <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-red-100 text-red-800">
+                                    <Clock className='mr-1' size={16} /> Bientôt fini
+                                </span>
+                            </div>
+                        )}
+                        {offer.images?.[0] ? (
+                            <img
+                                src={`${import.meta.env.VITE_BACKEND_URL}/images/files/${offer.images?.[0]?.name}`}
+                                alt={offer.name}
+                                className="size-48 object-cover rounded-lg pointer-events-none"
+                            />
+                        ) : (
+                            <div className="size-48 bg-purple-100 rounded-lg flex items-center justify-center">
+                                <img src={logo} alt="" className='w-1/3' />
+                            </div>
+                        )}
+
+                    </div>
 
                     <div className="flex-1 space-y-2">
                         <h2 className="text-xl font-bold text-purple-dark">{offer.name}</h2>
