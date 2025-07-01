@@ -14,7 +14,7 @@ import { formatDistanceToNow } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { toast } from 'sonner';
 import { Review, useReportReviewMutation } from '@/api/Review';
-import UserProfileLink from './UserProfileLink';
+import UserCardLink from './UserCardLink';
 
 interface UserReviewCardProps {
   review: Review;
@@ -94,7 +94,7 @@ const UserReviewCard = ({ review }: UserReviewCardProps) => {
       <div className='bg-white p-4 rounded-lg shadow-sm border'>
         <div className='flex items-start justify-between mb-1.5'>
           <div className='flex items-center gap-3'>
-            <UserProfileLink user={review.reviewer}>
+            <UserCardLink user={review.reviewer}>
               <div className='flex items-center flex-nowrap'>
                 <span className='text-gray-600'>
                   {review.reviewer.first_name || ''}{' '}
@@ -107,7 +107,7 @@ const UserReviewCard = ({ review }: UserReviewCardProps) => {
                   </span>
                 )}
               </div>
-            </UserProfileLink>
+            </UserCardLink>
           </div>
           <div className='flex items-center gap-2'>
             <Button

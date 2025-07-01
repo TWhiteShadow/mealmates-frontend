@@ -21,7 +21,7 @@ import {
     AlertDialogTitle,
     AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import UserProfileLink from '@/components/UserProfileLink';
+import UserCardLink from '@/components/UserCardLink';
 
 dayjs.locale('fr');
 
@@ -127,7 +127,7 @@ export default function ProductPage() {
                             <div className="flex justify-between items-start">
                                 <div>
                                     <h1 className="text-3xl font-bold tracking-tight text-gray-900">{product.name}</h1>
-                                    <UserProfileLink
+                                    <UserCardLink
                                         user={product.seller}
                                     >
                                         <div className='flex items-center flex-nowrap'>
@@ -139,7 +139,7 @@ export default function ProductPage() {
                                                 </span>
                                             )}
                                         </div>
-                                    </UserProfileLink>
+                                    </UserCardLink>
                                 </div>
                                 <p className="text-3xl font-bold text-purple-semi-dark">{formattedPrice == "0,00 €" ? "Don" : formattedPrice}</p>
                             </div>

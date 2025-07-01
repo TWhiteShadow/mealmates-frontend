@@ -20,8 +20,8 @@ import { ArrowLeft, ChevronsDownIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useUserData } from '@/api/User';
-import UserAvatar from '@/components/UserAvatar';
 import OfferActions from './OfferActions';
+import UserCardLink from '../UserCardLink';
 
 const Conversation: React.FC = () => {
   const [selectedId, setSelectedId] = useAtom(selectedConversationIdAtom);
@@ -308,18 +308,22 @@ const Conversation: React.FC = () => {
           </Button>
 
           <div className='flex items-center'>
-            <UserAvatar user={otherParticipant} size='sm' />
-            <div className='ml-3'>
-              <h3 className='text-sm font-medium text-gray-900'>
-                {otherParticipant
-                  ? `${otherParticipant.first_name} ${otherParticipant.last_name}`
-                  : 'Inconnu'}
-              </h3>
-              <p className='text-xs text-gray-500'>
-                {selectedConversation.offer.name} -{' '}
-                {selectedConversation.offer.price}€
-              </p>
-            </div>
+            <UserCardLink
+              user={otherParticipant}
+              link={`/app/product/${selectedConversation.offer.id}`}
+            >
+              <div>
+                <h3 className='text-sm font-medium text-gray-900'>
+                  {otherParticipant
+                    ? `${otherParticipant.first_name} ${otherParticipant.last_name}`
+                    : 'Inconnu'}
+                </h3>
+                <p className='text-xs text-gray-500'>
+                  {selectedConversation.offer.name} -{' '}
+                  {selectedConversation.offer.price}€
+                </p>
+              </div>
+            </UserCardLink>
           </div>
         </div>
       </div>
