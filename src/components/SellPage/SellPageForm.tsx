@@ -41,7 +41,7 @@ const SellPageForm = ({ mode = 'create', productId }: SellPageFormProps) => {
         } else if (formStep === 'imageUpload') {
             setFormStep('detailsInfo');
         } else if (formStep === 'locationInfo') {
-            setFormStep('imageUpload');
+            setFormStep(!productId ? 'imageUpload' : 'detailsInfo');
         }
     };
 
@@ -92,7 +92,7 @@ const SellPageForm = ({ mode = 'create', productId }: SellPageFormProps) => {
 
     return (
         <div className="max-w-xl mx-auto mt-4 px-4">
-            {formStep !== 'confirmation' && <SellPageStepper formStep={formStep} setFormStep={setFormStep} />}
+            {formStep !== 'confirmation' && <SellPageStepper formStep={formStep} setFormStep={setFormStep} editMode={!!productId} />}
 
             <FormProvider {...methods}>
                 <form onSubmit={methods.handleSubmit((data) => {
@@ -104,7 +104,7 @@ const SellPageForm = ({ mode = 'create', productId }: SellPageFormProps) => {
                         if (formStep === 'productInfo') {
                             setFormStep('detailsInfo');
                         } else if (formStep === 'detailsInfo') {
-                            setFormStep('imageUpload');
+                            setFormStep(!productId ? 'imageUpload': 'locationInfo');
                         } else if (formStep === 'imageUpload') {
                             setFormStep('locationInfo');
                         }
@@ -112,7 +112,7 @@ const SellPageForm = ({ mode = 'create', productId }: SellPageFormProps) => {
                 })}>
                     {formStep === 'productInfo' && <ProductInfoStep />}
                     {formStep === 'detailsInfo' && <DetailsInfoStep />}
-                    {formStep === 'imageUpload' && <ImageUploadStep />}
+                    {(formStep === 'imageUpload' && !productId) && <ImageUploadStep />}
                     {formStep === 'locationInfo' && <LocationInfoStep navigate={navigate} />}
                     {formStep === 'confirmation' && <ConfirmationStep navigate={navigate} product={confirmedProduct} />}
 
