@@ -6,7 +6,7 @@ import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import 'dayjs/locale/fr';
 import { Skeleton } from '@/components/ui/skeleton';
-import { useUserData } from '@/api/User';
+import { useAuthenticatedUserData } from '@/api/User';
 import UserAvatar from '@/components/UserAvatar';
 
 dayjs.extend(relativeTime);
@@ -14,7 +14,7 @@ dayjs.locale('fr');
 
 const ConversationList: React.FC = () => {
   const [selectedId, setSelectedId] = useAtom(selectedConversationIdAtom);
-  const { data: userData } = useUserData();
+  const { data: userData } = useAuthenticatedUserData();
 
   const { data: conversations = [], isLoading, error } = useConversations();
 
@@ -110,7 +110,7 @@ const ConversationList: React.FC = () => {
 
                 <div className='flex items-center'>
                   <p className='text-sm text-gray-500 truncate max-w-xs'>
-                    {conversation.offer.name} - {conversation.offer.price}€
+                    {conversation.offer.name} - {conversation.offer.dynamicPrice || conversation.offer.price}€
                   </p>
                 </div>
 

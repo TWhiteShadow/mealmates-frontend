@@ -20,8 +20,10 @@ import { useDocumentTitle } from './hooks/use-document-title';
 import ProtectedRoute from './components/ProtectedRoute';
 import EditProductPage from './pages/EditProductPage';
 import OrdersPage from './pages/Profile/OrdersPage';
-import OffersPage from './pages/Profile/OffersPage';
+import { default as ProfileOffersPage } from './pages/Profile/OffersPage';
 import UserPage from './pages/UserPage';
+import ReviewsPage from './pages/User/ReviewsPage';
+import OffersPage from './pages/User/OffersPage';
 
 function NavbarLayout() {
   return (
@@ -70,7 +72,7 @@ function App() {
         } />
         <Route path='app/profile/offers' element={
           <ProtectedRoute>
-            <OffersPage />
+            <ProfileOffersPage />
           </ProtectedRoute>
         } />
         <Route path='app/product/:id' element={<ProductPage />} />
@@ -90,6 +92,8 @@ function App() {
           </ProtectedRoute>
         } />
         <Route path='app/user/:id' element={<UserPage />} />
+        <Route path='app/user/:id/offers' element={<OffersPage />} />
+        <Route path='app/user/:id/reviews' element={<ReviewsPage />} />
       </Route>
       <Route path='*' element={<div>404</div>} />
     </Routes>

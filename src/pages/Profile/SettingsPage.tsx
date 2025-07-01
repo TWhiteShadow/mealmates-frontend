@@ -1,18 +1,18 @@
 import { useState, useEffect } from 'react';
 import { AxiosError } from 'axios';
-import UserAvatar from "@/components/UserAvatar";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import UserAvatar from '@/components/UserAvatar';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import ProfileAppBar from '@/components/ProfileAppBar';
 import {
   useUpdateUserDataMutation,
-  useUserData,
+  useAuthenticatedUserData,
   ApiErrorResponse,
   useDeleteAddressMutation,
-  Address
-} from "@/api/User";
+  Address,
+} from '@/api/User';
 import { Skeleton } from '@/components/ui/skeleton';
-import { toast } from "sonner";
+import { toast } from 'sonner';
 import AddressInput from '@/components/AddressInput';
 import { ChevronLeft, LogOut } from 'lucide-react';
 import { useAuth } from '@/utils/auth';
@@ -21,14 +21,20 @@ import {
   Home,
   Person,
   Delete,
+  RestaurantMenu,
+  NoFood,
 } from '@mui/icons-material';
+
+import { useAllergens } from '@/api/Allergen';
+import { useFoodPreferences } from '@/api/FoodPreference';
 
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-} from "@/components/ui/accordion";
+} from '@/components/ui/accordion';
+import { MultiSelect, Option } from '@/components/ui/multi-select';
 import { useNavigate, useSearchParams } from 'react-router';
 
 interface AddressWithEditing extends Address {
@@ -58,12 +64,18 @@ const SettingsPage = () => {
   const [newAddress, setNewAddress] = useState<AddressWithEditing | null>(null);
   const [firstName, setFirstName] = useState<string>('');
   const [lastName, setLastName] = useState<string>('');
+  const [selectedAllergens, setSelectedAllergens] = useState<number[]>([]);
+  const [selectedFoodPreferences, setSelectedFoodPreferences] = useState<
+    number[]
+  >([]);
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
 
-  const { isLoading, data: userData } = useUserData();
+  const { isLoading, data: userData } = useAuthenticatedUserData();
   const updateUserMutation = useUpdateUserDataMutation();
   const deleteAddressMutation = useDeleteAddressMutation();
+  const { data: allergens } = useAllergens();
+  const { data: foodPreferences } = useFoodPreferences();
 
   const [redirectURI, setRedirectURI] = useState<string | null>(null);
 
@@ -73,10 +85,21 @@ const SettingsPage = () => {
       setFirstName(userData.first_name || '');
       setLastName(userData.last_name || '');
       if (userData.address) {
-        setAddresses(userData.address.map(addr => ({
-          ...addr,
-          isEditing: false
-        })));
+        setAddresses(
+          userData.address.map((addr) => ({
+            ...addr,
+            isEditing: false,
+          }))
+        );
+      }
+      if (userData.allergen) {
+        setSelectedAllergens(userData.allergen.map((a) => a.id));
+      }
+
+      if (userData.foodPreference) {
+        setSelectedFoodPreferences(
+          userData.foodPreference.map((fp) => fp.id)
+        );
       }
     }
   }, [userData]);
@@ -103,7 +126,12 @@ const SettingsPage = () => {
   };
 
   const validateAddress = (address: Address): boolean => {
-    if (!address.address || !address.city || !address.zipCode || !address.region) {
+    if (
+      !address.address ||
+      !address.city ||
+      !address.zipCode ||
+      !address.region
+    ) {
       toast.error("Tous les champs d'adresse sont obligatoires");
       return false;
     }
@@ -122,7 +150,7 @@ const SettingsPage = () => {
     const addressToAdd: AddressWithEditing = {
       ...newAddress,
       id: null,
-      isEditing: false
+      isEditing: false,
     };
     setAddresses([...addresses, addressToAdd]);
     setNewAddress(null);
@@ -130,18 +158,18 @@ const SettingsPage = () => {
 
   const deleteAddress = async (id: number | null) => {
     if (id === null) {
-      setAddresses(addresses.filter(addr => addr.id !== null));
+      setAddresses(addresses.filter((addr) => addr.id !== null));
       return;
     }
 
     // Otherwise delete on server
     deleteAddressMutation.mutate(id, {
       onSuccess: () => {
-        setAddresses(addresses.filter(addr => addr.id !== id));
+        setAddresses(addresses.filter((addr) => addr.id !== id));
       },
       onError: (error) => {
         handleApiError(error, 'adresse');
-      }
+      },
     });
   };
 
@@ -158,7 +186,9 @@ const SettingsPage = () => {
       setFieldErrors(formatted);
     } else {
       console.error(`Error updating ${context}:`, error);
-      toast.error(`Une erreur est survenue lors de la mise à jour de vos ${context}`);
+      toast.error(
+        `Une erreur est survenue lors de la mise à jour de vos ${context}`
+      );
     }
   };
 
@@ -169,15 +199,17 @@ const SettingsPage = () => {
         ...address,
       });
     } else {
-      setAddresses(addresses.map(addr => {
-        if (addr.isEditing) {
-          return {
-            ...addr,
-            ...address,
-          };
-        }
-        return addr;
-      }));
+      setAddresses(
+        addresses.map((addr) => {
+          if (addr.isEditing) {
+            return {
+              ...addr,
+              ...address,
+            };
+          }
+          return addr;
+        })
+      );
     }
   };
 
@@ -187,8 +219,7 @@ const SettingsPage = () => {
     if (window.confirm('Are you sure you want to logout?')) {
       await logout();
     }
-  }
-
+  };
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -196,7 +227,7 @@ const SettingsPage = () => {
 
     if (!userData) return;
 
-    const processedAddresses = addresses.map(addr => {
+    const processedAddresses = addresses.map((addr) => {
       const addressData = { ...addr } as Address;
       delete (addressData as any).isEditing;
       // For new addresses, make sure id is null not undefined
@@ -208,8 +239,8 @@ const SettingsPage = () => {
       first_name: firstName,
       last_name: lastName,
       addresses: processedAddresses,
-      allergenIds: userData?.allergen?.map(a => a.id) || [],
-      foodPreferenceIds: [], // Add this property as required by API
+      allergenIds: selectedAllergens,
+      foodPreferenceIds: selectedFoodPreferences,
     };
 
     updateUserMutation.mutate(updatedUserData as any, {
@@ -226,12 +257,15 @@ const SettingsPage = () => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className='h-screen relative bg-gray-100 overflow-x-hidden pb-20'>
+    <form
+      onSubmit={handleSubmit}
+      className='h-screen relative bg-gray-100 overflow-x-hidden pb-20'
+    >
       <ProfileAppBar>
         <div className='relative flex items-center size-full justify-center'>
           <Button
-            type="button"
-            variant="ghost"
+            type='button'
+            variant='ghost'
             className='absolute left-3 p-1'
             onClick={() => navigate(-1)}
           >
@@ -241,23 +275,25 @@ const SettingsPage = () => {
             Votre compte
           </span>
           <Button
-            type="button"
-            variant="ghost"
+            type='button'
+            variant='ghost'
             className='absolute right-3 p-1'
             onClick={handleLogout}
           >
-            <LogOut
-              className='!text-purple-dark !h-7 !w-7'
-            />
+            <LogOut className='!text-purple-dark !h-7 !w-7' />
           </Button>
         </div>
       </ProfileAppBar>
       <div className='max-w-md mx-auto px-4'>
         <div className='max-w-xl m-auto'>
-          <UserAvatar user={userData} size="xl" className="my-7 mx-auto drop-shadow-lg" />
+          <UserAvatar
+            user={userData}
+            size='xl'
+            className='my-7 mx-auto drop-shadow-lg'
+          />
           <span className='font-semibold text-lg text-purple-dark mx-auto block text-center'>
             {isLoading ? (
-              <Skeleton className="h-6 w-32 mx-auto" />
+              <Skeleton className='h-6 w-32 mx-auto' />
             ) : (
               `${userData?.last_name} ${userData?.first_name}`
             )}
@@ -267,99 +303,116 @@ const SettingsPage = () => {
           <div className='flex items-center justify-between mb-4'>
             <h2 className='text-lg font-semibold'>Informations personnelles</h2>
           </div>
-          <Accordion type="multiple" className="w-full">
-            <AccordionItem value="name" className="border rounded-lg mb-4 shadow-sm bg-white">
-              <AccordionTrigger className="px-4 py-3 hover:bg-purple-50 transition-colors duration-200">
-                <div className="flex items-center">
+          <Accordion type='multiple' className='w-full'>
+            <AccordionItem
+              value='name'
+              className='border rounded-lg mb-4 shadow-sm bg-white'
+            >
+              <AccordionTrigger className='px-4 py-3 hover:bg-purple-50 transition-colors duration-200'>
+                <div className='flex items-center'>
                   <Person
                     sx={{ width: 24, height: 24 }}
                     className='!text-purple-dark !bg-transparent mr-2'
                   />
-                  <span className="font-medium">Nom et prénom</span>
+                  <span className='font-medium'>Nom et prénom</span>
                   {isLoading ? (
-                    <Skeleton className="h-4 w-[150px] ml-2" />
+                    <Skeleton className='h-4 w-[150px] ml-2' />
                   ) : (
-                    <span className="text-gray-500 text-sm ml-2">
+                    <span className='text-gray-500 text-sm ml-2'>
                       {userData?.last_name} {userData?.first_name}
                     </span>
                   )}
                 </div>
               </AccordionTrigger>
-              <AccordionContent className="px-4 pb-4 pt-2">
-                <div className="space-y-4">
-                  <div className="space-y-2">
+              <AccordionContent className='px-4 pb-4 pt-2'>
+                <div className='space-y-4'>
+                  <div className='space-y-2'>
                     <label
                       htmlFor='lastname'
                       className='block text-sm font-medium text-gray-700'
                     >
-                      Nom <span className="text-red-500">*</span>
+                      Nom <span className='text-red-500'>*</span>
                     </label>
                     <Input
-                      type="text"
-                      name="lastname"
-                      id="lastname"
+                      type='text'
+                      name='lastname'
+                      id='lastname'
                       value={lastName}
                       onChange={(e) => setLastName(e.target.value)}
-                      placeholder="Dupont"
-                      className="h-11"
+                      placeholder='Dupont'
+                      className='h-11'
                     />
                     {fieldErrors.lastname && (
-                      <p className="mt-1 text-red-600 text-sm">{fieldErrors.lastname}</p>
+                      <p className='mt-1 text-red-600 text-sm'>
+                        {fieldErrors.lastname}
+                      </p>
                     )}
                   </div>
-                  <div className="space-y-2">
-                    <label htmlFor="firstname" className="block text-sm font-medium text-gray-700">
-                      Prénom <span className="text-red-500">*</span>
+                  <div className='space-y-2'>
+                    <label
+                      htmlFor='firstname'
+                      className='block text-sm font-medium text-gray-700'
+                    >
+                      Prénom <span className='text-red-500'>*</span>
                     </label>
                     <Input
-                      type="text"
-                      name="firstname"
-                      id="firstname"
+                      type='text'
+                      name='firstname'
+                      id='firstname'
                       value={firstName}
                       onChange={(e) => setFirstName(e.target.value)}
-                      placeholder="Jean"
-                      className="h-11"
+                      placeholder='Jean'
+                      className='h-11'
                     />
                     {fieldErrors.firstname && (
-                      <p className="mt-1 text-red-600 text-sm">{fieldErrors.firstname}</p>
+                      <p className='mt-1 text-red-600 text-sm'>
+                        {fieldErrors.firstname}
+                      </p>
                     )}
                   </div>
                 </div>
               </AccordionContent>
             </AccordionItem>
 
-            <AccordionItem value="addresses" className="border rounded-lg mb-4 shadow-sm bg-white">
-              <AccordionTrigger className="px-4 py-3 hover:bg-purple-50 transition-colors duration-200">
-                <div className="flex items-center">
+            <AccordionItem
+              value='addresses'
+              className='border rounded-lg mb-4 shadow-sm bg-white'
+            >
+              <AccordionTrigger className='px-4 py-3 hover:bg-purple-50 transition-colors duration-200'>
+                <div className='flex items-center'>
                   <Home
                     sx={{ width: 24, height: 24 }}
                     className='!text-purple-dark !bg-transparent mr-2'
                   />
-                  <span className="font-medium">Adresses <span className="text-red-500">*</span></span>
+                  <span className='font-medium'>
+                    Adresses <span className='text-red-500'>*</span>
+                  </span>
                 </div>
               </AccordionTrigger>
-              <AccordionContent className="px-4 pb-4 pt-2">
+              <AccordionContent className='px-4 pb-4 pt-2'>
                 {isLoading ? (
-                  <div className="space-y-2">
-                    <Skeleton className="h-16 w-full" />
-                    <Skeleton className="h-16 w-full" />
+                  <div className='space-y-2'>
+                    <Skeleton className='h-16 w-full' />
+                    <Skeleton className='h-16 w-full' />
                   </div>
                 ) : (
-                  <div className="space-y-4">
+                  <div className='space-y-4'>
                     {/* Existing addresses */}
                     {addresses.map((address) => (
                       <div
                         key={address.id?.toString() || `new-${Math.random()}`}
-                        className="flex items-center justify-between px-4 py-3 border rounded-lg shadow-sm bg-white hover:bg-purple-50 transition-colors duration-200"
+                        className='flex items-center justify-between px-4 py-3 border rounded-lg shadow-sm bg-white hover:bg-purple-50 transition-colors duration-200'
                       >
-                        <span className="font-medium">{formatAddressTitle(address)}</span>
+                        <span className='font-medium'>
+                          {formatAddressTitle(address)}
+                        </span>
                         <Button
-                          variant="ghost"
+                          variant='ghost'
                           onClick={(e) => {
                             e.preventDefault();
                             deleteAddress(address.id || null);
                           }}
-                          className="text-red-500 p-1 hover:bg-red-50 hover:text-red-800"
+                          className='text-red-500 p-1 hover:bg-red-50 hover:text-red-800'
                         >
                           <Delete sx={{ fontSize: 20 }} />
                         </Button>
@@ -368,13 +421,21 @@ const SettingsPage = () => {
 
                     {/* New address accordion */}
                     {newAddress && (
-                      <Accordion type="single" className="w-full">
-                        <AccordionItem value="new-address" className="border rounded-lg shadow-sm">
-                          <AccordionTrigger className="px-4 py-3 hover:bg-purple-50 transition-colors duration-200">
-                            <span className="font-medium">{formatAddressTitle(newAddress)}</span>
+                      <Accordion type='single' className='w-full'>
+                        <AccordionItem
+                          value='new-address'
+                          className='border rounded-lg shadow-sm'
+                        >
+                          <AccordionTrigger className='px-4 py-3 hover:bg-purple-50 transition-colors duration-200'>
+                            <span className='font-medium'>
+                              {formatAddressTitle(newAddress)}
+                            </span>
                           </AccordionTrigger>
-                          <AccordionContent className="px-4 pb-4 pt-2">
-                            <AddressInput placeholder={""} onSelect={onAddressSelect} />
+                          <AccordionContent className='px-4 pb-4 pt-2'>
+                            <AddressInput
+                              placeholder={''}
+                              onSelect={onAddressSelect}
+                            />
                           </AccordionContent>
                         </AccordionItem>
                       </Accordion>
@@ -394,16 +455,16 @@ const SettingsPage = () => {
                     )}
 
                     {newAddress && (
-                      <div className="flex justify-end">
+                      <div className='flex justify-end'>
                         <Button
                           onClick={cancelNewAddress}
-                          className="bg-gray-300 hover:bg-gray-400 w-1/2 flex-1/2"
+                          className='bg-gray-300 hover:bg-gray-400 w-1/2 flex-1/2'
                         >
                           Annuler
                         </Button>
                         <Button
                           onClick={saveNewAddress}
-                          className="bg-purple-dark hover:bg-purple-dark/90 flex-1/2 ml-2"
+                          className='bg-purple-dark hover:bg-purple-dark/90 flex-1/2 ml-2'
                         >
                           Enregistrer
                         </Button>
@@ -411,22 +472,118 @@ const SettingsPage = () => {
                     )}
                   </div>
                 )}
+              </AccordionContent>
+            </AccordionItem>
 
+            <AccordionItem
+              value='preferences'
+              className='border rounded-lg mb-4 shadow-sm bg-white'
+            >
+              <AccordionTrigger className='px-4 py-3 hover:bg-purple-50 transition-colors duration-200'>
+                <div className='flex items-center'>
+                  <RestaurantMenu
+                    sx={{ width: 24, height: 24 }}
+                    className='!text-purple-dark !bg-transparent mr-2'
+                  />
+                  <span className='font-medium'>Préférences alimentaires</span>
+                </div>
+              </AccordionTrigger>
+              <AccordionContent className='px-4 pb-4 pt-2'>
+                <div className='space-y-4'>
+                  {isLoading ? (
+                    <Skeleton className='h-10 w-full' />
+                  ) : (
+                    <MultiSelect
+                      options={
+                        foodPreferences?.map((foodPref) => ({
+                          id: foodPref.id,
+                          label: foodPref.name,
+                          value: foodPref.id,
+                        })) || []
+                      }
+                      selected={
+                        foodPreferences
+                          ?.filter((foodPref) =>
+                            selectedFoodPreferences.includes(foodPref.id)
+                          )
+                          .map((foodPref) => ({
+                            id: foodPref.id,
+                            label: foodPref.name,
+                            value: foodPref.id,
+                          })) || []
+                      }
+                      onChange={(selected: Option[]) => {
+                        setSelectedFoodPreferences(
+                          selected.map((item) => item.id)
+                        );
+                      }}
+                      placeholder='Vos préférences alimentaires...'
+                      className='border-gray-300'
+                    />
+                  )}
+                </div>
+              </AccordionContent>
+            </AccordionItem>
 
+            <AccordionItem
+              value='allergens'
+              className='border rounded-lg mb-4 shadow-sm bg-white'
+            >
+              <AccordionTrigger className='px-4 py-3 hover:bg-purple-50 transition-colors duration-200'>
+                <div className='flex items-center'>
+                  <NoFood
+                    sx={{ width: 24, height: 24 }}
+                    className='!text-purple-dark !bg-transparent mr-2'
+                  />
+                  <span className='font-medium'>Allergènes</span>
+                </div>
+              </AccordionTrigger>
+              <AccordionContent className='px-4 pb-4 pt-2'>
+                <div className='space-y-4'>
+                  {isLoading ? (
+                    <Skeleton className='h-10 w-full' />
+                  ) : (
+                    <MultiSelect
+                      options={
+                        allergens?.map((allergen) => ({
+                          id: allergen.id,
+                          label: allergen.name,
+                          value: allergen.id,
+                        })) || []
+                      }
+                      selected={
+                        allergens
+                          ?.filter((allergen) =>
+                            selectedAllergens.includes(allergen.id)
+                          )
+                          .map((allergen) => ({
+                            id: allergen.id,
+                            label: allergen.name,
+                            value: allergen.id,
+                          })) || []
+                      }
+                      onChange={(selected: Option[]) => {
+                        setSelectedAllergens(selected.map((item) => item.id));
+                      }}
+                      placeholder='Sélectionner des allergènes...'
+                      className='border-gray-300'
+                    />
+                  )}
+                </div>
               </AccordionContent>
             </AccordionItem>
           </Accordion>
-          <div className="flex justify-end space-x-2 mt-4">
+          <div className='flex justify-end space-x-2 mt-4'>
             <Button
               type='submit'
-              className="bg-purple-dark hover:bg-purple-dark/90"
+              className='bg-purple-dark hover:bg-purple-dark/90'
             >
               Enregistrer
             </Button>
           </div>
         </section>
       </div>
-    </form >
+    </form>
   );
 };
 

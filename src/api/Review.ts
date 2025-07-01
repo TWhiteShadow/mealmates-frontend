@@ -26,7 +26,6 @@ export interface ReviewData {
 
 export interface ReportData {
   reason: string;
-  description?: string;
 }
 
 export async function submitTransactionReview(
@@ -69,10 +68,11 @@ export async function getUserReviews(
   return response.data;
 }
 
-export function useUserReviews(userId: number, limit: number = 5) {
+export function useUserReviews(userId: number, limit: number = 5, offset: number = 0, isLoading?: boolean) {
   return useQuery({
-    queryKey: ['userReviews', userId, limit],
-    queryFn: () => getUserReviews(userId, limit),
+    queryKey: ['userReviews', userId, limit, offset],
+    queryFn: () => getUserReviews(userId, limit, offset),
+    enabled: !isLoading && userId > 0,
   });
 }
 

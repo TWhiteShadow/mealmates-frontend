@@ -8,16 +8,18 @@ type User = {
   averageRating?: number | null;
 };
 
-const UserProfileLink = ({
+const UserCardLink = ({
   user,
+  link,
   children,
 }: {
   user: User;
+  link?: string;
   children: React.ReactNode;
 }) => {
   return (
     <Link
-      to={`/app/user/${user.id}`}
+      to={link ? link : `/app/user/${user.id}`}
       className='text-gray-600 flex items-center w-fit hover:bg-gray-100 p-2 rounded'
     >
       <UserAvatar user={user} size='sm' className='inline-block mr-2' />
@@ -26,4 +28,4 @@ const UserProfileLink = ({
   );
 };
 
-export default UserProfileLink;
+export default UserCardLink;

@@ -118,6 +118,7 @@ export async function getNearbyProducts(
     maxPrice?: number;
     // minSellerRating?: number;
     dietaryPreferences?: string[];
+    forMe?: boolean;
   }
 ): Promise<Product[]> {
   let url = `/products/nearby?lat=${lat}&lng=${lng}&radius=${radius}`;
@@ -142,10 +143,13 @@ export async function getNearbyProducts(
     if (filters.dietaryPreferences?.length) {
       url += `&dietaryPreferences=${filters.dietaryPreferences.join(',')}`;
     }
+    if(filters.forMe) {
+      url += `&forMe=true`;
+    }
   }
 
   const response = await api.get(url, {
-    withCredentials: false,
+    withCredentials: true,
   });
   return response.data;
 }
@@ -161,6 +165,7 @@ export function useNearbyProducts(
     maxPrice?: number;
     // minSellerRating?: number;
     dietaryPreferences?: string[];
+    forMe?: boolean;
   }
 ) {
   return useQuery({
@@ -266,6 +271,31 @@ export function useDeleteProductMutation() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['allUserProducts'] });
       queryClient.invalidateQueries({ queryKey: ['nearbyProducts'] });
+    },
+  });
+}
+
+export interface ReportProductData {
+  reason: string;
+}
+
+export async function reportProduct(productId: number, reportData: ReportProductData) {
+  const response = await api.post(`/products/${productId}/report`, reportData);
+  return response.data;
+}
+
+export function useReportProductMutation() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({
+      productId,
+      reportData,
+    }: {
+      productId: number;
+      reportData: ReportProductData;
+    }) => reportProduct(productId, reportData),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['product'] });
     },
   });
 }

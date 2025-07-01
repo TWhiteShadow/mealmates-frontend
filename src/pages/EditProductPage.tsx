@@ -7,7 +7,7 @@ import SellPageForm from '@/components/SellPage/SellPageForm';
 import { useEffect, useState } from 'react';
 import { useSetAtom } from 'jotai';
 import { sellFormDataAtom } from '@/components/SellPage/atoms';
-import { useUserData } from '@/api/User';
+import { useAuthenticatedUserData } from '@/api/User';
 import { toast } from 'sonner';
 
 const convertProductToFormData = (product: Product): ProductFormData => {
@@ -29,7 +29,7 @@ export default function EditProductPage() {
     const { id } = useParams();
     const navigate = useNavigate();
     const { data: product, isLoading: productLoading, error: productError } = useProduct(Number(id));
-    const { data: user, isLoading: userLoading, error: userError } = useUserData();
+    const { data: user, isLoading: userLoading, error: userError } = useAuthenticatedUserData();
     const [isLoadingImages, setIsLoadingImages] = useState(false);
     const setFormData = useSetAtom(sellFormDataAtom);
 

@@ -1,8 +1,8 @@
 import ProfileAppBar from '@/components/ProfileAppBar';
 import OrderCard from '@/components/OrderCard';
 import StatCard from '@/components/StatCard';
-import { useNavigate } from 'react-router';
-import { useUserData, useUserStats } from '@/api/User';
+import { Link, useNavigate } from 'react-router';
+import { useAuthenticatedUserData, useUserStats } from '@/api/User';
 import { Skeleton } from '@/components/ui/skeleton';
 import UserAvatar from '@/components/UserAvatar';
 import { useAllUserProducts, useUserBoughtProducts } from '@/api/Product';
@@ -13,9 +13,11 @@ import {
   ShoppingCart,
   Star,
 } from 'lucide-react';
+import { useUserReviews } from '@/api/Review';
+import UserReviewCard from '@/components/UserReviewCard';
 
 const ProfilePage = () => {
-  const { isLoading: isLoadingUserData, data: userData } = useUserData();
+  const { isLoading: isLoadingUserData, data: userData } = useAuthenticatedUserData();
 
   const { isLoading: isLoadingUserProductsData, data: userProductsData } =
     useAllUserProducts();
@@ -27,6 +29,13 @@ const ProfilePage = () => {
 
   const { isLoading: isLoadingUserStats, data: userStats } = useUserStats(
     userData?.id || 0,
+    isLoadingUserData
+  );
+
+  const { data: userReviews, isLoading: isLoadingReviews } = useUserReviews(
+    Number(userData?.id || 0),
+    5,
+    0,
     isLoadingUserData
   );
 
@@ -66,7 +75,7 @@ const ProfilePage = () => {
               value={
                 !isLoadingUserStats && userData?.averageRating
                   ? userData?.averageRating.toFixed(2)
-                  : '0.0'
+                  : ''
               }
               unit='/5'
               isLoading={isLoadingUserStats}
@@ -89,7 +98,7 @@ const ProfilePage = () => {
               title='Offres vendues'
               value={
                 !isLoadingUserStats &&
-                userStats?.completedTransactions !== undefined
+                  userStats?.completedTransactions !== undefined
                   ? userStats?.completedTransactions.toString()
                   : '0'
               }
@@ -102,7 +111,7 @@ const ProfilePage = () => {
               title='Offres achetées'
               value={
                 !isLoadingUserStats &&
-                userStats?.boughtTransactions !== undefined
+                  userStats?.boughtTransactions !== undefined
                   ? userStats?.boughtTransactions.toString()
                   : '0'
               }
@@ -113,7 +122,8 @@ const ProfilePage = () => {
             />
           </div>
         </section>
-        <section className='mb-8'>
+
+        <section className='mt-8 mb-8'>
           <div className='flex items-center justify-between mb-4'>
             <h2 className='text-lg font-semibold'>Vos dernières commandes</h2>
             <button
@@ -150,7 +160,7 @@ const ProfilePage = () => {
           )}
         </section>
 
-        <section className='mt-8'>
+        <section className='mt-8 mb-8'>
           <div className='flex items-center justify-between mb-4'>
             <h2 className='text-lg font-semibold'>Vos offres</h2>
             <button
@@ -182,6 +192,40 @@ const ProfilePage = () => {
               ) : (
                 <p className='text-gray-500'>
                   Vous n'avez pas d'offres publiées.
+                </p>
+              )}
+            </div>
+          )}
+        </section>
+
+        <section className='mt-8 mb-8'>
+          <div className='flex items-center justify-between mb-4'>
+            <h2 className='text-lg font-semibold'>Avis reçus</h2>
+            <Link
+              to={`/app/user/${userData?.id}/reviews`}
+              className='text-purple-dark underline-offset-2 underline text-sm'
+            >
+              Voir plus
+            </Link>
+          </div>
+
+          {isLoadingReviews ? (
+            <div className='space-y-4'>
+              <Skeleton className='h-32 bg-gray-200 w-full rounded-lg' />
+              <Skeleton className='h-32 bg-gray-200 w-full rounded-lg' />
+              <Skeleton className='h-32 bg-gray-200 w-full rounded-lg' />
+            </div>
+          ) : (
+            <div className='space-y-4'>
+              {userReviews && userReviews.length > 0 ? (
+                userReviews
+                  .slice(0, 3)
+                  .map((review) => (
+                    <UserReviewCard key={review.id} review={review} />
+                  ))
+              ) : (
+                <p className='text-gray-500 text-center py-8'>
+                  Aucun avis pour le moment.
                 </p>
               )}
             </div>

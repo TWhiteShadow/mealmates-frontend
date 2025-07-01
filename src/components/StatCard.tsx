@@ -12,11 +12,15 @@ interface StatCardProps {
   icon: ReactNode;
   className?: string;
   isLoading?: boolean;
+  onClick?: () => void;
 }
 
-const StatCard = ({ title, value, unit, icon, children, className, isLoading }: StatCardProps & { children?: ReactNode }) => {
+const StatCard = ({ title, value, unit, icon, children, className, isLoading, onClick }: StatCardProps & { children?: ReactNode }) => {
   return (
-    <div className="bg-white p-4 rounded-lg drop-shadow-lg text-center h-42">
+    <div
+      className="bg-white p-4 rounded-lg drop-shadow-lg text-center h-42"
+      onClick={onClick}
+    >
       <div className="text-sm text-gray-600 font-bold">{title}</div>
       {isLoading ? (
         <div className="flex justify-center items-center h-[90%]">

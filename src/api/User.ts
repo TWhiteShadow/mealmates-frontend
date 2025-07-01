@@ -5,6 +5,8 @@ import {
   useQuery,
   useQueryClient,
 } from '@tanstack/react-query';
+import { FoodPreference } from './FoodPreference';
+import { useState, useEffect } from 'react';
 
 export interface User {
   id: number;
@@ -61,6 +63,7 @@ export type UserData = {
   first_name: string;
   address: Address[];
   allergen: Allergen[];
+  foodPreference: FoodPreference[];
   isVerified: boolean;
   averageRating: number | null;
 };
@@ -179,6 +182,14 @@ export async function getUserData(): Promise<UserData> {
   return response.data;
 }
 
+export function useUserData(logged: boolean = false) {
+  return useQuery({
+    queryKey: ['userData'],
+    queryFn: () => getUserData(),
+    enabled: logged, // Only fetch if the user is logged in
+  });
+}
+
 // Update User Data with axios
 export async function updateUserDataWithAxios(
   userData: UserData
@@ -187,7 +198,7 @@ export async function updateUserDataWithAxios(
   return response.data;
 }
 
-const queryKey: QueryKey = ['userData'];
+const queryKey: QueryKey = ['userData', 'nearbyProducts'];
 
 // Tanstack Query Wrapper
 export function useUpdateUserDataMutation() {
@@ -199,14 +210,6 @@ export function useUpdateUserDataMutation() {
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey });
     },
-  });
-}
-
-// Get User Data
-export function useUserData() {
-  return useQuery({
-    queryKey: ['userData'],
-    queryFn: () => getUserData(),
   });
 }
 
@@ -243,4 +246,53 @@ export function useUserById(id: number) {
     queryKey: ['user', id],
     queryFn: () => getUserById(id),
   });
+}
+
+export interface ReportUserData {
+  reason: string;
+}
+
+export async function reportUser(userId: number, reportData: ReportUserData) {
+  const response = await api.post(`/users/${userId}/report`, reportData);
+  return response.data;
+}
+
+export function useReportUserMutation() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({
+      userId,
+      reportData,
+    }: {
+      userId: number;
+      reportData: ReportUserData;
+    }) => reportUser(userId, reportData),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['user'] });
+    },
+  });
+}
+
+export function useAuthenticatedUserData() {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
+
+  useEffect(() => {
+    const checkLoggedStatus = async () => {
+      try {
+        const response = await userLogged();
+        setIsLoggedIn(response.success);
+      } finally {
+        setIsCheckingAuth(false);
+      }
+    };
+    checkLoggedStatus();
+  }, []);
+
+  const query = useUserData(isLoggedIn);
+
+  return {
+    ...query,
+    isCheckingAuth,
+  };
 }

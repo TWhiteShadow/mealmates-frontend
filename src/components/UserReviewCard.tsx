@@ -1,20 +1,12 @@
 import { useState } from 'react';
 import { Flag, Star, StarHalf } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
-import { Label } from '@/components/ui/label';
+import ReportDialog from './ReportDialog';
 import { formatDistanceToNow } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { toast } from 'sonner';
 import { Review, useReportReviewMutation } from '@/api/Review';
-import UserProfileLink from './UserProfileLink';
+import UserCardLink from './UserCardLink';
 
 interface UserReviewCardProps {
   review: Review;
@@ -22,30 +14,20 @@ interface UserReviewCardProps {
 
 const UserReviewCard = ({ review }: UserReviewCardProps) => {
   const [showReportDialog, setShowReportDialog] = useState(false);
-  const [reportReason, setReportReason] = useState('');
-  const [reportDescription, setReportDescription] = useState('');
 
   const reportMutation = useReportReviewMutation();
 
-  const handleReport = () => {
-    if (!reportReason) {
-      toast.error('Veuillez sélectionner une raison');
-      return;
-    }
-
+  const handleReport = (reason: string) => {
     reportMutation.mutate(
       {
         reviewId: review.id,
         reportData: {
-          reason: reportReason,
-          description: reportDescription,
+          reason: reason,
         },
       },
       {
         onSuccess: () => {
           setShowReportDialog(false);
-          setReportReason('');
-          setReportDescription('');
         },
         onError: () => {
           toast.error("Erreur lors de l'envoi du signalement");
@@ -94,7 +76,7 @@ const UserReviewCard = ({ review }: UserReviewCardProps) => {
       <div className='bg-white p-4 rounded-lg shadow-sm border'>
         <div className='flex items-start justify-between mb-1.5'>
           <div className='flex items-center gap-3'>
-            <UserProfileLink user={review.reviewer}>
+            <UserCardLink user={review.reviewer}>
               <div className='flex items-center flex-nowrap'>
                 <span className='text-gray-600'>
                   {review.reviewer.first_name || ''}{' '}
@@ -107,7 +89,7 @@ const UserReviewCard = ({ review }: UserReviewCardProps) => {
                   </span>
                 )}
               </div>
-            </UserProfileLink>
+            </UserCardLink>
           </div>
           <div className='flex items-center gap-2'>
             <Button
@@ -158,58 +140,21 @@ const UserReviewCard = ({ review }: UserReviewCardProps) => {
         </div>
       </div>
 
-      <Dialog open={showReportDialog} onOpenChange={setShowReportDialog}>
-        <DialogContent className='sm:max-w-md'>
-          <DialogHeader>
-            <DialogTitle>Signaler ce commentaire</DialogTitle>
-            <DialogDescription>
-              Pourquoi souhaitez-vous signaler ce commentaire ?
-            </DialogDescription>
-          </DialogHeader>
-
-          <div className='space-y-4'>
-            <div className='space-y-2'>
-              <Label>Raison du signalement :</Label>
-              <div className='space-y-2'>
-                {[
-                  { value: 'spam', label: 'Spam ou contenu indésirable' },
-                  { value: 'harassment', label: 'Harcèlement ou intimidation' },
-                  { value: 'inappropriate', label: 'Contenu inapproprié' },
-                  { value: 'fake', label: 'Faux commentaire' },
-                  { value: 'other', label: 'Autre' },
-                ].map((option) => (
-                  <label
-                    key={option.value}
-                    className='flex items-center space-x-2 cursor-pointer'
-                  >
-                    <input
-                      type='radio'
-                      name='reportReason'
-                      value={option.value}
-                      checked={reportReason === option.value}
-                      onChange={(e) => setReportReason(e.target.value)}
-                      className='w-4 h-4 text-purple-600'
-                    />
-                    <span className='text-sm'>{option.label}</span>
-                  </label>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          <DialogFooter>
-            <Button
-              variant='outline'
-              onClick={() => setShowReportDialog(false)}
-            >
-              Annuler
-            </Button>
-            <Button onClick={handleReport} disabled={reportMutation.isPending}>
-              {reportMutation.isPending ? 'Envoi...' : 'Signaler'}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <ReportDialog
+        open={showReportDialog}
+        onOpenChange={setShowReportDialog}
+        title='Signaler ce commentaire'
+        description='Pourquoi souhaitez-vous signaler ce commentaire ?'
+        options={[
+          { value: 'spam', label: 'Spam ou contenu indésirable' },
+          { value: 'harassment', label: 'Harcèlement ou intimidation' },
+          { value: 'inappropriate', label: 'Contenu inapproprié' },
+          { value: 'fake', label: 'Faux commentaire' },
+          { value: 'other', label: 'Autre' },
+        ]}
+        onReport={handleReport}
+        isPending={reportMutation.isPending}
+      />
     </>
   );
 };
