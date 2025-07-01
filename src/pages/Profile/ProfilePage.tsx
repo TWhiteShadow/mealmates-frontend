@@ -75,7 +75,7 @@ const ProfilePage = () => {
               value={
                 !isLoadingUserStats && userData?.averageRating
                   ? userData?.averageRating.toFixed(2)
-                  : '0.0'
+                  : ''
               }
               unit='/5'
               isLoading={isLoadingUserStats}

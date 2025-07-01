@@ -74,7 +74,7 @@ const UserPage = () => {
               value={
                 !isLoading && user?.averageRating
                   ? user.averageRating.toFixed(2)
-                  : '0.0'
+                  : ''
               }
               unit='/5'
               isLoading={isLoading}
