@@ -26,7 +26,6 @@ export interface ReviewData {
 
 export interface ReportData {
   reason: string;
-  description?: string;
 }
 
 export async function submitTransactionReview(

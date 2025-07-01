@@ -246,3 +246,28 @@ export function useUserById(id: number) {
     queryFn: () => getUserById(id),
   });
 }
+
+export interface ReportUserData {
+  reason: string;
+}
+
+export async function reportUser(userId: number, reportData: ReportUserData) {
+  const response = await api.post(`/users/${userId}/report`, reportData);
+  return response.data;
+}
+
+export function useReportUserMutation() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({
+      userId,
+      reportData,
+    }: {
+      userId: number;
+      reportData: ReportUserData;
+    }) => reportUser(userId, reportData),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['user'] });
+    },
+  });
+}

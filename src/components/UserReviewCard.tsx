@@ -14,25 +14,20 @@ interface UserReviewCardProps {
 
 const UserReviewCard = ({ review }: UserReviewCardProps) => {
   const [showReportDialog, setShowReportDialog] = useState(false);
-  const [reportReason, setReportReason] = useState('');
-  const [reportDescription, setReportDescription] = useState('');
 
   const reportMutation = useReportReviewMutation();
 
-  const handleReport = () => {
+  const handleReport = (reason: string) => {
     reportMutation.mutate(
       {
         reviewId: review.id,
         reportData: {
-          reason: reportReason,
-          description: reportDescription,
+          reason: reason,
         },
       },
       {
         onSuccess: () => {
           setShowReportDialog(false);
-          setReportReason('');
-          setReportDescription('');
         },
         onError: () => {
           toast.error("Erreur lors de l'envoi du signalement");
@@ -157,10 +152,7 @@ const UserReviewCard = ({ review }: UserReviewCardProps) => {
           { value: 'fake', label: 'Faux commentaire' },
           { value: 'other', label: 'Autre' },
         ]}
-        onReport={(reason) => {
-          setReportReason(reason);
-          handleReport();
-        }}
+        onReport={handleReport}
         isPending={reportMutation.isPending}
       />
     </>

@@ -25,8 +25,8 @@ import {
   NoFood,
 } from '@mui/icons-material';
 
-import { useAllergens, Allergen } from '@/api/Allergen';
-import { useFoodPreferences, FoodPreference } from '@/api/FoodPreference';
+import { useAllergens } from '@/api/Allergen';
+import { useFoodPreferences } from '@/api/FoodPreference';
 
 import {
   Accordion,

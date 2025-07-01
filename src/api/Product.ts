@@ -277,7 +277,6 @@ export function useDeleteProductMutation() {
 
 export interface ReportProductData {
   reason: string;
-  description?: string;
 }
 
 export async function reportProduct(productId: number, reportData: ReportProductData) {

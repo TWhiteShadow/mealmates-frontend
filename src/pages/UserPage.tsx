@@ -1,4 +1,4 @@
-import { useUserById, useUserStats } from '@/api/User';
+import { useUserById, useUserStats, useReportUserMutation } from '@/api/User';
 import { useUserOffers } from '@/api/Product';
 import ProfileAppBar from '@/components/ProfileAppBar';
 import { Button } from '@/components/ui/button';
@@ -6,13 +6,17 @@ import { Skeleton } from '@/components/ui/skeleton';
 import StatCard from '@/components/StatCard';
 import OrderCard from '@/components/OrderCard';
 import UserReviewCard from '@/components/UserReviewCard';
-import { ChevronLeft, Star, ShoppingCart } from 'lucide-react';
+import { ChevronLeft, Star, ShoppingCart, Flag } from 'lucide-react';
 import { Link, useNavigate, useParams } from 'react-router';
 import { useUserReviews } from '@/api/Review';
+import { useState } from 'react';
+import ReportDialog from '@/components/ReportDialog';
+import { toast } from 'sonner';
 
 const UserPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const [showReportDialog, setShowReportDialog] = useState(false);
 
   const { data: user, isLoading, error } = useUserById(Number(id));
   const { data: userStats, isLoading: isLoadingUserStats } = useUserStats(
@@ -29,6 +33,28 @@ const UserPage = () => {
     5,
     0
   );
+
+  const reportMutation = useReportUserMutation();
+
+  const handleReport = (reason: string) => {
+    reportMutation.mutate(
+      {
+        userId: Number(id),
+        reportData: {
+          reason: reason,
+        },
+      },
+      {
+        onSuccess: () => {
+          setShowReportDialog(false);
+          toast.success('Signalement envoyé avec succès');
+        },
+        onError: () => {
+          toast.error("Erreur lors de l'envoi du signalement");
+        },
+      }
+    );
+  };
 
   if (isLoading) {
     return (
@@ -63,6 +89,15 @@ const UserPage = () => {
           <span className='text-lg font-Lilita font-bold text-purple-dark'>
             {user.first_name || ''} {user.last_name || ''}
           </span>
+          <Button
+            variant='ghost'
+            size='sm'
+            onClick={() => setShowReportDialog(true)}
+            className='p-1 absolute right-3 h-auto text-gray-400 hover:text-red-500'
+            title='Signaler cet utilisateur'
+          >
+            <Flag className='w-4 h-4' />
+          </Button>
         </div>
       </ProfileAppBar>
 
@@ -169,6 +204,22 @@ const UserPage = () => {
           )}
         </section>
       </div>
+      <ReportDialog
+        open={showReportDialog}
+        onOpenChange={setShowReportDialog}
+        title='Signaler cet utilisateur'
+        description='Pourquoi souhaitez-vous signaler cet utilisateur ?'
+        options={[
+          { value: 'spam', label: 'Spam ou contenu indésirable' },
+          { value: 'harassment', label: 'Harcèlement ou intimidation' },
+          { value: 'scam', label: 'Arnaque ou fraude' },
+          { value: 'fake', label: 'Faux profil' },
+          { value: 'inappropriate', label: 'Comportement inapproprié' },
+          { value: 'other', label: 'Autre' },
+        ]}
+        onReport={handleReport}
+        isPending={reportMutation.isPending}
+      />
     </div>
   );
 };
