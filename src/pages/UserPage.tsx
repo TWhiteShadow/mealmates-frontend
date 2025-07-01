@@ -15,7 +15,7 @@ const UserPage = () => {
   const navigate = useNavigate();
   
   const { data: user, isLoading, error } = useUserById(Number(id));
-  const { data: userStats, isLoading: isLoadingUserStats } = useUserStats(Number(id));
+  const { data: userStats, isLoading: isLoadingUserStats } = useUserStats(Number(id), isLoading);
   const { data: userOffers, isLoading: isLoadingOffers } = useUserOffers(Number(id), 3, 0);
   const { data: userReviews, isLoading: isLoadingReviews } = useUserReviews(Number(id), 5);
 
