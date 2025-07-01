@@ -12,6 +12,7 @@ export interface User {
   first_name: string;
   last_name: string;
   fullname?: string;
+  averageRating: number | null;
 }
 
 export interface AuthResponse {
@@ -50,7 +51,6 @@ export interface AddressResponse {
   success: boolean;
   message: string;
   address: Address[];
-  averageRating: number | null;
 }
 
 export type UserData = {
@@ -72,10 +72,9 @@ export type UserDataResponse = {
 };
 
 export type UserStatsResponse = {
-  totalEarnings: number;
+  totalEarnings?: number;
   completedTransactions: number;
-  boughtTransactions: number;
-  averageRating: number | null;
+  boughtTransactions?: number;
 };
 
 export interface ApiErrorResponse {
@@ -221,14 +220,27 @@ export async function userLogged(): Promise<LoggedResponse> {
   return response.data;
 }
 
-export const getUserStats = async (): Promise<UserStatsResponse> => {
-  const response = await api.get('/user/stats');
+export const getUserStats = async (id: number): Promise<UserStatsResponse> => {
+  const response = await api.get(`/user/${id}/stats`);
   return response.data;
 };
 
-export const useUserStats = () => {
+export const useUserStats = (id: number, isLoadingUserData: boolean) => {
   return useQuery({
-    queryKey: ['userStats'],
-    queryFn: getUserStats,
+    queryKey: ['userStats', id],
+    queryFn: () => getUserStats(id),
+    enabled: !isLoadingUserData && id > 0,
   });
 };
+
+export async function getUserById(id: number): Promise<UserData> {
+  const response = await api.get(`/user/${id}`);
+  return response.data;
+}
+
+export function useUserById(id: number) {
+  return useQuery({
+    queryKey: ['user', id],
+    queryFn: () => getUserById(id),
+  });
+}

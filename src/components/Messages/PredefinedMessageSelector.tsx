@@ -14,7 +14,7 @@ const PredefinedMessageSelector: React.FC<PredefinedMessageSelectorProps> = ({
     onClose
 }) => {
     return (
-        <div className="absolute bottom-full left-0 right-0 bg-white border rounded-lg shadow-lg p-2 mb-2">
+        <div className="absolute bottom-full left-0 right-0 bg-white border rounded-lg shadow-lg p-2 mb-2 z-20">
             <div className="flex justify-between items-center mb-2">
                 <h3 className="text-sm font-medium">Messages prédéfinis</h3>
                 <Button type="button" variant="ghost" size="icon" onClick={onClose}>

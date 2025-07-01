@@ -1,8 +1,9 @@
 import { Product } from '@/api/Product';
 import { Button } from '@/components/ui/button';
-import { XCircle } from 'lucide-react';
+import { Star, XCircle } from 'lucide-react';
 import { useNavigate } from 'react-router';
 import logo from '@/assets/MealMatesLogo.webp';
+import UserProfileLink from '@/components/UserProfileLink';
 
 interface OfferCardProps {
     offer: Product | null;
@@ -58,19 +59,24 @@ const OfferCard: React.FC<OfferCardProps> = ({ offer, onClose }) => {
                                     <span className="ml-2">{offer.quantity}</span>
                                 </div>
                             )}
-                            {offer.seller && (
-                                <div>
-                                    <span className="text-gray-500">Vendeur:</span>
-                                    <span className="ml-2">{offer.seller.first_name} {offer.seller.last_name}</span>
-                                </div>
-                            )}
-                            {offer.sellerRating && (
-                                <div>
-                                    <span className="text-gray-500">Note:</span>
-                                    <span className="ml-2">{offer.sellerRating.toFixed(2)}/5 ⭐</span>
-                                </div>
-                            )}
                         </div>
+                        {offer.seller && (
+                            <div>
+                                <UserProfileLink
+                                    user={offer.seller}
+                                >
+                                    <div className='flex items-center flex-nowrap'>
+                                        <span className='text-gray-600'>{offer.seller.first_name || ''} {offer.seller.last_name || ''}</span>
+                                        {offer.seller.averageRating && (
+                                            <span className="ml-2 text-gray-500 text-sm flex items-center flex-nowrap">
+                                                {offer.seller.averageRating.toFixed(2)}
+                                                <Star className='fill-purple-semi-dark stroke-purple-dark w-3 ml-0.5' />
+                                            </span>
+                                        )}
+                                    </div>
+                                </UserProfileLink>
+                            </div>
+                        )}
 
                         <div className="mt-4">
                             <Button

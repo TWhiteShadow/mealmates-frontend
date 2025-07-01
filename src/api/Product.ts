@@ -24,11 +24,13 @@ export interface Product {
     id: number;
     first_name: string | null;
     last_name: string | null;
+    averageRating?: number | null;
   };
   buyer: {
     id: number;
     first_name: string | null;
     last_name: string | null;
+    averageRating?: number | null;
   } | null;
   images?: Array<{
     id: number;
@@ -204,6 +206,28 @@ export function useUserBoughtProducts() {
   return useQuery({
     queryKey: ['userBoughtProducts'],
     queryFn: () => getUserBoughtProducts(),
+  });
+}
+
+export async function getByUserId(
+  id: number,
+  limit: number = 3,
+  offset: number = 0
+): Promise<Product[]> {
+  const response = await api.get(
+    `/user/${id}/offers?limit=${limit}&offset=${offset}`
+  );
+  return response.data;
+}
+
+export function useUserOffers(
+  id: number,
+  limit: number = 3,
+  offset: number = 0
+) {
+  return useQuery({
+    queryKey: ['user', id, 'products', limit, offset],
+    queryFn: () => getByUserId(id, limit, offset),
   });
 }
 
