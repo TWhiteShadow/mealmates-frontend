@@ -6,7 +6,7 @@ import { useUserData, useUserStats } from "@/api/User";
 import { Skeleton } from "@/components/ui/skeleton";
 import UserAvatar from "@/components/UserAvatar";
 import { useAllUserProducts, useUserBoughtProducts } from "@/api/Product";
-import { PackageOpen, PiggyBank, SettingsIcon, ShoppingCart, Zap } from "lucide-react";
+import { PackageOpen, PiggyBank, SettingsIcon, ShoppingCart, Star } from "lucide-react";
 
 const ProfilePage = () => {
     const { isLoading: isLoadingUserData, data: userData } = useUserData();
@@ -47,11 +47,12 @@ const ProfilePage = () => {
                 <section className="my-8">
                     <div className="grid grid-cols-2 gap-4">
                         <StatCard
-                            title="CO2 évité"
-                            value="51"
-                            unit="KW/h"
+                            title="Note moyenne"
+                            value={!isLoadingUserStats && userData?.averageRating ? userData?.averageRating.toFixed(2) : "0.0"}
+                            unit="/5"
+                            isLoading={isLoadingUserStats}
                             className="text-purple-dark"
-                            icon={<Zap className="size-[80px]" />}
+                            icon={<Star className="size-[80px]" />}
                         />
                         <StatCard
                             title="Porte-monnaie"
@@ -82,7 +83,12 @@ const ProfilePage = () => {
                 <section className="mb-8">
                     <div className="flex items-center justify-between mb-4">
                         <h2 className="text-lg font-semibold">Vos dernières commandes</h2>
-                        <a href="#" className="text-purple-dark underline-offset-2 underline text-sm">Voir plus</a>
+                        <button
+                            onClick={() => navigate('/app/profile/orders')}
+                            className="text-purple-dark underline-offset-2 underline text-sm"
+                        >
+                            Voir plus
+                        </button>
                     </div>
                     {isLoadingUserBoughtProductsData ? (
                         <div className="space-y-4">
@@ -97,6 +103,7 @@ const ProfilePage = () => {
                                     <OrderCard
                                         key={product.id}
                                         product={product}
+                                        onClick={() => navigate(`/app/product/${product.id}`)}
                                     />
                                 ))
                             ) : (
@@ -109,7 +116,12 @@ const ProfilePage = () => {
                 <section className="mt-8">
                     <div className="flex items-center justify-between mb-4">
                         <h2 className="text-lg font-semibold">Vos offres</h2>
-                        <a href="#" className="text-purple-dark underline-offset-2 underline text-sm">Voir plus</a>
+                        <button
+                            onClick={() => navigate('/app/profile/offers')}
+                            className="text-purple-dark underline-offset-2 underline text-sm"
+                        >
+                            Voir plus
+                        </button>
                     </div>
 
                     {isLoadingUserProductsData ? (
@@ -125,6 +137,7 @@ const ProfilePage = () => {
                                     <OrderCard
                                         key={product.id}
                                         product={product}
+                                        onClick={() => navigate(`/app/product/${product.id}`)}
                                     />
                                 ))
                             ) : (

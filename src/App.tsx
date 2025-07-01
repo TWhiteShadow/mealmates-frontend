@@ -18,6 +18,9 @@ import { navigationRef, locationRef } from './utils/navigateRef';
 import MessagesPage from './pages/MessagesPage';
 import { useDocumentTitle } from './hooks/use-document-title';
 import ProtectedRoute from './components/ProtectedRoute';
+import EditProductPage from './pages/EditProductPage';
+import OrdersPage from './pages/Profile/OrdersPage';
+import OffersPage from './pages/Profile/OffersPage';
 
 function NavbarLayout() {
   return (
@@ -59,7 +62,22 @@ function App() {
             <SettingsPage />
           </ProtectedRoute>
         } />
+        <Route path='app/profile/orders' element={
+          <ProtectedRoute>
+            <OrdersPage />
+          </ProtectedRoute>
+        } />
+        <Route path='app/profile/offers' element={
+          <ProtectedRoute>
+            <OffersPage />
+          </ProtectedRoute>
+        } />
         <Route path='app/product/:id' element={<ProductPage />} />
+        <Route path='app/product/:id/edit' element={
+          <ProtectedRoute>
+            <EditProductPage />
+          </ProtectedRoute>
+        } />
         <Route path='app/sell' element={
           <ProtectedRoute>
             <SellPage />

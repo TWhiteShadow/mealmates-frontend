@@ -109,26 +109,3 @@ export const validateQRCode = async (url: string): Promise<boolean> => {
   const response = await api.post(url);
   return response.data;
 };
-
-export interface ReviewData {
-  productQualityRating?: number;
-  appointmentRespectRating: number;
-  friendlinessRating: number;
-}
-
-export async function submitTransactionReview(transactionId: number, reviewData: ReviewData) {
-  const response = await api.post(`/transactions/${transactionId}/reviews`, reviewData);
-  return response.data;
-}
-
-export function useSubmitTransactionReviewMutation() {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: ({ transactionId, reviewData }: { transactionId: number; reviewData: ReviewData }) => 
-      submitTransactionReview(transactionId, reviewData),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['conversations', 'userStats'] });
-    },
-  });
-}
-

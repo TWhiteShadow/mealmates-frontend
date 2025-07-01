@@ -6,6 +6,14 @@ import {
   useQueryClient,
 } from '@tanstack/react-query';
 
+export interface User {
+  id: number;
+  email: string;
+  first_name: string;
+  last_name: string;
+  fullname?: string;
+}
+
 export interface AuthResponse {
   token: string;
 }
@@ -42,6 +50,7 @@ export interface AddressResponse {
   success: boolean;
   message: string;
   address: Address[];
+  averageRating: number | null;
 }
 
 export type UserData = {
@@ -53,6 +62,7 @@ export type UserData = {
   address: Address[];
   allergen: Allergen[];
   isVerified: boolean;
+  averageRating: number | null;
 };
 
 export type UserDataResponse = {
@@ -65,6 +75,7 @@ export type UserStatsResponse = {
   totalEarnings: number;
   completedTransactions: number;
   boughtTransactions: number;
+  averageRating: number | null;
 };
 
 export interface ApiErrorResponse {
@@ -200,8 +211,12 @@ export function useUserData() {
   });
 }
 
+export interface LoggedResponse {
+  success: boolean;
+}
+
 // check if user is logged
-export async function userLogged(): Promise<any> {
+export async function userLogged(): Promise<LoggedResponse> {
   const response = await api.get(`/user/logged`);
   return response.data;
 }

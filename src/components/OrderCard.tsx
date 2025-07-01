@@ -3,16 +3,20 @@ import logo from '@/assets/MealMatesLogo.webp';
 
 interface OrderCardProps {
   product: Product;
+  onClick?: () => void;
 }
 
-const OrderCard = ({ product }: OrderCardProps) => {
+const OrderCard = ({ product, onClick }: OrderCardProps) => {
   const imageUrl =
     product.images && product.images.length > 0
       ? `${import.meta.env.VITE_BACKEND_URL}/images/files/${product.images[0].name}`
       : "";
 
   return (
-    <div className="flex items-center gap-4 bg-white p-4 rounded-lg drop-shadow-lg max-w-full cursor-pointer hover:bg-purple-50 transition-all">
+    <div
+      onClick={onClick}
+      className="flex items-center gap-4 bg-white p-4 rounded-lg drop-shadow-lg max-w-full cursor-pointer hover:bg-purple-50 transition-all"
+    >
       {product.images?.[0] ? (
         <img
           src={imageUrl}

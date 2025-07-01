@@ -3,7 +3,7 @@ import { useForm, FormProvider } from 'react-hook-form';
 import { useAtom } from 'jotai';
 import { useNavigate } from 'react-router';
 import { sellFormDataAtom } from './atoms';
-import { ProductFormData, useAddProductMutation } from '@/api/Product';
+import { ProductFormData, useAddProductMutation, useEditProductMutation } from '@/api/Product';
 import { Button } from '@/components/ui/button';
 
 import ProductInfoStep from './ProductInfoStep';
@@ -15,7 +15,12 @@ import SellPageStepper from './SellPageStepper';
 
 type FormStep = 'productInfo' | 'detailsInfo' | 'imageUpload' | 'locationInfo' | 'confirmation';
 
-const SellPageForm = () => {
+interface SellPageFormProps {
+    mode?: 'create' | 'edit';
+    productId?: number;
+}
+
+const SellPageForm = ({ mode = 'create', productId }: SellPageFormProps) => {
     const [formStep, setFormStep] = useState<FormStep>('productInfo');
     const [formData, setFormData] = useAtom(sellFormDataAtom);
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -28,6 +33,7 @@ const SellPageForm = () => {
     });
 
     const addProductMutation = useAddProductMutation();
+    const editProductMutation = useEditProductMutation();
 
     const goToPreviousStep = () => {
         if (formStep === 'detailsInfo') {
@@ -65,15 +71,20 @@ const SellPageForm = () => {
             finalFormData.quantity = parseInt(finalFormData.quantity.toString());
             finalFormData.price = parseFloat(finalFormData.price.toString());
 
-            const response = await addProductMutation.mutateAsync(finalFormData);
-
-            const confirmedProduct = {
-                ...finalFormData,
-                id: response?.id || Date.now()
-            };
-
-            setConfirmedProduct(confirmedProduct);
-            setFormStep('confirmation');
+            let response;
+            if (mode === 'edit' && productId) {
+                response = await editProductMutation.mutateAsync({ id: productId, data: finalFormData });
+                navigate('/app/profile');
+                return;
+            } else {
+                response = await addProductMutation.mutateAsync(finalFormData);
+                const confirmedProduct = {
+                    ...finalFormData,
+                    id: response?.id || Date.now()
+                };
+                setConfirmedProduct(confirmedProduct);
+                setFormStep('confirmation');
+            }
         } finally {
             setIsSubmitting(false);
         }
@@ -131,7 +142,7 @@ const SellPageForm = () => {
                                                 Mise en vente...
                                             </>
                                         ) : (
-                                            'Mettre en vente'
+                                            mode === 'edit' ? 'Enregistrer les modifications' : 'Mettre en vente'
                                         )}
                                     </Button>
                                 ) : (

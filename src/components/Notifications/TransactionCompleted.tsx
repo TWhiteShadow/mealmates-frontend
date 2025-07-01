@@ -20,16 +20,24 @@ const TransactionCompleted: React.FC<TransactionCompletedProps> = ({
   const content = params.amount > 0 
     ? `${baseMessage}. Montant: ${params.amount}€`
     : `${baseMessage}.`;
-  
+
   const actions: NotificationAction[] = [
     {
+      title: 'Donner mon avis',
+      onClick: (_: React.MouseEvent, params: Record<string, any>) => {
+        return { type: "navigate" as const, path: `/app/messages?conversation=${params.conversation_id}&leaveReaview=true` };
+      },
+      variant: 'default',
+      className: "bg-purple-semi-dark text-white hover:bg-purple-dark"
+    },
+    {
       title: 'Voir détails',
-      onClick: (_, params: Record<string, any>) => {
-        return { type: 'navigate', path: `/transaction/${params.transaction_id}` };
+      onClick: (_: React.MouseEvent, params: Record<string, any>) => {
+        return { type: "navigate" as const, path: `/app/messages?conversation=${params.conversation_id}` };
       },
       variant: 'outline',
       className: "border-purple-semi-dark text-purple-semi-dark hover:bg-purple-semi-dark hover:text-white"
-    }
+    },
   ];
 
   const icon = (
