@@ -15,7 +15,7 @@ const ProfilePage = () => {
 
     const { isLoading: isLoadingUserBoughtProductsData, data: userBoughtProductsData } = useUserBoughtProducts();
 
-    const { isLoading: isLoadingUserStats, data: userStats } = useUserStats();
+    const { isLoading: isLoadingUserStats, data: userStats } = useUserStats(userData && userData.id ? userData.id : 0);
 
     const navigate = useNavigate();
 

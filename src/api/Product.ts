@@ -207,6 +207,27 @@ export function useUserBoughtProducts() {
   });
 }
 
+export async function getByUserId(
+  id: number,
+  limit: number = 3,
+  offset: number = 0
+): Promise<Product[]> {
+  const response = await api.get(`/user/${id}/offers?limit=${limit}&offset=${offset}`);
+  return response.data;
+}
+
+export function useUserOffers(
+  id: number,
+  limit: number = 3,
+  offset: number = 0
+) {
+  return useQuery({
+    queryKey: ['user', id, 'products', limit, offset],
+    queryFn: () => getByUserId(id, limit, offset),
+  });
+}
+
+
 export async function editProduct(
   id: number,
   productData: ProductFormData

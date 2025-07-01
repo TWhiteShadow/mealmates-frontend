@@ -1,8 +1,9 @@
 import { Product } from '@/api/Product';
 import { Button } from '@/components/ui/button';
 import { XCircle } from 'lucide-react';
-import { useNavigate } from 'react-router';
+import { Link, useNavigate } from 'react-router';
 import logo from '@/assets/MealMatesLogo.webp';
+import UserAvatar from '@/components/UserAvatar';
 
 interface OfferCardProps {
     offer: Product | null;
@@ -60,8 +61,17 @@ const OfferCard: React.FC<OfferCardProps> = ({ offer, onClose }) => {
                             )}
                             {offer.seller && (
                                 <div>
-                                    <span className="text-gray-500">Vendeur:</span>
-                                    <span className="ml-2">{offer.seller.first_name} {offer.seller.last_name}</span>
+                                    <Link
+                                        to={`/app/user/${offer.seller.id}`}
+                                        className="text-gray-500 flex items-center hover:bg-gray-100 p-2 rounded"
+                                    >
+                                        <UserAvatar
+                                            user={offer.seller}
+                                            size="sm"
+                                            className="inline-block mr-2"
+                                        />
+                                        {offer.seller.first_name || ''} {offer.seller.last_name || ''}
+                                    </Link>
                                 </div>
                             )}
                             {offer.sellerRating && (

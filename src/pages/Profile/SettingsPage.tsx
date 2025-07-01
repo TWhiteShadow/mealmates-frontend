@@ -233,7 +233,7 @@ const SettingsPage = () => {
             type="button"
             variant="ghost"
             className='absolute left-3 p-1'
-            onClick={() => window.history.back()}
+            onClick={() => navigate(-1)}
           >
             <ChevronLeft className='size-8 text-purple-dark' />
           </Button>

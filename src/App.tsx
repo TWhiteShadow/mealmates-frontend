@@ -21,6 +21,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 import EditProductPage from './pages/EditProductPage';
 import OrdersPage from './pages/Profile/OrdersPage';
 import OffersPage from './pages/Profile/OffersPage';
+import UserPage from './pages/UserPage';
 
 function NavbarLayout() {
   return (
@@ -88,6 +89,7 @@ function App() {
             <MessagesPage />
           </ProtectedRoute>
         } />
+        <Route path='app/user/:id' element={<UserPage />} />
       </Route>
       <Route path='*' element={<div>404</div>} />
     </Routes>

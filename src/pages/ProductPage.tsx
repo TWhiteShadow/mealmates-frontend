@@ -62,7 +62,7 @@ export default function ProductPage() {
                     <Button
                         variant="ghost"
                         className='absolute left-3 p-1'
-                        onClick={() => window.history.back()}
+                        onClick={() => navigate(-1)}
                     >
                         <ChevronLeft className='size-8 text-purple-dark' />
                     </Button>
@@ -179,36 +179,6 @@ export default function ProductPage() {
                                 </div>
                             )}
                         </div>
-
-                        {/* <div className="mt-8 grid grid-cols-3 gap-4">
-                            <StatCard
-                                title="Personnel"
-                                value="217"
-                                unit="personnes"
-                                icon={<span>👥</span>}
-                                className="bg-white"
-                            >
-                                <p className="text-xs text-gray-500">ont trouvé le personnel sympathique</p>
-                            </StatCard>
-                            <StatCard
-                                title="Qualité"
-                                value="106"
-                                unit="personnes"
-                                icon={<span>⭐</span>}
-                                className="bg-white"
-                            >
-                                <p className="text-xs text-gray-500">ont trouvé les produits qualitatifs</p>
-                            </StatCard>
-                            <StatCard
-                                title="Quantité"
-                                value="84"
-                                unit="personnes"
-                                icon={<span>🍽️</span>}
-                                className="bg-white"
-                            >
-                                <p className="text-xs text-gray-500">ont trouvé que les produits étaient copieux</p>
-                            </StatCard>
-                        </div> */}
 
                         <div className="mt-8">
                             {product.seller?.id === user?.id ? (

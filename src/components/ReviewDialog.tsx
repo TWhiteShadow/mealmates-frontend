@@ -31,7 +31,7 @@ const ReviewDialog: React.FC<ReviewDialogProps> = ({
   const [friendlinessRating, setFriendlinessRating] = useState<number>(0);
   const [hoveredRating, setHoveredRating] = useState<number>(0);
 
-  const submitReviewMutation = useSubmitTransactionReviewMutation();;
+  const submitReviewMutation = useSubmitTransactionReviewMutation();
 
   const steps = isBuyer ? [
     {
