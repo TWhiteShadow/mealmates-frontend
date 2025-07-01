@@ -47,7 +47,6 @@ const UserPage = () => {
       {
         onSuccess: () => {
           setShowReportDialog(false);
-          toast.success('Signalement envoyé avec succès');
         },
         onError: () => {
           toast.error("Erreur lors de l'envoi du signalement");
