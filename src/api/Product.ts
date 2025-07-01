@@ -269,3 +269,29 @@ export function useDeleteProductMutation() {
     },
   });
 }
+
+export interface ReportProductData {
+  reason: string;
+  description?: string;
+}
+
+export async function reportProduct(productId: number, reportData: ReportProductData) {
+  const response = await api.post(`/products/${productId}/report`, reportData);
+  return response.data;
+}
+
+export function useReportProductMutation() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({
+      productId,
+      reportData,
+    }: {
+      productId: number;
+      reportData: ReportProductData;
+    }) => reportProduct(productId, reportData),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['product'] });
+    },
+  });
+}
