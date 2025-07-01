@@ -135,8 +135,8 @@ const UserPage = () => {
           <div className='flex items-center justify-between mb-4'>
             <h2 className='text-lg font-semibold'>Ses offres</h2>
             <Link
-            to={`/app/user/${id}/offers`}
-            className='text-purple-dark underline-offset-2 underline text-sm'
+              to={`/app/user/${id}/offers`}
+              className='text-purple-dark underline-offset-2 underline text-sm'
             >
               Voir plus
             </Link>
