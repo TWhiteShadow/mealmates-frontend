@@ -11,6 +11,7 @@ import BrowsePage from './pages/BrowsePage';
 import AuthCallbackPage from './pages/AuthCallbackPage';
 import ProfilePage from './pages/Profile/ProfilePage';
 import SettingsPage from './pages/Profile/SettingsPage';
+import GamificationPage from './pages/Profile/GamificationPage';
 import SellPage from './pages/SellPage';
 import Navbar from "@/components/ui/Navbar";
 import { useEffect } from 'react';
@@ -73,6 +74,11 @@ function App() {
         <Route path='app/profile/offers' element={
           <ProtectedRoute>
             <ProfileOffersPage />
+          </ProtectedRoute>
+        } />
+        <Route path='app/profile/badges' element={
+          <ProtectedRoute>
+            <GamificationPage />
           </ProtectedRoute>
         } />
         <Route path='app/product/:id' element={<ProductPage />} />

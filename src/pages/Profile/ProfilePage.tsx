@@ -14,6 +14,9 @@ import {
   Star,
 } from 'lucide-react';
 import { useUserReviews } from '@/api/Review';
+import { useUserBadges, useUserCredits } from '@/api/Gamification';
+import BadgeGallery from '@/components/Gamification/BadgeGallery';
+import CreditCounter from '@/components/Gamification/CreditCounter';
 import UserReviewCard from '@/components/UserReviewCard';
 
 const ProfilePage = () => {
@@ -31,6 +34,10 @@ const ProfilePage = () => {
     userData?.id || 0,
     isLoadingUserData
   );
+    
+  const { data: badges, isLoading: isLoadingBadges } = useUserBadges(userData?.id || 0);
+    
+  const { data: credits, isLoading: isLoadingCredits } = useUserCredits(userData?.id || 0);
 
   const { data: userReviews, isLoading: isLoadingReviews } = useUserReviews(
       Number(userData?.id || 0),
@@ -120,6 +127,38 @@ const ProfilePage = () => {
               className='text-purple-dark '
               icon={<ShoppingCart className='size-[80px]' />}
             />
+          </div>
+        </section>
+
+        <section className='mb-8'>
+          <div className='flex items-center justify-between mb-4'>
+            <h2 className='text-lg font-semibold'>Mes badges et crédits</h2>
+            <button
+              onClick={() => navigate('/app/profile/badges')}
+              className='text-purple-dark underline-offset-2 underline text-sm'
+            >
+              Voir plus
+            </button>
+          </div>
+          
+          <div className='p-4 bg-white rounded-lg shadow-sm'>
+            <div className='flex justify-between items-center mb-4'>
+              <h3 className='text-sm font-medium'>Mes crédits</h3>
+              <CreditCounter 
+                credits={credits} 
+                isLoading={isLoadingCredits}
+                showLifetime={false}
+              />
+            </div>
+            
+            <div className='mt-4'>
+              <h3 className='text-sm font-medium mb-2'>Badges récents</h3>
+              <BadgeGallery 
+                badges={badges?.slice(0, 3) || []} 
+                isLoading={isLoadingBadges} 
+                showLocked={false}
+              />
+            </div>
           </div>
         </section>
 
