@@ -11,6 +11,8 @@ interface CustomAxiosRequestConfig extends AxiosRequestConfig {
 
 const baseURL = import.meta.env.VITE_BACKEND_URL;
 
+const whitelist = ['login_check'];
+
 const api = axios.create({
   baseURL: `${baseURL}/api/v1`,
   withCredentials: true,
@@ -24,35 +26,13 @@ api.interceptors.response.use(
     return response;
   },
   async (error) => {
-    const status = error.response?.status;
-    // Check if this is not a token refresh request and if we got a 401 or 403
-    if (
-      !error.config.url?.includes('/token/refresh') &&
-      (status === 401 || status === 403)
-    ) {
-      const config = error.config as CustomAxiosRequestConfig;
-      if (!config._retry) {
-        config._retry = true;
-        try {
-          await refreshToken();
-          // Retry the original request with the new token
-          return await api(config);
-        } catch (refreshError) {
-          if (navigationRef.navigate) {
-            const redirectURI = locationRef.location;
-            navigationRef.navigate(`/app/login?redirectURI=${redirectURI}`);
-          }
-          return Promise.reject(refreshError);
-        }
-      }
-    }
-
     if (error.response?.data) {
       if (error.response.status === 401) {
         const message =
           error.response.data.message === 'Bad credentials.'
             ? 'Identifiants incorrects.'
             : error.response.data.message;
+        console.error('Unauthorized:', message);
         if (
           message != 'Missing JWT Refresh Token' &&
           message != 'Missing JWT Access Token' &&
@@ -60,9 +40,7 @@ api.interceptors.response.use(
         ) {
           toast.error(message);
         }
-      }
-
-      if (error.response.data.success === false) {
+      } else if (error.response.data.success === false) {
         if (error.response.data.message) {
           toast.error(error.response.data.message);
         }
@@ -78,6 +56,32 @@ api.interceptors.response.use(
               });
             }
           });
+        }
+      }
+    }
+
+    const status = error.response?.status;
+    // Check if this is not a token refresh request and if we got a 401 or 403
+    if (
+      !error.config.url?.includes('/token/refresh') &&
+      (status === 401 || status === 403)
+    ) {
+      const config = error.config as CustomAxiosRequestConfig;
+      if (!config._retry) {
+        config._retry = true;
+        try {
+          await refreshToken();
+          // Retry the original request with the new token
+          return await api(config);
+        } catch (refreshError) {
+          if (
+            navigationRef.navigate &&
+            !whitelist.some((url) => config.url?.includes(url))
+          ) {
+            const redirectURI = locationRef.location;
+            navigationRef.navigate(`/app/login?redirectURI=${redirectURI}`);
+          }
+          return Promise.reject(refreshError);
         }
       }
     }
