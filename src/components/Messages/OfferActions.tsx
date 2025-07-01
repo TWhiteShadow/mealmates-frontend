@@ -1,5 +1,5 @@
 import { Product, Transaction } from '@/api/Product';
-import { useUserData } from '@/api/User';
+import { useAuthenticatedUserData } from '@/api/User';
 import {
   useCancelReservationMutation,
   useConfirmReservationMutation,
@@ -30,7 +30,7 @@ const ProductActions = ({
   otherParticipant,
   selectedId,
 }: ProductActionsProps) => {
-  const userData = useUserData();
+  const userData = useAuthenticatedUserData();
   const isSeller = userData?.data?.id === product.seller.id;
   const hasBuyer = product.buyer !== null;
   const isBuyer = userData?.data?.id === product.buyer?.id;

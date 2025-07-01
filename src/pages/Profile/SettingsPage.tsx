@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import ProfileAppBar from '@/components/ProfileAppBar';
 import {
   useUpdateUserDataMutation,
-  useUserData,
+  useAuthenticatedUserData,
   ApiErrorResponse,
   useDeleteAddressMutation,
   Address,
@@ -71,7 +71,7 @@ const SettingsPage = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
 
-  const { isLoading, data: userData } = useUserData();
+  const { isLoading, data: userData } = useAuthenticatedUserData();
   const updateUserMutation = useUpdateUserDataMutation();
   const deleteAddressMutation = useDeleteAddressMutation();
   const { data: allergens } = useAllergens();

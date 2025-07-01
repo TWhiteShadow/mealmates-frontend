@@ -1,7 +1,7 @@
 import { Product } from '@/api/Product';
 import logo from '@/assets/MealMatesLogo.webp';
 import { cn } from '@/lib/utils';
-import { useUserData } from '@/api/User';
+import { useAuthenticatedUserData } from '@/api/User';
 
 interface OrderCardProps {
   product: Product;
@@ -9,7 +9,7 @@ interface OrderCardProps {
 }
 
 const OrderCard = ({ product, onClick }: OrderCardProps) => {
-  const { data: user } = useUserData();
+  const { data: user } = useAuthenticatedUserData();
   const imageUrl =
     product.images && product.images.length > 0
       ? `${import.meta.env.VITE_BACKEND_URL}/images/files/${product.images[0].name}`
@@ -59,7 +59,7 @@ const OrderCard = ({ product, onClick }: OrderCardProps) => {
           </span>
         </div>
       )}
-      {showExpiredTag  && (
+      {showExpiredTag && (
         <div className='absolute top-2 right-4 z-10'>
           <span className='inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-red-100 text-red-800'>
             Expiré

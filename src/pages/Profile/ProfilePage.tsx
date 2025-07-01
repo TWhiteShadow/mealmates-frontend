@@ -2,7 +2,7 @@ import ProfileAppBar from '@/components/ProfileAppBar';
 import OrderCard from '@/components/OrderCard';
 import StatCard from '@/components/StatCard';
 import { Link, useNavigate } from 'react-router';
-import { useUserData, useUserStats } from '@/api/User';
+import { useAuthenticatedUserData, useUserStats } from '@/api/User';
 import { Skeleton } from '@/components/ui/skeleton';
 import UserAvatar from '@/components/UserAvatar';
 import { useAllUserProducts, useUserBoughtProducts } from '@/api/Product';
@@ -17,7 +17,7 @@ import { useUserReviews } from '@/api/Review';
 import UserReviewCard from '@/components/UserReviewCard';
 
 const ProfilePage = () => {
-  const { isLoading: isLoadingUserData, data: userData } = useUserData();
+  const { isLoading: isLoadingUserData, data: userData } = useAuthenticatedUserData();
 
   const { isLoading: isLoadingUserProductsData, data: userProductsData } =
     useAllUserProducts();
@@ -33,11 +33,11 @@ const ProfilePage = () => {
   );
 
   const { data: userReviews, isLoading: isLoadingReviews } = useUserReviews(
-      Number(userData?.id || 0),
-      5,
-      0,
-      isLoadingUserData
-    );
+    Number(userData?.id || 0),
+    5,
+    0,
+    isLoadingUserData
+  );
 
   const navigate = useNavigate();
 
@@ -98,7 +98,7 @@ const ProfilePage = () => {
               title='Offres vendues'
               value={
                 !isLoadingUserStats &&
-                userStats?.completedTransactions !== undefined
+                  userStats?.completedTransactions !== undefined
                   ? userStats?.completedTransactions.toString()
                   : '0'
               }
@@ -111,7 +111,7 @@ const ProfilePage = () => {
               title='Offres achetées'
               value={
                 !isLoadingUserStats &&
-                userStats?.boughtTransactions !== undefined
+                  userStats?.boughtTransactions !== undefined
                   ? userStats?.boughtTransactions.toString()
                   : '0'
               }

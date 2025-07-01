@@ -3,7 +3,7 @@ import { useFormContext } from 'react-hook-form';
 import { useAtom } from 'jotai';
 import { sellFormDataAtom } from './atoms';
 import { ProductFormData } from '@/api/Product';
-import { Address, useUserData } from '@/api/User';
+import { Address, useAuthenticatedUserData } from '@/api/User';
 import { NavigateFunction } from 'react-router';
 import { Button } from '@/components/ui/button';
 
@@ -13,7 +13,7 @@ interface LocationInfoStepProps {
 
 const LocationInfoStep = ({ navigate }: LocationInfoStepProps) => {
     const [formData, setFormData] = useAtom(sellFormDataAtom);
-    const { data: userData, isLoading } = useUserData();
+    const { data: userData, isLoading } = useAuthenticatedUserData();
     const { setValue } = useFormContext<ProductFormData>();
 
     useEffect(() => {

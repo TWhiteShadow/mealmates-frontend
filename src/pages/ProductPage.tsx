@@ -20,7 +20,7 @@ import { Button } from '@/components/ui/button';
 import ProfileAppBar from '@/components/ProfileAppBar';
 import { cn } from '@/lib/utils';
 import ContactSellerButton from '@/components/ProductPage/ContactSellerButton';
-import { useUserData } from '@/api/User';
+import { useAuthenticatedUserData } from '@/api/User';
 import logo from '@/assets/MealMatesLogo.webp';
 import {
   ChevronLeft,
@@ -49,7 +49,7 @@ export default function ProductPage() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { data: product, isLoading, error } = useProduct(Number(id));
-  const { data: user } = useUserData();
+  const { data: user } = useAuthenticatedUserData();
   const deleteProduct = useDeleteProductMutation();
   const reportProductMutation = useReportProductMutation();
 

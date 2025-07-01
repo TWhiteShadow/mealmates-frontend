@@ -1,5 +1,5 @@
 import api from './Axios';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 export interface UserReview {
   id: number;
@@ -24,7 +24,9 @@ export interface ReportResponse {
   message: string;
 }
 
-export async function reportReview(reportData: ReportReviewRequest): Promise<ReportResponse> {
+export async function reportReview(
+  reportData: ReportReviewRequest
+): Promise<ReportResponse> {
   const response = await api.post('/review/report', reportData);
   return response.data;
 }

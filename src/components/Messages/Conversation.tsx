@@ -19,7 +19,7 @@ import MessageInput from './MessageInput';
 import { ArrowLeft, ChevronsDownIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
-import { useUserData } from '@/api/User';
+import { useAuthenticatedUserData } from '@/api/User';
 import OfferActions from './OfferActions';
 import UserCardLink from '../UserCardLink';
 
@@ -38,7 +38,7 @@ const Conversation: React.FC = () => {
   const previousScrollHeight = useRef<number>(0);
   const isFirstLoadRef = useRef<boolean>(true);
   const currentConversationIdRef = useRef<number | null>(null);
-  const { data: userData } = useUserData();
+  const { data: userData } = useAuthenticatedUserData();
 
   const { data: conversations = [] } = useConversations();
 

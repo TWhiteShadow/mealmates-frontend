@@ -2,12 +2,12 @@ import { useFormContext } from 'react-hook-form';
 import { useAtom } from 'jotai';
 import { sellFormDataAtom } from './atoms';
 import { ProductFormData } from '@/api/Product';
-import { useUserData } from '@/api/User';
+import { useAuthenticatedUserData } from '@/api/User';
 import { Info } from 'lucide-react';
 import { CustomTooltip } from '../ui/customTooltip';
 
 const ProductInfoStep = () => {
-    useUserData();
+    useAuthenticatedUserData();
     const { register, watch } = useFormContext<ProductFormData>();
     const [formData] = useAtom(sellFormDataAtom);
     const price = watch('price');
