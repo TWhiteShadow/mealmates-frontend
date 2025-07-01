@@ -53,6 +53,13 @@ const Discover = () => {
     { expirationDate: 'week', dietaryPreferences: ['Vegan'] }
   );
 
+  const {data: forMeProducts, error: forMeProductsError, isLoading: forMeProductsLoading} = useNearbyProducts(
+    location.latitude,
+    location.longitude,
+    5000,
+    { forMe: true }
+  )
+
   useEffect(() => {
     const oneHourAgo = Date.now() - (60 * 60 * 1000);
     if (location.lastUpdated < oneHourAgo) {
@@ -64,7 +71,7 @@ const Discover = () => {
     navigate(`/app/product/${productId}`);
   };
 
-  if (isLoadingLocation || todayLoading || weekLoading || weekVeganLoading) {
+  if (isLoadingLocation || todayLoading || weekLoading || weekVeganLoading || forMeProductsLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-dark"></div>
@@ -72,7 +79,7 @@ const Discover = () => {
     );
   }
 
-  if (todayError || weekError || weekVeganError) {
+  if (todayError || weekError || weekVeganError || forMeProductsError) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <p className="text-red-500">Unable to fetch products. Please try again later.</p>
@@ -120,6 +127,23 @@ const Discover = () => {
           </div>
         )}
 
+        {forMeProducts && forMeProducts.length > 0 && (
+          <div>
+            <h2 className="text-2xl font-semibold mb-4 px-5">Pour Vous !</h2>
+            <div className="relative">
+              <Swiper {...swiperOptions}>
+                {forMeProducts.map((product) => (
+                  <SwiperSlide key={product.id} style={{ width: 'auto', height: 'auto' }}>
+                    <DiscoverCard
+                      product={product}
+                      onClick={handleProductClick}
+                    />
+                  </SwiperSlide>
+                ))}
+              </Swiper>
+            </div>
+          </div>
+        )}
 
 
         {weekVeganProducts && weekVeganProducts.length > 0 && (
@@ -140,7 +164,7 @@ const Discover = () => {
           </div>
         )}
 
-        {(!todayProducts || todayProducts.length === 0) && (!weekProducts || weekProducts.length === 0) && (!weekVeganProducts || weekVeganProducts.length === 0) && (
+        {(!todayProducts || todayProducts.length === 0) && (!weekProducts || weekProducts.length === 0) && (!forMeProducts || forMeProducts.length === 0) && (!weekVeganProducts || weekVeganProducts.length === 0) && (
           <div className="flex items-center justify-center py-10 px-5">
             <div className="bg-white rounded-lg shadow-md p-6 max-w-md w-full text-center">
               <div className="mb-4">

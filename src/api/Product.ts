@@ -118,6 +118,7 @@ export async function getNearbyProducts(
     maxPrice?: number;
     // minSellerRating?: number;
     dietaryPreferences?: string[];
+    forMe?: boolean;
   }
 ): Promise<Product[]> {
   let url = `/products/nearby?lat=${lat}&lng=${lng}&radius=${radius}`;
@@ -142,10 +143,13 @@ export async function getNearbyProducts(
     if (filters.dietaryPreferences?.length) {
       url += `&dietaryPreferences=${filters.dietaryPreferences.join(',')}`;
     }
+    if(filters.forMe) {
+      url += `&forMe=true`;
+    }
   }
 
   const response = await api.get(url, {
-    withCredentials: false,
+    withCredentials: true,
   });
   return response.data;
 }
@@ -161,6 +165,7 @@ export function useNearbyProducts(
     maxPrice?: number;
     // minSellerRating?: number;
     dietaryPreferences?: string[];
+    forMe?: boolean;
   }
 ) {
   return useQuery({

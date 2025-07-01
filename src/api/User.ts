@@ -5,6 +5,7 @@ import {
   useQuery,
   useQueryClient,
 } from '@tanstack/react-query';
+import { FoodPreference } from './FoodPreference';
 
 export interface User {
   id: number;
@@ -61,6 +62,7 @@ export type UserData = {
   first_name: string;
   address: Address[];
   allergen: Allergen[];
+  foodPreference: FoodPreference[];
   isVerified: boolean;
   averageRating: number | null;
 };
@@ -187,7 +189,7 @@ export async function updateUserDataWithAxios(
   return response.data;
 }
 
-const queryKey: QueryKey = ['userData'];
+const queryKey: QueryKey = ['userData', 'nearbyProducts'];
 
 // Tanstack Query Wrapper
 export function useUpdateUserDataMutation() {
