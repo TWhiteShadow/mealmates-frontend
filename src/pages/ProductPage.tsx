@@ -9,7 +9,7 @@ import { cn } from "@/lib/utils";
 import ContactSellerButton from '@/components/ProductPage/ContactSellerButton';
 import { useUserData } from '@/api/User';
 import logo from '@/assets/MealMatesLogo.webp';
-import { ChevronLeft, Pencil, Trash2 } from 'lucide-react';
+import { ChevronLeft, Pencil, Star, Trash2 } from 'lucide-react';
 import {
     AlertDialog,
     AlertDialogAction,
@@ -21,6 +21,7 @@ import {
     AlertDialogTitle,
     AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import UserProfileLink from '@/components/UserProfileLink';
 
 dayjs.locale('fr');
 
@@ -118,9 +119,19 @@ export default function ProductPage() {
                         <div className="flex justify-between items-start">
                             <div>
                                 <h1 className="text-3xl font-bold tracking-tight text-gray-900">{product.name}</h1>
-                                <p className="mt-1 text-sm text-gray-500">
-                                    Par {product.seller?.first_name} {product.seller?.last_name?.[0]}.
-                                </p>
+                                <UserProfileLink
+                                    user={product.seller}
+                                >
+                                    <div className='flex items-center flex-nowrap'>
+                                        <span className='text-gray-600'>{product.seller.first_name || ''} {product.seller.last_name || ''}</span>
+                                        {product.seller.averageRating && (
+                                            <span className="ml-2 text-gray-500 text-sm flex items-center flex-nowrap">
+                                                {product.seller.averageRating.toFixed(2)}
+                                                <Star className='fill-purple-semi-dark stroke-purple-dark w-3 ml-0.5' />
+                                            </span>
+                                        )}
+                                    </div>
+                                </UserProfileLink>
                             </div>
                             <p className="text-3xl font-bold text-purple-semi-dark">{formattedPrice == "0,00 €" ? "Don" : formattedPrice}</p>
                         </div>

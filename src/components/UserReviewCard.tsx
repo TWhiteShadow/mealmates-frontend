@@ -14,7 +14,7 @@ import { formatDistanceToNow } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { toast } from 'sonner';
 import { Review, useReportReviewMutation } from '@/api/Review';
-import UserAvatar from './UserAvatar';
+import UserProfileLink from './UserProfileLink';
 
 interface UserReviewCardProps {
   review: Review;
@@ -39,7 +39,7 @@ const UserReviewCard = ({ review }: UserReviewCardProps) => {
         reportData: {
           reason: reportReason,
           description: reportDescription,
-        }
+        },
       },
       {
         onSuccess: () => {
@@ -48,7 +48,7 @@ const UserReviewCard = ({ review }: UserReviewCardProps) => {
           setReportDescription('');
         },
         onError: () => {
-          toast.error('Erreur lors de l\'envoi du signalement');
+          toast.error("Erreur lors de l'envoi du signalement");
         },
       }
     );
@@ -66,32 +66,24 @@ const UserReviewCard = ({ review }: UserReviewCardProps) => {
     for (let i = 0; i < 5; i++) {
       if (rating >= i + 1) {
         stars.push(
-          <Star
-            key={i}
-            className="w-4 h-4 fill-yellow-400 text-yellow-400"
-          />
+          <Star key={i} className='w-4 h-4 fill-yellow-400 text-yellow-400' />
         );
       } else if (rating > i && rating < i + 1) {
         stars.push(
           <StarHalf
             key={i}
-            className="w-4 h-4 fill-yellow-400 text-yellow-400"
+            className='w-4 h-4 fill-yellow-400 text-yellow-400'
           />
         );
         stars.push(
           <Star
             key={i + 100}
-            className="w-4 h-4 text-yellow-400"
+            className='w-4 h-4 text-yellow-400'
             style={{ marginLeft: '-20px' }}
           />
         );
       } else {
-        stars.push(
-          <Star
-            key={i}
-            className="w-4 h-4 text-gray-300"
-          />
-        );
+        stars.push(<Star key={i} className='w-4 h-4 text-gray-300' />);
       }
     }
     return stars;
@@ -99,75 +91,86 @@ const UserReviewCard = ({ review }: UserReviewCardProps) => {
 
   return (
     <>
-      <div className="bg-white p-4 rounded-lg shadow-sm border">
-        <div className="flex items-start justify-between mb-3">
-          <div className="flex items-center gap-3">
-            <UserAvatar
-              user={review.reviewer}
-              size="md"
-              className="w-10 h-10 rounded-full"
-              alt={`${review.reviewer.first_name} ${review.reviewer.last_name}`}
-            />
-              
-            <div>
-              <p className="font-medium text-sm">
-                {review.reviewer.first_name} {review.reviewer.last_name}
-              </p>
-              <div className="flex items-center gap-1">
-                {renderStars(review.averageRating)}
+      <div className='bg-white p-4 rounded-lg shadow-sm border'>
+        <div className='flex items-start justify-between mb-1.5'>
+          <div className='flex items-center gap-3'>
+            <UserProfileLink user={review.reviewer}>
+              <div className='flex items-center flex-nowrap'>
+                <span className='text-gray-600'>
+                  {review.reviewer.first_name || ''}{' '}
+                  {review.reviewer.last_name || ''}
+                </span>
+                {review.reviewer.averageRating && (
+                  <span className='ml-2 text-gray-500 text-sm flex items-center flex-nowrap'>
+                    {review.reviewer.averageRating.toFixed(2)}
+                    <Star className='fill-purple-semi-dark stroke-purple-dark w-3 ml-0.5' />
+                  </span>
+                )}
               </div>
-            </div>
+            </UserProfileLink>
           </div>
-          <div className="flex items-center gap-2">
-            <span className="text-xs text-gray-500">
-              {formatDate(review.createdAt)}
-            </span>
+          <div className='flex items-center gap-2'>
             <Button
-              variant="ghost"
-              size="sm"
+              variant='ghost'
+              size='sm'
               onClick={() => setShowReportDialog(true)}
-              className="p-1 h-auto text-gray-400 hover:text-red-500"
+              className='p-1 h-auto text-gray-400 hover:text-red-500'
             >
-              <Flag className="w-4 h-4" />
+              <Flag className='w-4 h-4' />
             </Button>
           </div>
         </div>
-        
+
+        <div className='flex items-center gap-1 mb-2'>
+          {renderStars(review.averageRating)}
+          <span className='ml-2 text-xs text-gray-500'>
+            {formatDate(review.createdAt)}
+          </span>
+        </div>
         {review.offer?.name && (
-          <p className="text-gray-700 text-sm leading-relaxed font-bold">
+          <p className='text-gray-700 text-sm leading-relaxed font-bold'>
             Offre : <span className='font-normal'>{review.offer?.name}</span>
           </p>
         )}
-        <div className='flex items-center gap-2 mt-2 leading-relaxed'>
+        <div className='flex items-center gap-2 mt-2 leading-relaxed flex-wrap'>
           {review.productQualityRating && (
             <>
-              <p className="text-sm text-gray-600 font-bold">Qualité du produit : <span className='font-normal'>{review.productQualityRating}</span></p>
+              <p className='text-sm text-gray-600 font-bold'>
+                Qualité du produit :{' '}
+                <span className='font-normal'>
+                  {review.productQualityRating}
+                </span>
+              </p>
               <span className='text-sm text-gray-600 font-bold'>|</span>
             </>
           )}
-          <p className="text-sm text-gray-600 font-bold">
-            Rendez-vous : <span className='font-normal'>{review.appointmentRespectRating}</span>
+          <p className='text-sm text-gray-600 font-bold'>
+            Rendez-vous :{' '}
+            <span className='font-normal'>
+              {review.appointmentRespectRating}
+            </span>
           </p>
           <span className='text-sm text-gray-600 font-bold'>|</span>
-          <p className="text-sm text-gray-600 font-bold">
-            Amabilité : <span className='font-normal'>{review.friendlinessRating}</span>
+          <p className='text-sm text-gray-600 font-bold'>
+            Amabilité :{' '}
+            <span className='font-normal'>{review.friendlinessRating}</span>
           </p>
         </div>
       </div>
 
       <Dialog open={showReportDialog} onOpenChange={setShowReportDialog}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className='sm:max-w-md'>
           <DialogHeader>
             <DialogTitle>Signaler ce commentaire</DialogTitle>
             <DialogDescription>
               Pourquoi souhaitez-vous signaler ce commentaire ?
             </DialogDescription>
           </DialogHeader>
-          
-          <div className="space-y-4">
-            <div className="space-y-2">
+
+          <div className='space-y-4'>
+            <div className='space-y-2'>
               <Label>Raison du signalement :</Label>
-              <div className="space-y-2">
+              <div className='space-y-2'>
                 {[
                   { value: 'spam', label: 'Spam ou contenu indésirable' },
                   { value: 'harassment', label: 'Harcèlement ou intimidation' },
@@ -175,16 +178,19 @@ const UserReviewCard = ({ review }: UserReviewCardProps) => {
                   { value: 'fake', label: 'Faux commentaire' },
                   { value: 'other', label: 'Autre' },
                 ].map((option) => (
-                  <label key={option.value} className="flex items-center space-x-2 cursor-pointer">
+                  <label
+                    key={option.value}
+                    className='flex items-center space-x-2 cursor-pointer'
+                  >
                     <input
-                      type="radio"
-                      name="reportReason"
+                      type='radio'
+                      name='reportReason'
                       value={option.value}
                       checked={reportReason === option.value}
                       onChange={(e) => setReportReason(e.target.value)}
-                      className="w-4 h-4 text-purple-600"
+                      className='w-4 h-4 text-purple-600'
                     />
-                    <span className="text-sm">{option.label}</span>
+                    <span className='text-sm'>{option.label}</span>
                   </label>
                 ))}
               </div>
@@ -193,15 +199,12 @@ const UserReviewCard = ({ review }: UserReviewCardProps) => {
 
           <DialogFooter>
             <Button
-              variant="outline"
+              variant='outline'
               onClick={() => setShowReportDialog(false)}
             >
               Annuler
             </Button>
-            <Button
-              onClick={handleReport}
-              disabled={reportMutation.isPending}
-            >
+            <Button onClick={handleReport} disabled={reportMutation.isPending}>
               {reportMutation.isPending ? 'Envoi...' : 'Signaler'}
             </Button>
           </DialogFooter>

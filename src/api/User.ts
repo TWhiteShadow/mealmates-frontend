@@ -12,6 +12,7 @@ export interface User {
   first_name: string;
   last_name: string;
   fullname?: string;
+  averageRating: number | null;
 }
 
 export interface AuthResponse {
@@ -224,10 +225,11 @@ export const getUserStats = async (id: number): Promise<UserStatsResponse> => {
   return response.data;
 };
 
-export const useUserStats = (id: number) => {
+export const useUserStats = (id: number, isLoadingUserData: boolean) => {
   return useQuery({
     queryKey: ['userStats', id],
     queryFn: () => getUserStats(id),
+    enabled: !isLoadingUserData && id > 0,
   });
 };
 

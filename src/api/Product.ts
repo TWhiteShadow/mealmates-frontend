@@ -24,11 +24,13 @@ export interface Product {
     id: number;
     first_name: string | null;
     last_name: string | null;
+    averageRating?: number | null;
   };
   buyer: {
     id: number;
     first_name: string | null;
     last_name: string | null;
+    averageRating?: number | null;
   } | null;
   images?: Array<{
     id: number;
@@ -212,7 +214,9 @@ export async function getByUserId(
   limit: number = 3,
   offset: number = 0
 ): Promise<Product[]> {
-  const response = await api.get(`/user/${id}/offers?limit=${limit}&offset=${offset}`);
+  const response = await api.get(
+    `/user/${id}/offers?limit=${limit}&offset=${offset}`
+  );
   return response.data;
 }
 
@@ -226,7 +230,6 @@ export function useUserOffers(
     queryFn: () => getByUserId(id, limit, offset),
   });
 }
-
 
 export async function editProduct(
   id: number,
